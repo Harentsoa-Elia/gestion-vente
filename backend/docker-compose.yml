@@ -1,0 +1,69 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       billet_mahaleo
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: itdcmada
+    ports:
+      - "5433:5432"          # seulement si vous voulez aussi l’exposer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DB_USER:     postgres
+        DB_PASSWORD: itdcmada
+        DB_HOST:     db
+        DB_NAME:     billet_mahaleo
+        DB_PORT:     5432
+        PORT:        3136
+    container_name: billet-mahaleo-backend-container
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_USER:     postgres
+      DB_PASSWORD: itdcmada
+      DB_HOST:     db
+      DB_NAME:     billet_mahaleo
+      DB_PORT:     5432
+      PORT:        3136
+    ports:
+      - "3136:3136"
+    networks:
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_mahaleo
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL:    admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: itdcmada
+      PGADMIN_LISTEN_PORT:      5052
+    ports:
+      - "5052:5052"
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+
+networks:
+  backend:

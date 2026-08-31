@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+    environment { COMPOSE_PROJECT_NAME = 'billet-mahaleo' }
+
+    stages {
+
+        stage('Build & Deploy') {
+            steps {
+                script {
+                    sh '''
+                        docker compose down || true
+                        docker compose up -d --build
+                    '''
+                }
+            }
+        }
+    }
+
+    post { always { cleanWs() } }
+}
