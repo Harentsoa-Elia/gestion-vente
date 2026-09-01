@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { fetchConcerts, generateTickets } from "@/lib/api"
-import type { Concert, Ticket } from "@/lib/types"
+import { fetchConcerts, generateTickets } from "@/services"
+import type { Concert, Ticket } from "@/types"
 import { toast } from "sonner"
 import { Download, Info } from "lucide-react" // Importation des icônes
 import html2canvas from "html2canvas" // Importation de html2canvas

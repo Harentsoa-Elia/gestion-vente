@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { fetchConcerts, generateTickets, regenerateTickets } from "@/lib/api"
-import type { Concert, Ticket } from "@/lib/types"
+import { fetchConcerts, generateTickets, regenerateTickets } from "@/services"
+import type { Concert, Ticket } from "@/types"
 import { toast } from "sonner"
 import {
   Download,

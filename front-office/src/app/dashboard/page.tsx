@@ -51,8 +51,8 @@ import {
   fetchTicketCategoryStats,
   fetchTicketStats,
   fetchTicketLists,
-} from "@/lib/api";
-import type { Concert, TicketStats, DynamicCategoryStats } from "@/lib/types";
+} from "@/services";
+import type { Concert, TicketStats, DynamicCategoryStats } from "@/types";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 

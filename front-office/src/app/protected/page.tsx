@@ -26,8 +26,8 @@ import {
   Legend,
 } from "recharts"
 import AuthWrapper from "@/components/auth-wrapper"
-import { fetchConcertAmount, fetchConcerts, fetchTicketCategoryStats, fetchTicketStats } from "@/lib/api"
-import type { Concert } from "@/lib/types"
+import { fetchConcertAmount, fetchConcerts, fetchTicketCategoryStats, fetchTicketStats } from "@/services"
+import type { Concert } from "@/types"
 
 // ----------------- Types dynamiques -----------------
 type TicketStats = { total: number; used: number; unused: number }

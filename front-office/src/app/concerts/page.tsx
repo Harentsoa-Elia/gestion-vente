@@ -1,5 +1,5 @@
-import { fetchConcerts } from "@/lib/api"
-import type { Concert } from "@/lib/types"
+import { fetchConcerts } from "@/services"
+import type { Concert } from "@/types"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 

@@ -19,8 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { fetchConcerts, generateTickets, regenerateTickets } from "@/lib/api";
-import type { Concert, Ticket } from "@/lib/types";
+import { fetchConcerts, generateTickets, regenerateTickets } from "@/services";
+import type { Concert, Ticket } from "@/types";
 import { toast } from "sonner";
 import {
   Download,

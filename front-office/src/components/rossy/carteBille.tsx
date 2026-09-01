@@ -1,6 +1,6 @@
 "use client";
 
-import { Concert, Ticket } from "@/lib/types";
+import { Concert, Ticket } from "@/types";
 import TicketCard from "./fond/billet";
 
 type VIPProps = {

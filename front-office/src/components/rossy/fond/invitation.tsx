@@ -1,7 +1,7 @@
 "use client"
 
 import QRCode from "react-qr-code"
-import type { Concert, Ticket } from "@/lib/types"
+import type { Concert, Ticket } from "@/types"
 
 interface TicketCardProps {
   ticket: Ticket

@@ -6,8 +6,8 @@ import { useSearchParams } from "next/navigation"
 import { CheckCircle, XCircle, Loader2 } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { scanTicket } from "@/lib/api"
-import type { TicketScanResponse } from "@/lib/types"
+import { scanTicket } from "@/services"
+import type { TicketScanResponse } from "@/types"
 
 // Composant qui contient la logique de validation
 function ValidateTicketContent() {
