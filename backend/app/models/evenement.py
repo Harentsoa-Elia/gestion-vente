@@ -8,8 +8,8 @@ class Evenement(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     titre = Column(String, index=True, nullable=False)
-    description = Column(String, nullable=False)
-    date_debut = Column(DateTime(timezone=True), nullable=False)
+    description = Column(String, nullable=True)
+    date_debut = Column(DateTime(timezone=True), nullable=True, default=None)
     date_fin = Column(DateTime(timezone=True), nullable=True)
     capacite = Column(Integer, nullable=True)
     prix_billet = Column(Float, nullable=True)
@@ -18,7 +18,7 @@ class Evenement(Base):
 
     lieu_id = Column(Integer, ForeignKey("lieux.id"), nullable=True)
     categorie_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
-    organisateur_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    organisateur_id = Column(Integer, ForeignKey("users.id"), nullable=True, default=1)
 
     lieu = relationship("Lieu", back_populates="evenements")
     categorie = relationship("Categorie", back_populates="evenements")

@@ -13,7 +13,6 @@ class EvenementBase(BaseModel):
     statut_validation: str = Field("brouillon", description="Statut de l'evenement")
     lieu_id: Optional[int] = Field(None, description="ID du lieu associe")
     categorie_id: Optional[int] = Field(None, description="ID de la categorie associee")
-    organisateur_id: int = Field(..., description="ID de l'organisateur")
 
 
 class EvenementCreate(EvenementBase):
@@ -22,6 +21,7 @@ class EvenementCreate(EvenementBase):
 
 class EvenementResponse(EvenementBase):
     id: int = Field(..., description="Unique ID de l'evenement")
+    organisateur_id: int
     date_creation: datetime
 
     class Config:

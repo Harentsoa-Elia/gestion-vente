@@ -1,11 +1,16 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.controllers import (
-    concert_controller, 
+    concert_controller,
     ticket_controller,
-    user_controller, # Add new controller
-    backup_controller
+    user_controller,
+    backup_controller,
+    artiste_controller,
+    lieu_controller,
+    categorie_controller,
+    evenement_controller,
 )
+
 from app.database import engine, Base
 from app.auth.auth_bearer import JWTBearer  # Import JWTBearer
 
@@ -22,10 +27,14 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(user_controller.router, prefix="/api/v1")  # Add user routes
+app.include_router(user_controller.router, prefix="/api/v1")
 app.include_router(concert_controller.router, prefix="/api/v1")
 app.include_router(ticket_controller.router, prefix="/api/v1")
 app.include_router(backup_controller.router, prefix="/api/v1")
+app.include_router(artiste_controller.router, prefix="/api/v1")
+app.include_router(lieu_controller.router, prefix="/api/v1")
+app.include_router(categorie_controller.router, prefix="/api/v1")
+app.include_router(evenement_controller.router, prefix="/api/v1")
 
 
 @app.get("/")
