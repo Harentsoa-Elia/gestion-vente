@@ -3,3 +3,5 @@ export * from "./ticket";
 export * from "./categoryStats";
 export * from "./amount";
 export * from "./auth";
+export * from "./proposition";
+export * from "./interaction";
