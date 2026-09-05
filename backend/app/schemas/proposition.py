@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from typing import Optional
 from datetime import datetime
 from enum import Enum
@@ -17,6 +17,16 @@ class PropositionBase(BaseModel):
     artiste_id: Optional[int] = Field(None, description="ID de l'artiste propose")
     lieu_id: Optional[int] = Field(None, description="ID du lieu propose")
     categorie_id: Optional[int] = Field(None, description="ID de la categorie proposee")
+
+    @model_validator(mode="after")
+    def verifier_coherence_type(self):
+        if self.type == PropositionType.ARTISTE and self.artiste_id is None:
+            raise ValueError("artiste_id requis quand type est ARTISTE")
+        if self.type == PropositionType.LIEU and self.lieu_id is None:
+            raise ValueError("lieu_id requis quand type est LIEU")
+        if self.type == PropositionType.CATEGORIE and self.categorie_id is None:
+            raise ValueError("categorie_id requis quand type est CATEGORIE")
+        return self
 
 
 class PropositionCreate(PropositionBase):

@@ -9,6 +9,8 @@ from app.controllers import (
     lieu_controller,
     categorie_controller,
     evenement_controller,
+    proposition_controller,
+    interaction_publique_controller,
 )
 
 from app.database import engine, Base
@@ -35,6 +37,8 @@ app.include_router(artiste_controller.router, prefix="/api/v1")
 app.include_router(lieu_controller.router, prefix="/api/v1")
 app.include_router(categorie_controller.router, prefix="/api/v1")
 app.include_router(evenement_controller.router, prefix="/api/v1")
+app.include_router(proposition_controller.router, prefix="/api/v1")
+app.include_router(interaction_publique_controller.router, prefix="/api/v1")
 
 
 @app.get("/")
