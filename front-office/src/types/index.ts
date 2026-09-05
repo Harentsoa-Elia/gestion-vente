@@ -5,3 +5,4 @@ export * from "./amount";
 export * from "./auth";
 export * from "./proposition";
 export * from "./interaction";
+export * from "./dashboard";
