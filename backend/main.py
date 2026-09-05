@@ -12,6 +12,7 @@ from app.controllers import (
     proposition_controller,
     interaction_publique_controller,
     recommandation_controller,
+    dashboard_controller,
 )
 
 from app.database import engine, Base
@@ -41,6 +42,7 @@ app.include_router(evenement_controller.router, prefix="/api/v1")
 app.include_router(proposition_controller.router, prefix="/api/v1")
 app.include_router(interaction_publique_controller.router, prefix="/api/v1")
 app.include_router(recommandation_controller.router, prefix="/api/v1")
+app.include_router(dashboard_controller.router, prefix="/api/v1")
 
 
 @app.get("/")
