@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from app.schemas.proposition import PropositionCreate, PropositionResponse
+from app.schemas.proposition import PropositionCreate, PropositionResponse, PropositionAvecScoreResponse
 from app.services.proposition_service import PropositionService
 from app.auth.auth_bearer import JWTBearer
 from app.database import get_db
@@ -50,6 +50,20 @@ async def get_propositions_by_evenement(
 ):
     service = PropositionService(db)
     return await service.get_propositions_by_evenement(evenement_id)
+
+
+@router.get(
+    "/evenements/{evenement_id}/propositions/scores",
+    response_model=List[PropositionAvecScoreResponse],
+    summary="Get all propositions for an evenement with their current score",
+)
+async def get_propositions_avec_scores(
+    evenement_id: int,
+    auth_data: dict = Depends(JWTBearer()),
+    db: AsyncSession = Depends(get_db),
+):
+    service = PropositionService(db)
+    return await service.get_propositions_avec_scores(evenement_id)
 
 
 @router.get("/propositions/{proposition_id}", response_model=PropositionResponse, summary="Get a specific proposition")

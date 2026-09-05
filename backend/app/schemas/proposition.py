@@ -39,3 +39,7 @@ class PropositionResponse(PropositionBase):
 
     class Config:
         from_attributes = True
+
+
+class PropositionAvecScoreResponse(PropositionResponse):
+    score: int = Field(..., description="Score actuel calcule a partir des interactions")    
