@@ -10,6 +10,9 @@ from .categorie import Categorie
 from .proposition import Proposition
 from .recommandation import Recommandation
 from .interaction_publique import InteractionPublique
+from .reservation import Reservation
+from .paiement import Paiement
+from .billet import Billet
 
 __all__ = [
     'Concert',
@@ -23,4 +26,7 @@ __all__ = [
     'Proposition',
     'Recommandation',
     'InteractionPublique',
+    'Reservation',
+    'Paiement',
+    'Billet',
 ]
