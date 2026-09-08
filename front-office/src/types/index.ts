@@ -6,3 +6,4 @@ export * from "./auth";
 export * from "./proposition";
 export * from "./interaction";
 export * from "./dashboard";
+export * from "./reservation";
