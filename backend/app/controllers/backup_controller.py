@@ -3,23 +3,24 @@ import uuid
 import subprocess
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import FileResponse
-from app.auth.auth_bearer import JWTBearer  # si tu veux protéger l’endpoint
+from app.auth.auth_bearer import JWTBearer
 
 router = APIRouter()
 
-# Récupération des variables d’environnement injectées par Dockerfile
 PG_USER = os.getenv("DB_USER", "postgres")
 PG_PASSWORD = os.getenv("DB_PASSWORD", "")
 PG_HOST = os.getenv("DB_HOST", "db")
 PG_PORT = os.getenv("DB_PORT", "5432")
 PG_DATABASE = os.getenv("DB_NAME", "")
 
-# Important : pg_dump lit le mot de passe via PGPASSWORD
 os.environ["PGPASSWORD"] = PG_PASSWORD
 
 
-@router.get("/backup-db", summary="Télécharger un backup SQL de la base")
-async def backup_database():
+@router.get("/backup-db", summary="Telecharger un backup SQL de la base (admin uniquement)")
+async def backup_database(auth_data: dict = Depends(JWTBearer())):
+    if auth_data.get("concert_id") != 0:
+        raise HTTPException(status_code=403, detail="Only admin can access database backups.")
+
     try:
         file_name = f"backup_{uuid.uuid4().hex}.sql"
         file_path = f"/tmp/{file_name}"
