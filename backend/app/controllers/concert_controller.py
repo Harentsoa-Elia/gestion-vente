@@ -7,7 +7,6 @@ from app.services.concert_service import ConcertService
 from app.auth.auth_bearer import JWTBearer
 from app.database import get_db
 
-from sqlalchemy import text
 
 router = APIRouter(tags=["concerts"])
 
