@@ -43,31 +43,31 @@ def check_access(user_concert_id: int, target_concert_id: int):
         raise HTTPException(status_code=403, detail="Access denied for this concert.")
     return True
 
+
 # -----------------------
 # 🔹 Génération de tickets
 # -----------------------
 @router.post(
-    "/tickets/generate",
+    "/tickets/regenerate",
     response_model=List[TicketResponse],
-    status_code=status.HTTP_201_CREATED,
-    summary="Generate new tickets (admin or your concert)",
 )
-async def generate_tickets(
-    request: TicketGenerateRequest,
+async def regenerate_tickets(
+    request: TicketRegenerateRequest,
     auth_data: dict = Depends(JWTBearer()),
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(get_db)
 ):
     user_concert_id = auth_data.get("concert_id")
     check_access(user_concert_id, request.concert_id)
 
     service = TicketService(db)
-    try:
-        tickets = await service.generate_tickets(request)
-        return tickets
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate tickets: {e}")
+
+    return await service.regenerate_tickets(
+        concert_id=request.concert_id,
+        start_code=request.ticket_id_start,
+        end_code=request.ticket_id_end,
+        category=request.category
+    )
+
 
 # -----------------------
 # 🔹 Scan d’un ticket
@@ -96,6 +96,7 @@ async def scan_ticket(
     except Exception:
         raise HTTPException(status_code=500, detail="Erreur interne lors du scan.")
 
+
 # -----------------------
 # 🔹 Statistiques globales
 # -----------------------
@@ -111,6 +112,7 @@ async def get_ticket_counts(auth_data: dict = Depends(JWTBearer()), db: AsyncSes
     if user_concert_id == 0:
         return await service.get_ticket_counts()
     return await service.get_ticket_counts(user_concert_id)
+
 
 # -----------------------
 # 🔹 Stats par concert
@@ -144,6 +146,7 @@ async def get_concert_ticket_counts_by_category(
     data = await service.get_ticket_counts_by_category(concert_id)
     return {"categories": data}
 
+
 # -----------------------
 # 🔹 Liste des concerts visibles
 # -----------------------
@@ -171,6 +174,7 @@ async def list_concerts(
         raise HTTPException(status_code=404, detail="Concert not found.")
     return [{"id": int(concert[0]), "title": concert[1]}]
 
+
 # -----------------------
 # 🔹 Montant total
 # -----------------------
@@ -187,6 +191,7 @@ async def get_amount_money(
     check_access(auth_data.get("concert_id"), concert_id)
     service = TicketService(db)
     return await service.get_amount(concert_id)
+
 
 # -----------------------
 # 🔹 Derniers tickets
@@ -249,18 +254,6 @@ async def get_tickets_used_unused_by_category(
 
     return result
 
-# --- creation table scan_history --
-#@router.post("/admin/create-scan-history-table")
-#async def create_scan_history_table(auth_data: dict = Depends(JWTBearer())):
-#    if auth_data.get("concert_id") != 0:
-#        raise HTTPException(status_code=403, detail="Admin only")
-#
-#    try:
-#        service = ScanHistoryService(None)
-#        await service.create_table(engine, Base)
-#        return {"ok": True, "message": "Table 'scan_history' créée avec succès"}
-#    except Exception as e:
-#        raise HTTPException(status_code=500, detail=f"Erreur lors de la création : {e}")
 
 # --- Enregistrement d'un scan --
 @router.post(
@@ -354,24 +347,6 @@ async def delete_tickets(
     return {"deleted": deleted_count, "range": f"{from_id} → {to_id}"}
 
 
-@router.post(
-    "/tickets/regenerate",
-    response_model=List[TicketResponse],
-)
-async def regenerate_tickets(
-    request: TicketRegenerateRequest,
-    db: AsyncSession = Depends(get_db)
-):
-    service = TicketService(db)
-
-    return await service.regenerate_tickets(
-        concert_id=request.concert_id,
-        start_code=request.ticket_id_start,
-        end_code=request.ticket_id_end,
-        category=request.category
-    )
-
-
 @router.get(
     "/concerts/{concert_id}/tickets/last-by-category/{category}",
     summary="Get last ticket ID for a concert and category",
@@ -414,7 +389,9 @@ async def list_ticket_categories(db: AsyncSession = Depends(get_db)):
 
 
 #add categorie
-@router.post("/tickets/categories", summary="Ajouter une nouvelle catégorie de ticket")
+import re
+
+@router.post("/tickets/categories", summary="Ajouter une nouvelle categorie de ticket")
 async def add_ticket_category(
     payload: TicketCategoryCreate,
     auth_data: dict = Depends(JWTBearer()),
@@ -423,10 +400,15 @@ async def add_ticket_category(
     if auth_data.get("concert_id") != 0:
         raise HTTPException(status_code=403, detail="Only admin can add categories")
 
-    category_name = payload.category.replace('"', '""')  # Échapper les guillemets
+    category_name = payload.category.strip().upper()
+
+    if not re.fullmatch(r"[A-Z0-9_]{1,50}", category_name):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid category name. Only uppercase letters, digits and underscores are allowed."
+        )
 
     try:
-        # Vérifier si la catégorie existe déjà
         check_sql = text("""
             SELECT 1 FROM pg_enum e
             JOIN pg_type t ON t.oid = e.enumtypid
@@ -438,7 +420,6 @@ async def add_ticket_category(
         if exists:
             return {"ok": True, "category": category_name, "message": "Category already exists"}
 
-        # Ajouter la valeur
         add_sql = text(f"ALTER TYPE ticketcategory ADD VALUE '{category_name}'")
         await db.execute(add_sql)
         await db.commit()
@@ -447,4 +428,4 @@ async def add_ticket_category(
 
     except Exception as e:
         await db.rollback()
-        raise HTTPException(status_code=500, detail=f"Erreur ajout catégorie: {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur ajout categorie: {e}")
