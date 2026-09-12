@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { fetchUserData, logout } from "@/services/auth.service";
 import type { AuthUser } from "@/types/auth";
+import { API_BASE_URL } from "@/services/apiConfig";
 
 export function AppHeader() {
 const pathname = usePathname();
@@ -33,10 +34,6 @@ const [isMounted, setIsMounted] = useState(false);
 
 // ---- NEW : Etat du menu Admin ----
 const [showAdminMenu, setShowAdminMenu] = useState(false);
-
-const API_BASE_URL =
-process.env.NEXT_PUBLIC_API_URL ||
-"http://localhost:8000/api/v1";
 
 // ---------------- BASE LINKS ----------------
 const baseLinks = [

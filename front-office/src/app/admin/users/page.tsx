@@ -30,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/services/apiConfig";
 
 /* ---------- Types ---------- */
 interface User {
@@ -182,10 +183,7 @@ function useConcert(concertId: number | null | undefined) {
       try {
         setLoading(true);
         const token = localStorage.getItem("access_token");
-        const API_BASE_URL =
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://backend-test.itdcmada.mg/api/v1";
-
+      
         const res = await fetch(`${API_BASE_URL}/concerts/${concertId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -232,10 +230,6 @@ export default function UsersPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL ||
-    "https://backend-test.itdcmada.mg/api/v1";
 
   const fetchUsers = async () => {
     try {
@@ -524,10 +518,6 @@ function CreateUserForm({ onSuccess }: { onSuccess: () => void }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL ||
-    "https://backend-test.itdcmada.mg/api/v1";
-
   useEffect(() => {
     const fetchConcerts = async () => {
       try {
@@ -708,10 +698,6 @@ function EditUserForm({
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL ||
-    "https://backend-test.itdcmada.mg/api/v1";
-
   useEffect(() => {
     const fetchConcerts = async () => {
       try {
@@ -745,7 +731,7 @@ function EditUserForm({
         body.password = password;
       }
 
-      const res = await fetch(`${API_BASE_URL}/users/${user.id}`, {
+     const res = await fetch(`${API_BASE_URL}/admin/users`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

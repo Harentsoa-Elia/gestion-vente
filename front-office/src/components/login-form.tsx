@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, LogIn, UserPlus, ShieldCheck, Sparkles } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { API_BASE_URL } from "@/services/apiConfig";
 
 interface LoginFormProps {
   onLoginSuccess: (token: string) => void
@@ -23,8 +24,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
