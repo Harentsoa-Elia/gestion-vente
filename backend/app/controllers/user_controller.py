@@ -41,13 +41,11 @@ async def create_user(user: UserSchema = Body(...), db: AsyncSession = Depends(g
         fullname=user.fullname,
         email=user.email,
         password=hashed_password,
-        concert_id=user.concert_id,
+        concert_id=None,
     )
     db.add(db_user)
     await db.commit()
     return {"message": "User created successfully"}
-
-    return sign_jwt(db_user.email, db_user.id, db_user.concert_id)
 
 @router.post("/login", tags=["user"])
 async def user_login(user: UserLoginSchema = Body(...), db: AsyncSession = Depends(get_db)):
@@ -85,8 +83,8 @@ async def update_user(
     if not auth_user:
         raise HTTPException(status_code=401, detail="Utilisateur non trouvé (auth)")
 
-    # 🔐 Vérification permissions
-    # Si l'utilisateur connecté n'est PAS superadmin ET n'est PAS l'utilisateur qu'il modifie → FORBIDDEN
+    # Verification permissions
+    # Si l'utilisateur connecté n'est PAS superadmin ET n'est PAS l'utilisateur qu'il modifie : FORBIDDEN
     if auth_user.concert_id != 0 and auth_user_id != user_id:
         raise HTTPException(status_code=403, detail="Accès interdit")
 
@@ -102,6 +100,8 @@ async def update_user(
     user.email = user_data.email or user.email
 
     if user_data.concert_id is not None:
+        if auth_user.concert_id != 0:
+            raise HTTPException(status_code=403, detail="Only admin can change concert_id")
         user.concert_id = user_data.concert_id
 
     if user_data.password:
@@ -195,9 +195,34 @@ async def delete_user(
     await db.delete(user_to_delete)
     await db.commit()
 
-    # Si l'utilisateur supprime son propre compte → blacklist du token
+    # Si l'utilisateur supprime son propre compte : blacklist du token
     if auth_user_id == user_id:
         token = auth_data["token"]
         BLACKLISTED_TOKENS.add(token)
 
     return {"message": "Utilisateur supprimé avec succès"}
+
+@router.post("/admin/users", tags=["user"])
+async def admin_create_user(
+    user: UserSchema = Body(...),
+    auth_data: dict = Depends(JWTBearer()),
+    db: AsyncSession = Depends(get_db),
+):
+    if auth_data.get("concert_id") != 0:
+        raise HTTPException(status_code=403, detail="Only admin can assign concert_id.")
+
+    result = await db.execute(select(User).where(User.email == user.email))
+    existing_user = result.scalar_one_or_none()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists")
+
+    hashed_password = hash_password(user.password)
+    db_user = User(
+        fullname=user.fullname,
+        email=user.email,
+        password=hashed_password,
+        concert_id=user.concert_id,
+    )
+    db.add(db_user)
+    await db.commit()
+    return {"message": "User created successfully"}
