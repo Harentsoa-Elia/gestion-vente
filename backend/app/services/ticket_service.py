@@ -11,7 +11,7 @@ from sqlalchemy import insert
 from app.models.ticket import Ticket,TicketCategory as SA_TicketCategory
 from app.models.concert import Concert
 from app.schemas.ticket import TicketGenerateRequest, TicketScanRequest, TicketScanResponse
-from app.utils.crypto import encrypt_data, decrypt_data  # 🔐 encryption helpers
+from app.utils.crypto import encrypt_data, decrypt_data
 from urllib.parse import urlparse, parse_qs, unquote
 from app.models.ticket import TicketCategory
 
@@ -41,7 +41,7 @@ class TicketService:
             → créer un préfixe unique automatiquement si collision
         """
 
-        # 1️⃣ Récupérer concert
+        # 1) Récupérer concert
         concert_res = await self.db.execute(
             select(Concert).where(Concert.id == request.concert_id)
         )
@@ -51,7 +51,7 @@ class TicketService:
 
         concert_code = (concert.code or "").strip().upper()[:2]
 
-        # 2️⃣ Catégorie
+        # 2) Catégorie
         category_name = (
             request.category.value if hasattr(request.category, "value") else str(request.category)
         ).strip().upper()
@@ -62,14 +62,14 @@ class TicketService:
 
         base_prefix = f"{concert_code}{cat_prefix}"
 
-        # 3️⃣ Charger tous les tickets du même concert
+        # 3) Charger tous les tickets du même concert
         existing_res = await self.db.execute(
             select(Ticket.id, Ticket.category)
             .where(Ticket.concert_id == request.concert_id)
         )
         existing = existing_res.all()
 
-        # 4️⃣ Vérifier si cette catégorie a DEJA des tickets
+        # 4) Vérifier si cette catégorie a DEJA des tickets
         existing_category_prefixes = set()
         last_number = 0
 
@@ -88,13 +88,13 @@ class TicketService:
                 if numeric.isdigit():
                     last_number = max(last_number, int(numeric))
 
-        # 🟢 CAS 1 : mêmes catégorie + concert → utiliser le préfixe déjà existant
+        # CAS 1 : mêmes catégorie + concert → utiliser le préfixe déjà existant
         if existing_category_prefixes:
             # prendre le tout premier préfixe utilisé (ex: MAEM, MAEMA…)
             final_prefix = sorted(existing_category_prefixes)[0]
 
         else:
-            # 🟡 CAS 2 : nouvelle catégorie pour ce concert
+            # CAS 2 : nouvelle catégorie pour ce concert
             # vérifier collisions avec autres catégories
             used_prefixes = {tid[:-4] for tid, _ in existing}
 
@@ -110,7 +110,7 @@ class TicketService:
 
             last_number = 0  # nouvelle catégorie → numéro recommence à 1
 
-        # 5️⃣ Génération des tickets
+        # 5) Génération des tickets
         generated = []
 
         for i in range(1, request.quantity + 1):
@@ -128,7 +128,7 @@ class TicketService:
             self.db.add(new_ticket)
             generated.append(new_ticket)
 
-        # 6️⃣ Commit
+        # 6) Commit
         try:
             await self.db.commit()
         except IntegrityError:
@@ -334,7 +334,7 @@ class TicketService:
         """Retourne dynamiquement les catégories présentes dans la base pour un concert donné."""
         results = {}
 
-        # 🔹 Récupérer toutes les catégories existantes dans ce concert
+        # Récupérer toutes les catégories existantes dans ce concert
         categories_result = await self.db.execute(
             select(Ticket.category).where(Ticket.concert_id == concert_id).distinct()
         )

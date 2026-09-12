@@ -11,7 +11,7 @@ from app.database import get_db
 router = APIRouter(tags=["concerts"])
 
 # --------------------------------------------------
-# 🔹 Helper : contrôle d'accès
+# Helper : contrôle d'accès
 # --------------------------------------------------
 def check_access(user_concert_id: int, target_concert_id: int):
     """
@@ -25,7 +25,7 @@ def check_access(user_concert_id: int, target_concert_id: int):
     return True
 
 # --------------------------------------------------
-# 🔹 Créer un concert (admin seulement)
+# Créer un concert (admin seulement)
 # --------------------------------------------------
 @router.post(
     "/concerts",
@@ -56,7 +56,7 @@ async def create_concert(
     return await service.create_concert(concert)
 
 # --------------------------------------------------
-# 🔹 Lister les concerts
+# Lister les concerts
 # --------------------------------------------------
 @router.get("/concerts", response_model=List[ConcertResponse], summary="Get accessible concerts")
 async def get_user_concerts(
@@ -81,7 +81,7 @@ async def get_user_concerts(
     return [concert]
 
 # --------------------------------------------------
-# 🔹 Obtenir un concert spécifique
+# Obtenir un concert spécifique
 # --------------------------------------------------
 @router.get(
     "/concerts/{concert_id}",
@@ -107,7 +107,7 @@ async def get_concert(
     return concert
 
 # --------------------------------------------------
-# 🔹 Mettre à jour un concert
+# Mettre à jour un concert
 # --------------------------------------------------
 @router.put(
     "/concerts/{concert_id}",

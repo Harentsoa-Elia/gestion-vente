@@ -28,6 +28,6 @@ def read_root():
 
 @app.on_event("startup")
 async def startup_event():
-    print("🚀 Application startup")
+    print("Application startup")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
