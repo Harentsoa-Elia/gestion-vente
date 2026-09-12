@@ -1,15 +1,17 @@
 from __future__ import annotations
+
+import re
 from typing import List, Dict, Any
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from sqlalchemy import select, update, text
+from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db, Base, engine
+from app.database import get_db
 from app.auth.auth_bearer import JWTBearer
 from app.models.concert import Concert
+from app.models.ticket import Ticket
 from app.schemas.ticket import (
-    TicketGenerateRequest,
     TicketResponse,
     TicketScanRequest,
     TicketScanResponse,
@@ -18,19 +20,17 @@ from app.schemas.ticket import (
     Amount,
     TicketRegenerateRequest,
     TicketWithTotalResponse,
+    TicketCategoryCreate,
 )
-from app.services.ticket_service import TicketService
-from sqlalchemy import update
-from app.models.ticket import Ticket  # Assure-toi que ton modèle Ticket est bien importé
-router = APIRouter(tags=["tickets"])
 from app.schemas.scan_history import ScanHistoryCreate, ScanHistoryListResponse, ScanHistoryResponse
 from app.services.scan_history_service import ScanHistoryService
-from app.models.scan_history import ScanHistory
-from app.schemas.ticket import TicketCategoryCreate
+from app.services.ticket_service import TicketService
+
+router = APIRouter(tags=["tickets"])
 
 
 # --------------------------------------------------
-# 🔹 Helper : vérifie si l'utilisateur a accès au concert
+# Helper : vérifie si l'utilisateur a accès au concert
 # --------------------------------------------------
 def check_access(user_concert_id: int, target_concert_id: int):
     """
@@ -45,7 +45,7 @@ def check_access(user_concert_id: int, target_concert_id: int):
 
 
 # -----------------------
-# 🔹 Génération de tickets
+# Génération de tickets
 # -----------------------
 @router.post(
     "/tickets/regenerate",
@@ -70,7 +70,7 @@ async def regenerate_tickets(
 
 
 # -----------------------
-# 🔹 Scan d’un ticket
+# Scan d'un ticket
 # -----------------------
 @router.post(
     "/tickets/scan",
@@ -98,7 +98,7 @@ async def scan_ticket(
 
 
 # -----------------------
-# 🔹 Statistiques globales
+# Statistiques globales
 # -----------------------
 @router.get(
     "/tickets/count",
@@ -115,7 +115,7 @@ async def get_ticket_counts(auth_data: dict = Depends(JWTBearer()), db: AsyncSes
 
 
 # -----------------------
-# 🔹 Stats par concert
+# Stats par concert
 # -----------------------
 @router.get(
     "/concerts/{concert_id}/tickets/count",
@@ -148,7 +148,7 @@ async def get_concert_ticket_counts_by_category(
 
 
 # -----------------------
-# 🔹 Liste des concerts visibles
+# Liste des concerts visibles
 # -----------------------
 @router.get("/concerts", summary="List concerts (admin or your own)")
 async def list_concerts(
@@ -176,7 +176,7 @@ async def list_concerts(
 
 
 # -----------------------
-# 🔹 Montant total
+# Montant total
 # -----------------------
 @router.get(
     "/concerts/{concert_id}/amount",
@@ -194,7 +194,7 @@ async def get_amount_money(
 
 
 # -----------------------
-# 🔹 Derniers tickets
+# Derniers tickets
 # -----------------------
 
 @router.get(
@@ -388,9 +388,7 @@ async def list_ticket_categories(db: AsyncSession = Depends(get_db)):
     return categories
 
 
-#add categorie
-import re
-
+# Ajouter une categorie
 @router.post("/tickets/categories", summary="Ajouter une nouvelle categorie de ticket")
 async def add_ticket_category(
     payload: TicketCategoryCreate,
