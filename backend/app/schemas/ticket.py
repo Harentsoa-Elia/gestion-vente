@@ -38,7 +38,7 @@ class TicketScanRequest(BaseModel):
     Charge utile côté mobile :
       - qr_code_data: valeur brute lue par le scanner (id chiffré/encodé)
       - selected_categories: catégories autorisées par l’agent (min 1, pas de scan sinon)
-      - selected_concert_ids: optionnel; si fourni → on refuse un ticket d’un autre concert
+      - selected_concert_ids: optionnel; si fourni, on refuse un ticket d'un autre concert
     """
     qr_code_data: str = Field(..., min_length=1, description="QR content (e.g. encrypted ticket id)")
     selected_categories: List[TicketCategory] = Field(..., min_length=1, description="One or more allowed categories")
@@ -82,7 +82,7 @@ class TicketRegenerateRequest(BaseModel):
     concert_id: int = Field(..., description="ID du concert")
     ticket_id_start: str = Field(..., description="ID du ticket de départ")
     ticket_id_end: Optional[str] = Field(None, description="ID du ticket de fin (optionnel si un seul ticket)")
-    category: str = None  # 🆕 facultatif
+    category: str = None  # facultatif
 
 class TicketWithTotalResponse(BaseModel):
     last_ticket_id: str | None

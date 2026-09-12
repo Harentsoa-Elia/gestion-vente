@@ -1,7 +1,7 @@
 # app/services/scan_history_service.py
 from sqlalchemy import select
 from app.models.scan_history import ScanHistory
-from app.models.user import User  # ✅ import du modèle utilisateur
+from app.models.user import User
 from app.schemas.scan_history import ScanHistoryResponse
 
 class ScanHistoryService:
@@ -41,7 +41,7 @@ class ScanHistoryService:
                 raise PermissionError("Accès refusé pour ces concerts.")
             concert_ids = [user_concert_id]
 
-        # ✅ jointure entre scan_history et user
+        # jointure entre scan_history et user
         result = await self.db.execute(
             select(
                 ScanHistory,

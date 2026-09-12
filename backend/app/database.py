@@ -21,7 +21,7 @@ SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOS
 try:
     engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, pool_size=10, max_overflow=20)
 except Exception as e:
-    print("❌ Failed to create SQLAlchemy engine:", e, file=sys.stderr)
+    print("Failed to create SQLAlchemy engine:", e, file=sys.stderr)
     sys.exit(1)
 
 # Session factory pour FastAPI

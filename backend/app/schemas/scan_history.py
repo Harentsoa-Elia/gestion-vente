@@ -18,7 +18,7 @@ class ScanHistoryCreate(BaseModel):
 class ScanHistoryResponse(ScanHistoryCreate):
     id: int
     user_id: int
-    scanned_by: Optional[str] = None  # ✅ nouveau champ : nom complet du user
+    scanned_by: Optional[str] = None  # nom complet du user
 
     class Config:
         from_attributes = True
