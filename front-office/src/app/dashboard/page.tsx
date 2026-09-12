@@ -217,7 +217,7 @@ function DashboardContent() {
   ) => {
     const wb = XLSX.utils.book_new();
 
-    // 1️⃣ Récapitulatif général
+    // 1) Récapitulatif général
     let totalScanned = 0;
     let totalNotScanned = 0;
     let grandTotal = 0;
@@ -245,7 +245,7 @@ function DashboardContent() {
     wsSummary["!cols"] = [{ wch: 30 }, { wch: 20 }];
     XLSX.utils.book_append_sheet(wb, wsSummary, "Résumé général");
 
-    // 2️⃣ Récapitulatif par catégorie
+    // 2) Récapitulatif par catégorie
     const categoryRows: (string | number)[][] = [
       ["Catégorie", "Total", "Scannés", "Non scannés", "Taux de scan"],
     ];
@@ -274,7 +274,7 @@ function DashboardContent() {
     ];
     XLSX.utils.book_append_sheet(wb, wsCat, "Par catégorie");
 
-    // 3️⃣ Liste détaillée avec tri numérique correct pour les tickets
+    // 3) Liste détaillée avec tri numérique correct pour les tickets
     const detailedRows: (string | number)[][] = [
       ["Catégorie", "Statut", "Numéro de billet"],
     ];
@@ -331,7 +331,7 @@ function DashboardContent() {
     wsDetails["!cols"] = [{ wch: 30 }, { wch: 15 }, { wch: 25 }]; // Largeur augmentée pour les numéros longs
     XLSX.utils.book_append_sheet(wb, wsDetails, "Liste détaillée");
 
-    // 4️⃣ Feuille supplémentaire avec regroupement par plages de tickets
+    // 4) Feuille supplémentaire avec regroupement par plages de tickets
     const rangesRows: (string | number)[][] = [
       ["Catégorie", "Plage de billets", "Statut", "Quantité"],
     ];
@@ -415,7 +415,7 @@ function DashboardContent() {
     wsRanges["!cols"] = [{ wch: 25 }, { wch: 40 }, { wch: 15 }, { wch: 12 }];
     XLSX.utils.book_append_sheet(wb, wsRanges, "Plages de billets");
 
-    // 5️⃣ Sauvegarde du fichier
+    // 5) Sauvegarde du fichier
     const fileName = `billets_${concertName.replace(/\s+/g, "_")}_${
       new Date().toISOString().split("T")[0]
     }.xlsx`;
