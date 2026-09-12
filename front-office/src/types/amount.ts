@@ -1,6 +1,4 @@
-// =============================
-// 💰 Montants calculés localement (manuel)
-// =============================
+// Montants calculés localement (manuel)
 export interface CategoryAmount {
   label: string
   used: number

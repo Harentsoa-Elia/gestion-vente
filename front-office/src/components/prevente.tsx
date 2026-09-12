@@ -24,13 +24,13 @@ import {
   Hash,
 } from "lucide-react"
 import VIP from "./VIP"
-import AdulteEnfant from "./carteBille" // ✅ corrigé : importé depuis carteBille, pas VIP
+import AdulteEnfant from "./carteBille" // importé depuis carteBille, pas VIP
 
 export default function TicketGeneratorForm() {
   const [concerts, setConcerts] = useState<Concert[]>([])
   const [selectedConcertId, setSelectedConcertId] = useState<string | null>(null)
   const [quantity, setQuantity] = useState<string>("")
-  const [category, setCategory] = useState<string>("PREVENTE") // ✅ valeur par défaut restaurée
+  const [category, setCategory] = useState<string>("PREVENTE") // valeur par défaut restaurée
   const [generatedTickets, setGeneratedTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

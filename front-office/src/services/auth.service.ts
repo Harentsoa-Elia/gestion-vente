@@ -2,7 +2,7 @@ import type { AuthUser } from "../types";
 import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
 
 // ======================================================
-// 🔐 Authentification
+// Authentification
 // ======================================================
 
 export async function fetchUserData(): Promise<AuthUser> {

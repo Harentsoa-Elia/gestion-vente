@@ -2,7 +2,7 @@ import type { Concert } from "../types";
 import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
 
 // ======================================================
-// 🎵 Concerts
+// Concerts
 // ======================================================
 
 export async function fetchConcerts(): Promise<Concert[]> {

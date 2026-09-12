@@ -78,7 +78,7 @@ function DashboardContent() {
 
         setTicketStats(stats)
         setConcertAmount(amount)
-        // ✅ Le backend renvoie { categories: { "VENTELIVE": {...}, "CHILD": {...} } }
+        // Le backend renvoie { categories: { "VENTELIVE": {...}, "CHILD": {...} } }
         setCatStats(categories)
 
       })

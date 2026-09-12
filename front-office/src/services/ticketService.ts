@@ -2,7 +2,7 @@ import type { Ticket, TicketScanResponse, TicketStats } from "../types";
 import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
 
 // ======================================================
-// 🎟️ Tickets
+// Tickets
 // ======================================================
 
 export async function generateTickets(

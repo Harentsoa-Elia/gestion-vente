@@ -242,7 +242,7 @@ export default function TicketGeneratorForm() {
 
       {/* IMPRESSION */}
      {ticketsByPage
-  .filter(page => page.length > 0) // ⬅️ enlève les pages vides
+  .filter(page => page.length > 0) // enlève les pages vides
   .map((page, i) => (
     <div key={i} className="print-page">
 

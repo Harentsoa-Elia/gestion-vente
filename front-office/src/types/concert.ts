@@ -1,6 +1,4 @@
-// =============================
-// 🎵 Concert
-// =============================
+// Concert
 export interface Concert {
   id: number
   title: string

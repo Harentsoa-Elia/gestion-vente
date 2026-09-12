@@ -1,17 +1,13 @@
-// =============================
-// 🎟️ Ticket
-// =============================
+// Ticket
 export interface Ticket {
   id: string
   concert_id: number
   is_used: boolean
   qr_code_data: string
-  category: string // 🔹 devient libre : pas limité à "VIP" | "ADULT" ...
+  category: string // libre : pas limité à "VIP" | "ADULT" ...
 }
 
-// =============================
-// 🔍 Réponse du scan
-// =============================
+// Réponse du scan
 export interface TicketScanResponse {
   ticket_id: string
   is_valid: boolean
@@ -20,9 +16,7 @@ export interface TicketScanResponse {
   concert_description: string
 }
 
-// =============================
-// 📊 Statistiques globales
-// =============================
+// Statistiques globales
 export interface TicketStats {
   total: number
   used: number

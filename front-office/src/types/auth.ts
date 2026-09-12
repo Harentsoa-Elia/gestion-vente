@@ -1,6 +1,4 @@
-// =============================
-// 👤 Utilisateur authentifié
-// =============================
+// Utilisateur authentifié
 export interface AuthUser {
   id: number
   fullname: string

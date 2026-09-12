@@ -1,6 +1,4 @@
-// =============================
-// 📈 Statistiques par catégorie dynamique
-// =============================
+// Statistiques par catégorie dynamique
 // Exemple :
 // {
 //   "VIP": { total: 300, used: 200, unused: 100 },

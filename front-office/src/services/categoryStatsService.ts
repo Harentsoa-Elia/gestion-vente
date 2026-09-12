@@ -2,7 +2,7 @@ import type { DynamicCategoryStats } from "../types";
 import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
 
 // ======================================================
-// 📊 Catégories dynamiques
+// Catégories dynamiques
 // ======================================================
 
 export async function fetchTicketCategoryStats(
@@ -21,6 +21,6 @@ export async function fetchTicketCategoryStats(
     );
   }
 
-  // ✅ le backend renvoie { categories: { "VENTELIVE": {...}, "CHILD": {...} } }
+  // le backend renvoie { categories: { "VENTELIVE": {...}, "CHILD": {...} } }
   return (data.categories ?? {}) as DynamicCategoryStats;
 }
