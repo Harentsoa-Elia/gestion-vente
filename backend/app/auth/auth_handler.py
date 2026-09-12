@@ -14,6 +14,17 @@ def sign_jwt(email: str, user_id: int, concert_id: Optional[int] = None) -> Dict
         "email": email,
         "user_id": user_id,
         "concert_id": concert_id,
+        "account_type": "staff",
+        "expires": time.time() + 86400  # 24h
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return token_response(token)
+
+def sign_jwt_participant(email: str, participant_id: int) -> Dict[str, str]:
+    payload = {
+        "email": email,
+        "participant_id": participant_id,
+        "account_type": "participant",
         "expires": time.time() + 86400  # 24h
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)

@@ -13,6 +13,7 @@ from .interaction_publique import InteractionPublique
 from .reservation import Reservation
 from .paiement import Paiement
 from .billet import Billet
+from .participant import Participant
 
 __all__ = [
     'Concert',
@@ -29,4 +30,5 @@ __all__ = [
     'Reservation',
     'Paiement',
     'Billet',
+    'Participant',
 ]

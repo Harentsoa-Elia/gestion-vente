@@ -14,6 +14,7 @@ from app.controllers import (
     recommandation_controller,
     dashboard_controller,
     reservation_controller,
+    participant_controller,
 )
 
 from app.database import engine, Base
@@ -45,9 +46,11 @@ app.include_router(interaction_publique_controller.router, prefix="/api/v1")
 app.include_router(recommandation_controller.router, prefix="/api/v1")
 app.include_router(dashboard_controller.router, prefix="/api/v1")
 app.include_router(reservation_controller.router, prefix="/api/v1", dependencies=[Depends(JWTBearer())])  # Protect reservation routes with JWTBearer
+app.include_router(participant_controller.router, prefix="/api/v1")
 
 
 @app.get("/")
+
 def read_root():
     return {"message": "Concert Project API"}
 

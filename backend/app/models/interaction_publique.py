@@ -18,6 +18,7 @@ class InteractionPublique(Base):
     date_interaction = Column(DateTime(timezone=True), server_default=func.now())
 
     proposition_id = Column(Integer, ForeignKey("propositions.id"), nullable=False)
-    participant_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    participant_id = Column(Integer, ForeignKey("participants.id"), nullable=False)
 
     proposition = relationship("Proposition", back_populates="interactions")
+    participant = relationship("Participant", back_populates="interactions")    
