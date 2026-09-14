@@ -14,10 +14,25 @@ class DashboardService:
         self.db = db
 
     async def get_taux_remplissage(self, evenement_id: int) -> Optional[float]:
-        # Necessite de vraies reservations/ventes de billets sur l'Evenement,
-        # module non encore implemente (en attente de la clarification paiement).
-        # Retourne None tant que ces donnees ne sont pas disponibles.
-        return None
+        from app.models.reservation import Reservation
+
+        result_evenement = await self.db.execute(
+            select(Evenement).filter(Evenement.id == evenement_id)
+        )
+        evenement = result_evenement.scalar_one_or_none()
+        if not evenement or not evenement.capacite or evenement.capacite <= 0:
+            return None
+
+        result_reservations = await self.db.execute(
+            select(func.count(Reservation.id)).filter(
+                Reservation.evenement_id == evenement_id,
+                Reservation.statut == "confirmee",
+            )
+        )
+        nb_reservations_confirmees = result_reservations.scalar() or 0
+
+        taux = (nb_reservations_confirmees / evenement.capacite) * 100
+        return round(min(taux, 100), 2)
 
     async def get_score_total_evenement(self, evenement_id: int) -> int:
         result = await self.db.execute(
