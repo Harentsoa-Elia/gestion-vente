@@ -27,6 +27,12 @@ class EvenementService:
         result = await self.db.execute(select(Evenement))
         return result.scalars().all()
 
+    async def get_evenements_publics(self) -> List[Evenement]:
+        result = await self.db.execute(
+            select(Evenement).filter(Evenement.statut_validation == "valide")
+        )
+        return result.scalars().all()
+
     async def update_evenement(
         self, evenement_id: int, evenement_update: EvenementCreate
     ) -> Optional[Evenement]:
@@ -36,6 +42,52 @@ class EvenementService:
                 setattr(db_evenement, key, value)
             await self.db.commit()
             await self.db.refresh(db_evenement)
+        return db_evenement
+
+    async def publier_evenement(self, evenement_id: int) -> Optional[Evenement]:
+        from app.models.proposition import Proposition
+
+        db_evenement = await self.get_evenement(evenement_id)
+        if not db_evenement:
+            return None
+        if db_evenement.statut_validation != "brouillon":
+            raise ValueError("Seul un evenement en brouillon peut etre soumis pour validation.")
+
+        for type_requis in ["LIEU", "CATEGORIE", "ARTISTE"]:
+            result = await self.db.execute(
+                select(Proposition).filter(
+                    Proposition.evenement_id == evenement_id,
+                    Proposition.type == type_requis,
+                )
+            )
+            if result.scalars().first() is None:
+                raise ValueError(f"Une Proposition de type {type_requis} est requise avant de publier.")
+
+        db_evenement.statut_validation = "en_attente_validation"
+        await self.db.commit()
+        await self.db.refresh(db_evenement)
+        return db_evenement
+
+    async def valider_evenement(self, evenement_id: int) -> Optional[Evenement]:
+        db_evenement = await self.get_evenement(evenement_id)
+        if not db_evenement:
+            return None
+        if db_evenement.statut_validation != "en_attente_validation":
+            raise ValueError("Seul un evenement en attente peut etre valide.")
+        db_evenement.statut_validation = "valide"
+        await self.db.commit()
+        await self.db.refresh(db_evenement)
+        return db_evenement
+
+    async def rejeter_evenement(self, evenement_id: int) -> Optional[Evenement]:
+        db_evenement = await self.get_evenement(evenement_id)
+        if not db_evenement:
+            return None
+        if db_evenement.statut_validation != "en_attente_validation":
+            raise ValueError("Seul un evenement en attente peut etre rejete.")
+        db_evenement.statut_validation = "rejete"
+        await self.db.commit()
+        await self.db.refresh(db_evenement)
         return db_evenement
 
     async def delete_evenement(self, evenement_id: int):

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Optional
 
-from app.schemas.evenement import EvenementCreate, EvenementResponse
+from app.schemas.evenement import EvenementCreate, EvenementUpdate, EvenementResponse
 from app.services.evenement_service import EvenementService
 from app.auth.auth_bearer import JWTBearer
 from app.database import get_db
@@ -17,6 +17,12 @@ def check_access(auth_data: dict, evenement_organisateur_id: int):
         return True
     if user_id != evenement_organisateur_id:
         raise HTTPException(status_code=403, detail="Access denied for this evenement.")
+    return True
+
+
+def check_admin(auth_data: dict):
+    if auth_data.get("concert_id") != 0:
+        raise HTTPException(status_code=403, detail="Reserve a l'administrateur.")
     return True
 
 
@@ -36,11 +42,19 @@ async def create_evenement(
     return await service.create_evenement(evenement, organisateur_id)
 
 
-@router.get("/evenements", response_model=List[EvenementResponse], summary="Get all evenements")
+@router.get("/evenements", response_model=List[EvenementResponse], summary="Get public (validated) evenements")
+async def get_public_evenements(db: AsyncSession = Depends(get_db)):
+    """Route publique : accessible sans authentification, ne montre que les evenements valides."""
+    service = EvenementService(db)
+    return await service.get_evenements_publics()
+
+
+@router.get("/evenements/all", response_model=List[EvenementResponse], summary="Get all evenements (staff only)")
 async def get_all_evenements(
     auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    """Route staff : montre tous les evenements, y compris brouillon/en_attente/rejete."""
     service = EvenementService(db)
     return await service.get_all_evenements()
 
@@ -48,9 +62,9 @@ async def get_all_evenements(
 @router.get("/evenements/{evenement_id}", response_model=EvenementResponse, summary="Get a specific evenement")
 async def get_evenement(
     evenement_id: int,
-    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    """Route publique : accessible sans authentification."""
     service = EvenementService(db)
     evenement = await service.get_evenement(evenement_id)
     if not evenement:
@@ -61,7 +75,7 @@ async def get_evenement(
 @router.put("/evenements/{evenement_id}", response_model=EvenementResponse, summary="Update an evenement")
 async def update_evenement(
     evenement_id: int,
-    evenement: EvenementCreate,
+    evenement: EvenementUpdate,
     auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
@@ -73,6 +87,60 @@ async def update_evenement(
 
     updated_evenement = await service.update_evenement(evenement_id, evenement)
     return updated_evenement
+
+
+@router.post("/evenements/{evenement_id}/publier", response_model=EvenementResponse, summary="Soumettre l'evenement pour validation (organisateur)")
+async def publier_evenement(
+    evenement_id: int,
+    auth_data: dict = Depends(JWTBearer()),
+    db: AsyncSession = Depends(get_db),
+):
+    service = EvenementService(db)
+    existing = await service.get_evenement(evenement_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Evenement not found.")
+    check_access(auth_data, existing.organisateur_id)
+
+    try:
+        return await service.publier_evenement(evenement_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/evenements/{evenement_id}/valider", response_model=EvenementResponse, summary="Valider un evenement (admin)")
+async def valider_evenement(
+    evenement_id: int,
+    auth_data: dict = Depends(JWTBearer()),
+    db: AsyncSession = Depends(get_db),
+):
+    check_admin(auth_data)
+    service = EvenementService(db)
+    existing = await service.get_evenement(evenement_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Evenement not found.")
+
+    try:
+        return await service.valider_evenement(evenement_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/evenements/{evenement_id}/rejeter", response_model=EvenementResponse, summary="Rejeter un evenement (admin)")
+async def rejeter_evenement(
+    evenement_id: int,
+    auth_data: dict = Depends(JWTBearer()),
+    db: AsyncSession = Depends(get_db),
+):
+    check_admin(auth_data)
+    service = EvenementService(db)
+    existing = await service.get_evenement(evenement_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Evenement not found.")
+
+    try:
+        return await service.rejeter_evenement(evenement_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.delete("/evenements/{evenement_id}", status_code=200, summary="Delete an evenement")
