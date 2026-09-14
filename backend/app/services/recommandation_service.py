@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from typing import Optional, List
-from collections import defaultdict
+from datetime import datetime, timezone
 
 from app.models.recommandation import Recommandation
 from app.models.proposition import Proposition, PropositionType
@@ -47,6 +47,15 @@ class RecommandationService:
 
         return scores
 
+    def _pourcentage_gagnant(self, scores: dict, gagnant: Optional[dict]) -> Optional[float]:
+        """Retourne le % du score du gagnant sur le total de son type, ou None si aucune proposition."""
+        if not scores or not gagnant:
+            return None
+        total = sum(v["score"] for v in scores.values())
+        if total == 0:
+            return 0.0
+        return (gagnant["score"] / total) * 100
+
     async def calculer_recommandation(self, evenement_id: int) -> Recommandation:
         scores_artistes = await self._get_propositions_avec_scores(evenement_id, PropositionType.ARTISTE)
         scores_lieux = await self._get_propositions_avec_scores(evenement_id, PropositionType.LIEU)
@@ -59,11 +68,13 @@ class RecommandationService:
         lieu_gagnant = max(scores_lieux.values(), key=lambda x: x["score"])
         categorie_gagnante = max(scores_categories.values(), key=lambda x: x["score"], default=None)
 
-        total_score_artistes = sum(v["score"] for v in scores_artistes.values())
-        if total_score_artistes > 0 and artiste_gagnant:
-            niveau_interet = (artiste_gagnant["score"] / total_score_artistes) * 100
-        else:
-            niveau_interet = 0
+        pourcentages = [
+            self._pourcentage_gagnant(scores_artistes, artiste_gagnant),
+            self._pourcentage_gagnant(scores_lieux, lieu_gagnant),
+            self._pourcentage_gagnant(scores_categories, categorie_gagnante),
+        ]
+        pourcentages_valides = [p for p in pourcentages if p is not None]
+        niveau_interet = sum(pourcentages_valides) / len(pourcentages_valides) if pourcentages_valides else 0
 
         result_lieu = await self.db.execute(
             select(Lieu).filter(Lieu.id == lieu_gagnant["proposition"].lieu_id)
@@ -82,6 +93,7 @@ class RecommandationService:
         recommandation.categorie_id = categorie_gagnante["proposition"].categorie_id if categorie_gagnante else None
         recommandation.niveau_interet_estime = round(niveau_interet, 2)
         recommandation.participation_estimee = participation_estimee
+        recommandation.date_calcul = datetime.now(timezone.utc)
 
         await self.db.commit()
         await self.db.refresh(recommandation)
