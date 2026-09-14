@@ -5,7 +5,7 @@ from typing import List
 from app.schemas.reservation import ReservationCreate, ReservationResponse, PaiementConfirmeResponse
 from app.schemas.billet import BilletResponse
 from app.services.reservation_service import ReservationService
-from app.auth.auth_bearer import JWTBearer
+from app.auth.auth_bearer import ParticipantBearer, FlexibleBearer
 from app.database import get_db
 
 router = APIRouter(tags=["reservations"])
@@ -19,11 +19,11 @@ router = APIRouter(tags=["reservations"])
 )
 async def create_reservation(
     reservation: ReservationCreate,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(ParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = ReservationService(db)
-    participant_id = auth_data.get("user_id")
+    participant_id = auth_data.get("participant_id")
     try:
         return await service.create_reservation(reservation, participant_id)
     except ValueError as e:
@@ -36,25 +36,28 @@ async def create_reservation(
     summary="Get all reservations for the current participant",
 )
 async def get_mes_reservations(
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(ParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = ReservationService(db)
-    participant_id = auth_data.get("user_id")
+    participant_id = auth_data.get("participant_id")
     return await service.get_reservations_by_participant(participant_id)
 
 
 @router.get("/reservations/{reservation_id}", response_model=ReservationResponse, summary="Get a specific reservation")
 async def get_reservation(
     reservation_id: int,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(FlexibleBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = ReservationService(db)
     reservation = await service.get_reservation(reservation_id)
     if not reservation:
         raise HTTPException(status_code=404, detail="Reservation not found.")
-    if reservation.participant_id != auth_data.get("user_id") and auth_data.get("concert_id") != 0:
+
+    is_owner = auth_data.get("account_type") == "participant" and reservation.participant_id == auth_data.get("participant_id")
+    is_staff_admin = auth_data.get("account_type") == "staff" and auth_data.get("concert_id") == 0
+    if not is_owner and not is_staff_admin:
         raise HTTPException(status_code=403, detail="Access denied for this reservation.")
     return reservation
 
@@ -66,14 +69,14 @@ async def get_reservation(
 )
 async def payer_reservation(
     reservation_id: int,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(ParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = ReservationService(db)
     reservation = await service.get_reservation(reservation_id)
     if not reservation:
         raise HTTPException(status_code=404, detail="Reservation not found.")
-    if reservation.participant_id != auth_data.get("user_id"):
+    if reservation.participant_id != auth_data.get("participant_id"):
         raise HTTPException(status_code=403, detail="Access denied for this reservation.")
 
     try:
@@ -85,27 +88,6 @@ async def payer_reservation(
 
     return PaiementConfirmeResponse(
         reservation_id=reservation_id,
-        statut_reservation="confirmee",
+        status_reservation="confirmee", 
         montant_paye=paiement.montant,
-        numero_billet=billet.numero_billet,
-        qr_code=billet.qr_code,
     )
-
-
-@router.get("/reservations/{reservation_id}/billet", response_model=BilletResponse, summary="Get the billet for a reservation")
-async def get_billet(
-    reservation_id: int,
-    auth_data: dict = Depends(JWTBearer()),
-    db: AsyncSession = Depends(get_db),
-):
-    service = ReservationService(db)
-    reservation = await service.get_reservation(reservation_id)
-    if not reservation:
-        raise HTTPException(status_code=404, detail="Reservation not found.")
-    if reservation.participant_id != auth_data.get("user_id") and auth_data.get("concert_id") != 0:
-        raise HTTPException(status_code=403, detail="Access denied for this reservation.")
-
-    billet = await service.get_billet_by_reservation(reservation_id)
-    if not billet:
-        raise HTTPException(status_code=404, detail="Billet not found. Payment may not be completed.")
-    return billet

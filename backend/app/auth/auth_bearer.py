@@ -59,3 +59,27 @@ class ParticipantBearer(HTTPBearer):
             "participant_id": payload.get("participant_id"),
             "email": payload.get("email"),
         }
+
+class FlexibleBearer(HTTPBearer):
+    """Accepte un token staff OU participant ; la route decide ce qui est autorise."""
+    def __init__(self, auto_error: bool = True):
+        super(FlexibleBearer, self).__init__(auto_error=auto_error)
+
+    async def __call__(self, request: Request):
+        credentials: HTTPAuthorizationCredentials = await super(FlexibleBearer, self).__call__(request)
+        if not credentials or credentials.scheme != "Bearer":
+            raise HTTPException(status_code=403, detail="Invalid authentication scheme.")
+        token = credentials.credentials
+        if token in BLACKLISTED_TOKENS:
+            raise HTTPException(status_code=403, detail="Token has been revoked.")
+        payload = decode_jwt(token)
+        if not payload:
+            raise HTTPException(status_code=403, detail="Invalid or expired token.")
+        return {
+            "token": token,
+            "account_type": payload.get("account_type"),
+            "user_id": payload.get("user_id"),
+            "concert_id": payload.get("concert_id"),
+            "participant_id": payload.get("participant_id"),
+            "email": payload.get("email"),
+        }    

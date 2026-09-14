@@ -4,7 +4,7 @@ from typing import List
 
 from app.schemas.interaction_publique import InteractionPubliqueCreate, InteractionPubliqueResponse
 from app.services.interaction_publique_service import InteractionPubliqueService
-from app.auth.auth_bearer import JWTBearer
+from app.auth.auth_bearer import ParticipantBearer, FlexibleBearer
 from app.database import get_db
 
 router = APIRouter(tags=["interactions"])
@@ -18,11 +18,11 @@ router = APIRouter(tags=["interactions"])
 )
 async def create_interaction(
     interaction: InteractionPubliqueCreate,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(ParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = InteractionPubliqueService(db)
-    participant_id = auth_data.get("user_id")
+    participant_id = auth_data.get("participant_id")
     return await service.create_interaction(interaction, participant_id)
 
 
@@ -33,7 +33,7 @@ async def create_interaction(
 )
 async def get_interactions_by_proposition(
     proposition_id: int,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(FlexibleBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = InteractionPubliqueService(db)
@@ -43,14 +43,18 @@ async def get_interactions_by_proposition(
 @router.delete("/interactions/{interaction_id}", status_code=200, summary="Delete an interaction")
 async def delete_interaction(
     interaction_id: int,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(FlexibleBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = InteractionPubliqueService(db)
     interaction = await service.get_interaction(interaction_id)
     if not interaction:
         raise HTTPException(status_code=404, detail="Interaction not found.")
-    if interaction.participant_id != auth_data.get("user_id") and auth_data.get("concert_id") != 0:
+
+    is_owner = auth_data.get("account_type") == "participant" and interaction.participant_id == auth_data.get("participant_id")
+    is_staff_admin = auth_data.get("account_type") == "staff" and auth_data.get("concert_id") == 0
+    if not is_owner and not is_staff_admin:
         raise HTTPException(status_code=403, detail="Access denied for this interaction.")
+
     await service.delete_interaction(interaction_id)
     return {"message": "Interaction deleted successfully."}
