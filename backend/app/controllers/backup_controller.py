@@ -16,7 +16,7 @@ PG_DATABASE = os.getenv("DB_NAME", "")
 os.environ["PGPASSWORD"] = PG_PASSWORD
 
 
-@router.get("/backup-db", summary="Telecharger un backup SQL de la base (admin uniquement)")
+@router.get("/backup-db", tags=["system"], summary="Telecharger un backup SQL de la base (admin uniquement)")
 async def backup_database(auth_data: dict = Depends(JWTBearer())):
     if auth_data.get("concert_id") != 0:
         raise HTTPException(status_code=403, detail="Only admin can access database backups.")

@@ -49,7 +49,7 @@ app.include_router(reservation_controller.router, prefix="/api/v1", dependencies
 app.include_router(participant_controller.router, prefix="/api/v1")
 
 
-@app.get("/")
+@app.get("/", tags=["system"])
 
 def read_root():
     return {"message": "Concert Project API"}
