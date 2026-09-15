@@ -1,6 +1,7 @@
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.auth.auth_handler import decode_jwt
+from typing import Optional as _Optional
 import asyncio
 import time
 
@@ -83,3 +84,24 @@ class FlexibleBearer(HTTPBearer):
             "participant_id": payload.get("participant_id"),
             "email": payload.get("email"),
         }    
+
+class OptionalParticipantBearer(HTTPBearer):
+    """Accepte les visiteurs anonymes (aucun token) ET les Participants connectes.
+    Un token staff est traite comme anonyme (participant_id = None)."""
+    def __init__(self):
+        super(OptionalParticipantBearer, self).__init__(auto_error=False)
+
+    async def __call__(self, request: Request):
+        credentials: _Optional[HTTPAuthorizationCredentials] = await super(OptionalParticipantBearer, self).__call__(request)
+        if not credentials or credentials.scheme != "Bearer":
+            return {"participant_id": None}
+
+        token = credentials.credentials
+        if token in BLACKLISTED_TOKENS:
+            return {"participant_id": None}
+
+        payload = decode_jwt(token)
+        if not payload or payload.get("account_type") != "participant":
+            return {"participant_id": None}
+
+        return {"participant_id": payload.get("participant_id"), "email": payload.get("email")}

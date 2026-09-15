@@ -7,6 +7,7 @@ from app.models.evenement import Evenement
 from app.models.proposition import Proposition
 from app.models.interaction_publique import InteractionPublique
 from app.models.recommandation import Recommandation
+from app.utils.scoring import POIDS_INTERACTION
 
 
 class DashboardService:
@@ -50,8 +51,7 @@ class DashboardService:
         )
         interactions = interactions_result.scalars().all()
 
-        poids = {"LIKE": 1, "FAVORI": 2, "COMMENTAIRE": 3}
-        return sum(poids.get(str(i.value) if hasattr(i, "value") else str(i), 0) for i in interactions)
+        return sum(POIDS_INTERACTION.get(i, 0) for i in interactions)
 
     async def get_evenements_populaires(self, organisateur_id: int, limit: int = 5) -> List[Dict]:
         result = await self.db.execute(

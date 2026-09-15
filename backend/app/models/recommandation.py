@@ -9,6 +9,7 @@ class Recommandation(Base):
     id = Column(Integer, primary_key=True, index=True)
     niveau_interet_estime = Column(Float, nullable=True)
     participation_estimee = Column(Integer, nullable=True)
+    score_engagement_total = Column(Integer, nullable=True)
     date_calcul = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     evenement_id = Column(Integer, ForeignKey("evenements.id"), unique=True, nullable=False)

@@ -7,13 +7,7 @@ from app.models.recommandation import Recommandation
 from app.models.proposition import Proposition, PropositionType
 from app.models.interaction_publique import InteractionPublique, InteractionType
 from app.models.lieu import Lieu
-
-POIDS_INTERACTION = {
-    InteractionType.LIKE: 1,
-    InteractionType.FAVORI: 2,
-    InteractionType.COMMENTAIRE: 3,
-}
-
+from app.utils.scoring import POIDS_INTERACTION
 
 class RecommandationService:
     def __init__(self, db: AsyncSession):
@@ -74,6 +68,9 @@ class RecommandationService:
             self._pourcentage_gagnant(scores_categories, categorie_gagnante),
         ]
         pourcentages_valides = [p for p in pourcentages if p is not None]
+        score_engagement_total = sum(
+            g["score"] for g in [artiste_gagnant, lieu_gagnant, categorie_gagnante] if g is not None
+        )
         niveau_interet = sum(pourcentages_valides) / len(pourcentages_valides) if pourcentages_valides else 0
 
         result_lieu = await self.db.execute(
@@ -93,6 +90,7 @@ class RecommandationService:
         recommandation.categorie_id = categorie_gagnante["proposition"].categorie_id if categorie_gagnante else None
         recommandation.niveau_interet_estime = round(niveau_interet, 2)
         recommandation.participation_estimee = participation_estimee
+        recommandation.score_engagement_total = score_engagement_total
         recommandation.date_calcul = datetime.now(timezone.utc)
 
         await self.db.commit()

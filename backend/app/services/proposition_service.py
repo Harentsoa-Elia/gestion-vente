@@ -6,12 +6,7 @@ from app.models.proposition import Proposition
 from app.models.evenement import Evenement
 from app.models.interaction_publique import InteractionPublique, InteractionType
 from app.schemas.proposition import PropositionCreate
-
-POIDS_INTERACTION = {
-    InteractionType.LIKE: 1,
-    InteractionType.FAVORI: 2,
-    InteractionType.COMMENTAIRE: 3,
-}
+from app.utils.scoring import POIDS_INTERACTION
 
 
 class PropositionService:

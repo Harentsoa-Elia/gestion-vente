@@ -6,6 +6,8 @@ from enum import Enum
 
 class InteractionType(str, Enum):
     LIKE = "LIKE"
+    WAOUH = "WAOUH"
+    JADORE = "JADORE"
     COMMENTAIRE = "COMMENTAIRE"
     FAVORI = "FAVORI"
 
@@ -30,7 +32,7 @@ class InteractionPubliqueCreate(InteractionPubliqueBase):
 
 class InteractionPubliqueResponse(InteractionPubliqueBase):
     id: int = Field(..., description="Unique ID de l'interaction")
-    participant_id: int
+    participant_id: Optional[int] = None
     date_interaction: datetime
 
     class Config:

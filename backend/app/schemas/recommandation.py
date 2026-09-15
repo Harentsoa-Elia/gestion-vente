@@ -10,6 +10,7 @@ class RecommandationBase(BaseModel):
     artiste_id: Optional[int] = Field(None, description="ID de l'artiste recommande")
     lieu_id: Optional[int] = Field(None, description="ID du lieu recommande")
     categorie_id: Optional[int] = Field(None, description="ID de la categorie recommandee")
+    score_engagement_total: Optional[int] = Field(None, ge=0, description="Score brut total d'engagement (somme des scores gagnants LIEU+CATEGORIE+ARTISTE)")
 
 
 class RecommandationResponse(RecommandationBase):

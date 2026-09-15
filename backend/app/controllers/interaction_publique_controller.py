@@ -4,7 +4,7 @@ from typing import List
 
 from app.schemas.interaction_publique import InteractionPubliqueCreate, InteractionPubliqueResponse
 from app.services.interaction_publique_service import InteractionPubliqueService
-from app.auth.auth_bearer import ParticipantBearer, FlexibleBearer
+from app.auth.auth_bearer import OptionalParticipantBearer, FlexibleBearer
 from app.database import get_db
 
 router = APIRouter(tags=["interactions"])
@@ -14,15 +14,16 @@ router = APIRouter(tags=["interactions"])
     "/interactions",
     response_model=InteractionPubliqueResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a new interaction (like, commentaire, favori)",
+    summary="Create a new interaction (like, waouh, jadore, commentaire, favori) - accessible sans compte",
 )
 async def create_interaction(
     interaction: InteractionPubliqueCreate,
-    auth_data: dict = Depends(ParticipantBearer()),
+    auth_data: dict = Depends(OptionalParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = InteractionPubliqueService(db)
     participant_id = auth_data.get("participant_id")
+    print("DEBUG auth_data complet:", auth_data)
     return await service.create_interaction(interaction, participant_id)
 
 
