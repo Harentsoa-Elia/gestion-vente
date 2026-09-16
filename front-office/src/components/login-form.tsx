@@ -234,7 +234,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         {/* Footer */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="text-center mt-6">
           <p className="text-gray-500 text-sm flex items-center justify-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-purple-300" /> Enterprise-grade security • Premium UI
+            <ShieldCheck className="w-4 h-4 text-purple-300" /> Enterprise-grade security - Premium UI
           </p>
         </motion.div>
       </motion.div>

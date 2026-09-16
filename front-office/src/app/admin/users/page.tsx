@@ -639,7 +639,7 @@ function CreateUserForm({ onSuccess }: { onSuccess: () => void }) {
             onChange={(e) => setPassword(e.target.value)}
             required
             className="h-11 px-4 pr-11 bg-white/90 border-slate-200"
-            placeholder="••••••••"
+            placeholder="********"
           />
           <button
             type="button"
@@ -815,7 +815,7 @@ function EditUserForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="h-11 px-4 pr-11 bg-white/90 border-slate-200"
-            placeholder="••••••••"
+            placeholder="********"
           />
           <button
             type="button"

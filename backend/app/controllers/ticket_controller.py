@@ -34,7 +34,7 @@ router = APIRouter(tags=["tickets"])
 # --------------------------------------------------
 def check_access(user_concert_id: int, target_concert_id: int):
     """
-    - Si user_concert_id == 0 → admin → accès à tout
+    - Si user_concert_id == 0 -> admin -> accès à tout
     - Sinon, le concert doit correspondre à celui du user
     """
     if user_concert_id == 0:
@@ -108,7 +108,7 @@ async def scan_ticket(
 async def get_ticket_counts(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
     service = TicketService(db)
     user_concert_id = auth_data.get("concert_id")
-    # admin → global stats
+    # admin -> global stats
     if user_concert_id == 0:
         return await service.get_ticket_counts()
     return await service.get_ticket_counts(user_concert_id)
@@ -156,8 +156,8 @@ async def list_concerts(
     db: AsyncSession = Depends(get_db)
 ) -> List[Dict[str, Any]]:
     """
-    Admin (concert_id=0) → voit tous les concerts
-    User normal → voit seulement son concert
+    Admin (concert_id=0) -> voit tous les concerts
+    User normal -> voit seulement son concert
     """
     user_concert_id = auth_data.get("concert_id")
 
@@ -167,7 +167,7 @@ async def list_concerts(
         items.sort(key=lambda x: (x["title"] or "").lower())
         return items
 
-    # user normal → un seul concert
+    # user normal -> un seul concert
     row = await db.execute(select(Concert.id, Concert.title).where(Concert.id == user_concert_id))
     concert = row.first()
     if not concert:
@@ -210,8 +210,8 @@ async def get_ticket_categories_by_concert(
 ):
     """
     Récupère toutes les catégories de tickets réellement présentes pour un concert spécifique.
-    - Admin → accès à tout
-    - Utilisateur → uniquement à son concert
+    - Admin -> accès à tout
+    - Utilisateur -> uniquement à son concert
     """
     check_access(auth_data.get("concert_id"), concert_id)
     service = TicketService(db)
@@ -269,8 +269,8 @@ async def save_scan_history(
 ):
     """
     Enregistre un scan dans l'historique :
-    - Superadmin (concert_id == 0) → peut tout enregistrer.
-    - Utilisateur normal → uniquement son concert.
+    - Superadmin (concert_id == 0) -> peut tout enregistrer.
+    - Utilisateur normal -> uniquement son concert.
     """
     user_id = auth_data.get("user_id")
     user_concert_id = auth_data.get("concert_id")
@@ -300,8 +300,8 @@ async def list_scan_history(
 ):
     """
     Récupère les scans :
-    - Admin → tous les concerts sélectionnés.
-    - User → seulement ses propres concerts.
+    - Admin -> tous les concerts sélectionnés.
+    - User -> seulement ses propres concerts.
     """
     selected_concert_ids = payload.get("concert_ids", [])
     if not selected_concert_ids:
@@ -344,7 +344,7 @@ async def delete_tickets(
 
     service = TicketService(db)
     deleted_count = await service.delete_tickets(concert_id, from_id, to_id)
-    return {"deleted": deleted_count, "range": f"{from_id} → {to_id}"}
+    return {"deleted": deleted_count, "range": f"{from_id} -> {to_id}"}
 
 
 @router.get(

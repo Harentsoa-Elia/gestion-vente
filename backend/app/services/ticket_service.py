@@ -34,11 +34,11 @@ class TicketService:
 
         Règles :
         - Même concert + même catégorie :
-            → utiliser le préfixe déjà existant
-            → continuer la numérotation
-            → ne jamais créer de nouveau préfixe
+            -> utiliser le préfixe déjà existant
+            -> continuer la numérotation
+            -> ne jamais créer de nouveau préfixe
         - Même concert + autre catégorie :
-            → créer un préfixe unique automatiquement si collision
+            -> créer un préfixe unique automatiquement si collision
         """
 
         # 1) Récupérer concert
@@ -88,7 +88,7 @@ class TicketService:
                 if numeric.isdigit():
                     last_number = max(last_number, int(numeric))
 
-        # CAS 1 : mêmes catégorie + concert → utiliser le préfixe déjà existant
+        # CAS 1 : mêmes catégorie + concert -> utiliser le préfixe déjà existant
         if existing_category_prefixes:
             # prendre le tout premier préfixe utilisé (ex: MAEM, MAEMA…)
             final_prefix = sorted(existing_category_prefixes)[0]
@@ -108,7 +108,7 @@ class TicketService:
                 if counter > 26:
                     raise ValueError("Impossible de créer un préfixe unique")
 
-            last_number = 0  # nouvelle catégorie → numéro recommence à 1
+            last_number = 0  # nouvelle catégorie -> numéro recommence à 1
 
         # 5) Génération des tickets
         generated = []

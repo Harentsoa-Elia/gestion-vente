@@ -309,7 +309,7 @@ export default function TicketGeneratorForm() {
                     <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
                     <span className="truncate">
                       <span className="font-semibold">{selectedConcert.title}</span>
-                      <span className="mx-1.5 text-emerald-400">•</span>
+                      <span className="mx-1.5 text-emerald-400">-</span>
                       <span className="inline-flex items-center gap-1 text-emerald-700/80">
                         <Hash className="h-3 w-3" />
                         {selectedConcert.code}

@@ -15,7 +15,7 @@ router = APIRouter(tags=["concerts"])
 # --------------------------------------------------
 def check_access(user_concert_id: int, target_concert_id: int):
     """
-    - Si user_concert_id == 0 → admin → accès à tout
+    - Si user_concert_id == 0 -> admin -> accès à tout
     - Sinon, ne peut accéder qu'à son propre concert
     """
     if user_concert_id == 0:
@@ -64,17 +64,17 @@ async def get_user_concerts(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    - Admin → voit tous les concerts
-    - Utilisateur → voit uniquement le sien
+    - Admin -> voit tous les concerts
+    - Utilisateur -> voit uniquement le sien
     """
     service = ConcertService(db)
     user_concert_id = auth_data.get("concert_id")
 
-    # Admin → tous les concerts
+    # Admin -> tous les concerts
     if user_concert_id == 0:
         return await service.get_all_concerts()
 
-    # Utilisateur normal → un seul concert
+    # Utilisateur normal -> un seul concert
     concert = await service.get_concert(user_concert_id)
     if not concert:
         raise HTTPException(status_code=404, detail="Concert not found.")
@@ -94,8 +94,8 @@ async def get_concert(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Admin → accès à tout
-    User → accès uniquement à son concert
+    Admin -> accès à tout
+    User -> accès uniquement à son concert
     """
     user_concert_id = auth_data.get("concert_id")
     check_access(user_concert_id, concert_id)
@@ -121,8 +121,8 @@ async def update_concert(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    - Admin → peut tout modifier
-    - Utilisateur → ne peut modifier que son propre concert
+    - Admin -> peut tout modifier
+    - Utilisateur -> ne peut modifier que son propre concert
     """
     user_concert_id = auth_data.get("concert_id")
     check_access(user_concert_id, concert_id)
