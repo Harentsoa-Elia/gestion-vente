@@ -5,6 +5,7 @@ from datetime import datetime
 
 class ReservationBase(BaseModel):
     evenement_id: int = Field(..., description="ID de l'evenement concerne")
+    categorie_billet_id: int = Field(..., description="ID de la categorie de billet choisie (VIP, Simple, etc.)")
 
 
 class ReservationCreate(ReservationBase):

@@ -12,7 +12,6 @@ class Evenement(Base):
     date_debut = Column(DateTime(timezone=True), nullable=False)
     date_fin = Column(DateTime(timezone=True), nullable=True)
     capacite = Column(Integer, nullable=True)
-    prix_billet = Column(Float, nullable=True)
     statut_validation = Column(String, default="brouillon", nullable=False)
     date_creation = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -25,3 +24,4 @@ class Evenement(Base):
     propositions = relationship("Proposition", back_populates="evenement")
     recommandation = relationship("Recommandation", back_populates="evenement", uselist=False)
     reservations = relationship("Reservation", back_populates="evenement")
+    categories_billet = relationship("CategorieBillet", back_populates="evenement")

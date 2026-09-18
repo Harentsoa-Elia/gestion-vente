@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime, timezone
 import uuid
@@ -8,6 +9,7 @@ from app.models.reservation import Reservation
 from app.models.paiement import Paiement
 from app.models.billet import Billet
 from app.models.evenement import Evenement
+from app.models.categorie_billet import CategorieBillet
 from app.schemas.reservation import ReservationCreate
 from app.utils.crypto import encrypt_data
 
@@ -24,8 +26,28 @@ class ReservationService:
         if not evenement:
             raise ValueError("Evenement not found.")
 
+        result_categorie = await self.db.execute(
+            select(CategorieBillet).filter(CategorieBillet.id == reservation.categorie_billet_id)
+        )
+        categorie = result_categorie.scalar_one_or_none()
+        if not categorie:
+            raise ValueError("Categorie de billet not found.")
+        if categorie.evenement_id != reservation.evenement_id:
+            raise ValueError("Cette categorie de billet n'appartient pas a cet evenement.")
+
+        if categorie.quantite_disponible is not None:
+            result_count = await self.db.execute(
+                select(func.count(Reservation.id)).filter(
+                    Reservation.categorie_billet_id == categorie.id
+                )
+            )
+            nb_reservees = result_count.scalar() or 0
+            if nb_reservees >= categorie.quantite_disponible:
+                raise ValueError("Plus de places disponibles pour cette categorie de billet.")
+
         db_reservation = Reservation(
             evenement_id=reservation.evenement_id,
+            categorie_billet_id=reservation.categorie_billet_id,
             participant_id=participant_id,
             statut="en_attente",
         )
@@ -54,10 +76,10 @@ class ReservationService:
             raise ValueError("Reservation deja payee.")
 
         result = await self.db.execute(
-            select(Evenement).filter(Evenement.id == reservation.evenement_id)
+            select(CategorieBillet).filter(CategorieBillet.id == reservation.categorie_billet_id)
         )
-        evenement = result.scalar_one_or_none()
-        montant = evenement.prix_billet if evenement and evenement.prix_billet else 0.0
+        categorie = result.scalar_one_or_none()
+        montant = categorie.prix if categorie else 0.0
 
         paiement = Paiement(
             montant=montant,

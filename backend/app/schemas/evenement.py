@@ -17,7 +17,6 @@ class EvenementBase(BaseModel):
     date_debut: datetime = Field(..., description="Date et heure de debut")
     date_fin: Optional[datetime] = Field(None, description="Date et heure de fin")
     capacite: Optional[int] = Field(None, gt=0, description="Capacite maximale")
-    prix_billet: Optional[float] = Field(None, gt=0, description="Prix du billet")
     lieu_id: Optional[int] = Field(None, description="ID du lieu associe")
     categorie_id: Optional[int] = Field(None, description="ID de la categorie associee")
 
@@ -37,6 +36,7 @@ class EvenementResponse(EvenementBase):
     organisateur_id: int
     statut_validation: StatutValidation
     date_creation: datetime
+    prix_a_partir_de: Optional[float] = Field(None, description="Prix minimum parmi les categories de billet disponibles")
 
     class Config:
         from_attributes = True

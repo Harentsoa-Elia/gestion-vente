@@ -1,8 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import func
 from typing import List, Optional
 
 from app.models.evenement import Evenement
+from app.models.categorie_billet import CategorieBillet
 from app.schemas.evenement import EvenementCreate
 
 
@@ -10,28 +12,44 @@ class EvenementService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def _attacher_prix(self, evenement: Evenement) -> Evenement:
+        result = await self.db.execute(
+            select(func.min(CategorieBillet.prix)).filter(CategorieBillet.evenement_id == evenement.id)
+        )
+        evenement.prix_a_partir_de = result.scalar()
+        return evenement
+
     async def create_evenement(self, evenement: EvenementCreate, organisateur_id: int) -> Evenement:
         db_evenement = Evenement(**evenement.dict(), organisateur_id=organisateur_id)
         self.db.add(db_evenement)
         await self.db.commit()
         await self.db.refresh(db_evenement)
-        return db_evenement
+        return await self._attacher_prix(db_evenement)
 
     async def get_evenement(self, evenement_id: int) -> Optional[Evenement]:
         result = await self.db.execute(
             select(Evenement).filter(Evenement.id == evenement_id)
         )
-        return result.scalar_one_or_none()
+        evenement = result.scalar_one_or_none()
+        if evenement:
+            await self._attacher_prix(evenement)
+        return evenement
 
     async def get_all_evenements(self) -> List[Evenement]:
         result = await self.db.execute(select(Evenement))
-        return result.scalars().all()
+        evenements = result.scalars().all()
+        for e in evenements:
+            await self._attacher_prix(e)
+        return evenements
 
     async def get_evenements_publics(self) -> List[Evenement]:
         result = await self.db.execute(
             select(Evenement).filter(Evenement.statut_validation == "valide")
         )
-        return result.scalars().all()
+        evenements = result.scalars().all()
+        for e in evenements:
+            await self._attacher_prix(e)
+        return evenements
 
     async def update_evenement(
         self, evenement_id: int, evenement_update: EvenementCreate
@@ -42,6 +60,7 @@ class EvenementService:
                 setattr(db_evenement, key, value)
             await self.db.commit()
             await self.db.refresh(db_evenement)
+            await self._attacher_prix(db_evenement)
         return db_evenement
 
     async def publier_evenement(self, evenement_id: int) -> Optional[Evenement]:
@@ -66,6 +85,7 @@ class EvenementService:
         db_evenement.statut_validation = "en_attente_validation"
         await self.db.commit()
         await self.db.refresh(db_evenement)
+        await self._attacher_prix(db_evenement)
         return db_evenement
 
     async def valider_evenement(self, evenement_id: int) -> Optional[Evenement]:
@@ -77,6 +97,7 @@ class EvenementService:
         db_evenement.statut_validation = "valide"
         await self.db.commit()
         await self.db.refresh(db_evenement)
+        await self._attacher_prix(db_evenement)
         return db_evenement
 
     async def rejeter_evenement(self, evenement_id: int) -> Optional[Evenement]:
@@ -88,6 +109,7 @@ class EvenementService:
         db_evenement.statut_validation = "rejete"
         await self.db.commit()
         await self.db.refresh(db_evenement)
+        await self._attacher_prix(db_evenement)
         return db_evenement
 
     async def delete_evenement(self, evenement_id: int):

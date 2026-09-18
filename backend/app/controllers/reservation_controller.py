@@ -88,6 +88,29 @@ async def payer_reservation(
 
     return PaiementConfirmeResponse(
         reservation_id=reservation_id,
-        status_reservation="confirmee", 
+        statut_reservation="confirmee",
         montant_paye=paiement.montant,
+        numero_billet=billet.numero_billet,
+        qr_code=billet.qr_code,
     )
+
+@router.get("/reservations/{reservation_id}/billet", response_model=BilletResponse, summary="Get the billet for a reservation")
+async def get_billet(
+    reservation_id: int,
+    auth_data: dict = Depends(FlexibleBearer()),
+    db: AsyncSession = Depends(get_db),
+):
+    service = ReservationService(db)
+    reservation = await service.get_reservation(reservation_id)
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found.")
+
+    is_owner = auth_data.get("account_type") == "participant" and reservation.participant_id == auth_data.get("participant_id")
+    is_staff_admin = auth_data.get("account_type") == "staff" and auth_data.get("concert_id") == 0
+    if not is_owner and not is_staff_admin:
+        raise HTTPException(status_code=403, detail="Access denied for this reservation.")
+
+    billet = await service.get_billet_by_reservation(reservation_id)
+    if not billet:
+        raise HTTPException(status_code=404, detail="Billet not found. Payment may not be completed.")
+    return billet

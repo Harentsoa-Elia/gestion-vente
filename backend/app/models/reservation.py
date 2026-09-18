@@ -13,8 +13,10 @@ class Reservation(Base):
 
     evenement_id = Column(Integer, ForeignKey("evenements.id"), nullable=False)
     participant_id = Column(Integer, ForeignKey("participants.id"), nullable=False)
+    categorie_billet_id = Column(Integer, ForeignKey("categories_billet.id"), nullable=False)
 
     evenement = relationship("Evenement", back_populates="reservations")
     paiement = relationship("Paiement", back_populates="reservation", uselist=False)
     billet = relationship("Billet", back_populates="reservation", uselist=False)
     participant = relationship("Participant", back_populates="reservations")
+    categorie_billet = relationship("CategorieBillet", back_populates="reservations")

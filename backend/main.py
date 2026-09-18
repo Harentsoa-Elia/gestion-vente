@@ -15,10 +15,12 @@ from app.controllers import (
     dashboard_controller,
     reservation_controller,
     participant_controller,
+    categorie_billet_controller,
 )
 
 from app.database import engine, Base
 from app.auth.auth_bearer import JWTBearer  # Import JWTBearer
+
 
 #app = FastAPI(docs_url=None, redoc_url=None)
 app = FastAPI()
@@ -45,9 +47,9 @@ app.include_router(proposition_controller.router, prefix="/api/v1")
 app.include_router(interaction_publique_controller.router, prefix="/api/v1")
 app.include_router(recommandation_controller.router, prefix="/api/v1")
 app.include_router(dashboard_controller.router, prefix="/api/v1")
-app.include_router(reservation_controller.router, prefix="/api/v1", dependencies=[Depends(JWTBearer())])  # Protect reservation routes with JWTBearer
+app.include_router(reservation_controller.router, prefix="/api/v1")
 app.include_router(participant_controller.router, prefix="/api/v1")
-
+app.include_router(categorie_billet_controller.router, prefix="/api/v1")
 
 @app.get("/", tags=["system"])
 

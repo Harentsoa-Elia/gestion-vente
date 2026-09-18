@@ -14,6 +14,7 @@ from .reservation import Reservation
 from .paiement import Paiement
 from .billet import Billet
 from .participant import Participant
+from .categorie_billet import CategorieBillet
 
 __all__ = [
     'Concert',
@@ -31,4 +32,5 @@ __all__ = [
     'Paiement',
     'Billet',
     'Participant',
+    'CategorieBillet',
 ]
