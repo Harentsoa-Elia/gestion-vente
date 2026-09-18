@@ -20,6 +20,10 @@ from fastapi import HTTPException
 from sqlalchemy import update
 import uuid
 
+from app.models.billet import Billet
+from app.models.reservation import Reservation
+from app.models.evenement import Evenement
+
 
 
 class TicketService:
@@ -238,6 +242,62 @@ class TicketService:
                 if pair:
                     ticket, concert = pair
                     break
+
+        # 2.3 rien trouve dans l'ancien systeme -> chercher dans le nouveau systeme (Billet)
+        billet = evenement_new = None
+        if ticket is None:
+            for cand in candidates_id:
+                row = await self.db.execute(
+                    select(Billet, Evenement)
+                    .join(Reservation, Billet.reservation_id == Reservation.id)
+                    .join(Evenement, Reservation.evenement_id == Evenement.id)
+                    .where(Billet.numero_billet == cand)
+                )
+                pair = row.first()
+                if pair:
+                    billet, evenement_new = pair
+                    break
+
+            if billet is None:
+                for qv in candidates_qr_data:
+                    row = await self.db.execute(
+                        select(Billet, Evenement)
+                        .join(Reservation, Billet.reservation_id == Reservation.id)
+                        .join(Evenement, Reservation.evenement_id == Evenement.id)
+                        .where(Billet.qr_code == qv)
+                    )
+                    pair = row.first()
+                    if pair:
+                        billet, evenement_new = pair
+                        break
+
+        if billet is not None:
+            if billet.is_used:
+                return TicketScanResponse(
+                    ticket_id=billet.numero_billet, is_valid=False,
+                    message="Ticket deja utilise.",
+                    concert_title=evenement_new.titre,
+                    concert_description=evenement_new.description,
+                )
+            billet.is_used = True
+            self.db.add(billet)
+            try:
+                await self.db.commit()
+            except Exception:
+                await self.db.rollback()
+                return TicketScanResponse(
+                    ticket_id=billet.numero_billet, is_valid=False,
+                    message="Erreur interne lors de la validation du ticket.",
+                    concert_title=evenement_new.titre,
+                    concert_description=evenement_new.description,
+                )
+            await self.db.refresh(billet)
+            return TicketScanResponse(
+                ticket_id=billet.numero_billet, is_valid=True,
+                message="Ticket valide. Bon evenement!",
+                concert_title=evenement_new.titre,
+                concert_description=evenement_new.description,
+            )        
 
         if ticket is None:
             return TicketScanResponse(
