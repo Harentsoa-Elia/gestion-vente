@@ -7,3 +7,5 @@ export * from "./proposition";
 export * from "./interaction";
 export * from "./dashboard";
 export * from "./reservation";
+export * from "./evenement";
+export * from "./participant";
