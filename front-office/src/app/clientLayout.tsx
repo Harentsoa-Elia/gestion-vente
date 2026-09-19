@@ -5,13 +5,16 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "sonner"
 import { AppHeader } from "@/components/app-header"
+import { PublicHeader } from "@/components/public-header"
 import { usePathname } from "next/navigation"
+import { isPublicRoute } from "@/utils"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export default function ClientLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname()
   const isLoginPage = pathname === "/login"
+  const isPublic = isPublicRoute(pathname)
 
   return (
     <html lang="fr">
@@ -34,10 +37,13 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
           }
         `}</style>
 
-        {!isLoginPage && <AppHeader />}
+        {isPublic ? (
+          <PublicHeader />
+        ) : (
+          !isLoginPage && <AppHeader />
+        )}
 
-        {/* Fix: no padding on login page */}
-        <main className={isLoginPage ? "pt-0" : "pt-[55px]"}>{children}</main>
+        <main className={isLoginPage || isPublic ? "pt-0" : "pt-[55px]"}>{children}</main>
 
         <Toaster richColors position="top-right" />
       </body>

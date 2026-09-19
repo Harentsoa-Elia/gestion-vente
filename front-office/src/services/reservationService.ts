@@ -1,4 +1,5 @@
-import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
+import { API_BASE_URL, parseJsonSafe } from "./apiConfig";
+import { getParticipantAuthHeaders } from "./participantService";
 import type { Reservation, PaiementConfirme, Billet, CategorieBillet } from "../types";
 
 export async function fetchCategoriesBillet(evenementId: number): Promise<CategorieBillet[]> {
@@ -13,7 +14,7 @@ export async function fetchCategoriesBillet(evenementId: number): Promise<Catego
 export async function createReservation(evenementId: number, categorieBilletId: number): Promise<Reservation> {
   const res = await fetch(`${API_BASE_URL}/reservations`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: getParticipantAuthHeaders(),
     body: JSON.stringify({ evenement_id: evenementId, categorie_billet_id: categorieBilletId }),
   });
   const data = await parseJsonSafe(res);
@@ -26,7 +27,7 @@ export async function createReservation(evenementId: number, categorieBilletId: 
 export async function payerReservation(reservationId: number): Promise<PaiementConfirme> {
   const res = await fetch(`${API_BASE_URL}/reservations/${reservationId}/payer`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: getParticipantAuthHeaders(),
   });
   const data = await parseJsonSafe(res);
   if (!res.ok) {
@@ -37,7 +38,7 @@ export async function payerReservation(reservationId: number): Promise<PaiementC
 
 export async function fetchBillet(reservationId: number): Promise<Billet> {
   const res = await fetch(`${API_BASE_URL}/reservations/${reservationId}/billet`, {
-    headers: getAuthHeaders(),
+    headers: getParticipantAuthHeaders(),
   });
   const data = await parseJsonSafe(res);
   if (!res.ok) {
@@ -48,7 +49,7 @@ export async function fetchBillet(reservationId: number): Promise<Billet> {
 
 export async function fetchMesReservations(): Promise<Reservation[]> {
   const res = await fetch(`${API_BASE_URL}/reservations/moi`, {
-    headers: getAuthHeaders(),
+    headers: getParticipantAuthHeaders(),
   });
   const data = await parseJsonSafe(res);
   if (!res.ok) {

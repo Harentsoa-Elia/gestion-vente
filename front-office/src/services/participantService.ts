@@ -59,3 +59,14 @@ export async function fetchParticipantMe(): Promise<Participant> {
   }
   return data;
 }
+
+export async function logoutParticipant(): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/participants/logout`, {
+    method: "POST",
+    headers: getParticipantAuthHeaders(),
+  });
+  if (!res.ok) {
+    const data = await parseJsonSafe(res);
+    throw new Error(data?.detail || `Failed to logout: ${res.statusText}`);
+  }
+}
