@@ -90,13 +90,11 @@ async def scan_ticket(
 
     service = TicketService(db)
     try:
-        return await service.scan_ticket(request)
+        return await service.scan_ticket(request, auth_data)
     except HTTPException:
         raise
     except Exception:
         raise HTTPException(status_code=500, detail="Erreur interne lors du scan.")
-
-
 # -----------------------
 # Statistiques globales
 # -----------------------

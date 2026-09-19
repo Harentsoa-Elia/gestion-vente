@@ -147,7 +147,7 @@ class TicketService:
     # -------------------------
     # Scan d'un ticket
     # -------------------------
-    async def scan_ticket(self, req: TicketScanRequest) -> TicketScanResponse:
+    async def scan_ticket(self, req: TicketScanRequest, auth_data: dict) -> TicketScanResponse:
         if not req.selected_categories:
             return TicketScanResponse(
                 ticket_id="UNKNOWN", is_valid=False,
@@ -272,6 +272,14 @@ class TicketService:
                         break
 
         if billet is not None:
+            user_concert_id = auth_data.get("concert_id")
+            if user_concert_id != 0 and auth_data.get("user_id") != evenement_new.organisateur_id:
+                return TicketScanResponse(
+                    ticket_id=billet.numero_billet, is_valid=False,
+                    message="Evenement non autorise pour cette selection.",
+                    concert_title=evenement_new.titre,
+                    concert_description=evenement_new.description,
+                )
             if billet.is_used:
                 return TicketScanResponse(
                     ticket_id=billet.numero_billet, is_valid=False,
