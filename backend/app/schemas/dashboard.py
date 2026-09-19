@@ -10,6 +10,9 @@ class DashboardEvenementResponse(BaseModel):
     score_popularite: int
     niveau_interet_estime: Optional[float]
     participation_estimee: Optional[int]
+    billets_total: int
+    billets_scannes: int
+    billets_non_scannes: int
 
 
 class EvenementPopulaireResponse(BaseModel):

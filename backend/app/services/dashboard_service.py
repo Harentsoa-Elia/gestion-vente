@@ -8,6 +8,7 @@ from app.models.proposition import Proposition
 from app.models.interaction_publique import InteractionPublique
 from app.models.recommandation import Recommandation
 from app.utils.scoring import POIDS_INTERACTION
+from app.models.billet import Billet
 
 
 class DashboardService:
@@ -34,6 +35,22 @@ class DashboardService:
 
         taux = (nb_reservations_confirmees / evenement.capacite) * 100
         return round(min(taux, 100), 2)
+
+    async def get_billets_scan_stats(self, evenement_id: int) -> Dict:
+        from app.models.reservation import Reservation
+
+        result = await self.db.execute(
+            select(Billet.is_used)
+            .join(Reservation, Billet.reservation_id == Reservation.id)
+            .filter(Reservation.evenement_id == evenement_id)
+        )
+        etats = result.scalars().all()
+
+        total = len(etats)
+        scannes = sum(1 for e in etats if e)
+        non_scannes = total - scannes
+
+        return {"total": total, "scannes": scannes, "non_scannes": non_scannes}
 
     async def get_score_total_evenement(self, evenement_id: int) -> int:
         result = await self.db.execute(
@@ -81,6 +98,7 @@ class DashboardService:
 
         taux_remplissage = await self.get_taux_remplissage(evenement_id)
         score_popularite = await self.get_score_total_evenement(evenement_id)
+        billets_scan = await self.get_billets_scan_stats(evenement_id)
 
         recommandation_result = await self.db.execute(
             select(Recommandation).filter(Recommandation.evenement_id == evenement_id)
@@ -95,4 +113,7 @@ class DashboardService:
             "score_popularite": score_popularite,
             "niveau_interet_estime": recommandation.niveau_interet_estime if recommandation else None,
             "participation_estimee": recommandation.participation_estimee if recommandation else None,
+            "billets_total": billets_scan["total"],
+            "billets_scannes": billets_scan["scannes"],
+            "billets_non_scannes": billets_scan["non_scannes"],
         }
