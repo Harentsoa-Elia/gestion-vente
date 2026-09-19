@@ -1,6 +1,15 @@
+export interface CategorieBillet {
+  id: number
+  nom: string
+  prix: number
+  quantite_disponible: number | null
+  evenement_id: number
+}
+
 export interface Reservation {
   id: number
   evenement_id: number
+  categorie_billet_id: number
   statut: string
   participant_id: number
   date_reservation: string

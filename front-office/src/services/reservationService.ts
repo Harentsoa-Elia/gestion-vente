@@ -1,11 +1,20 @@
 import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
-import type { Reservation, PaiementConfirme, Billet } from "../types";
+import type { Reservation, PaiementConfirme, Billet, CategorieBillet } from "../types";
 
-export async function createReservation(evenementId: number): Promise<Reservation> {
+export async function fetchCategoriesBillet(evenementId: number): Promise<CategorieBillet[]> {
+  const res = await fetch(`${API_BASE_URL}/evenements/${evenementId}/categories-billet`);
+  const data = await parseJsonSafe(res);
+  if (!res.ok) {
+    throw new Error(data?.detail || `Failed to fetch categories: ${res.statusText}`);
+  }
+  return data;
+}
+
+export async function createReservation(evenementId: number, categorieBilletId: number): Promise<Reservation> {
   const res = await fetch(`${API_BASE_URL}/reservations`, {
     method: "POST",
     headers: getAuthHeaders(),
-    body: JSON.stringify({ evenement_id: evenementId }),
+    body: JSON.stringify({ evenement_id: evenementId, categorie_billet_id: categorieBilletId }),
   });
   const data = await parseJsonSafe(res);
   if (!res.ok) {
