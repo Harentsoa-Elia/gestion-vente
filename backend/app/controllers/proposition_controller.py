@@ -4,7 +4,7 @@ from typing import List
 
 from app.schemas.proposition import PropositionCreate, PropositionResponse, PropositionAvecScoreResponse
 from app.services.proposition_service import PropositionService
-from app.auth.auth_bearer import JWTBearer
+from app.auth.auth_bearer import JWTBearer, OptionalParticipantBearer
 from app.database import get_db
 
 router = APIRouter(tags=["propositions"])
@@ -45,7 +45,7 @@ async def create_proposition(
 )
 async def get_propositions_by_evenement(
     evenement_id: int,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(OptionalParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = PropositionService(db)
@@ -59,7 +59,7 @@ async def get_propositions_by_evenement(
 )
 async def get_propositions_avec_scores(
     evenement_id: int,
-    auth_data: dict = Depends(JWTBearer()),
+    auth_data: dict = Depends(OptionalParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = PropositionService(db)
