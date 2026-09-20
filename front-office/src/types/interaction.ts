@@ -1,4 +1,4 @@
-export type InteractionType = "LIKE" | "COMMENTAIRE" | "FAVORI"
+export type InteractionType = "LIKE" | "WAOUH" | "JADORE" | "COMMENTAIRE" | "FAVORI"
 
 export interface InteractionPublique {
   id: number

@@ -1,4 +1,5 @@
-import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
+import { API_BASE_URL, parseJsonSafe } from "./apiConfig";
+import { getParticipantAuthHeaders } from "./participantService";
 import type { InteractionCreate, InteractionPublique } from "../types";
 
 export async function createInteraction(
@@ -6,7 +7,7 @@ export async function createInteraction(
 ): Promise<InteractionPublique> {
   const res = await fetch(`${API_BASE_URL}/interactions`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers: getParticipantAuthHeaders(),
     body: JSON.stringify(interaction),
   });
   const data = await parseJsonSafe(res);

@@ -4,21 +4,28 @@ import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { createInteraction } from "@/services"
-import type { PropositionAvecScore } from "@/types"
+import type { InteractionType, PropositionAvecScore } from "@/types"
 import { toast } from "sonner"
-import { Heart, MessageCircle, Star } from "lucide-react"
+import { MessageCircle } from "lucide-react"
 
 interface PropositionCardProps {
   proposition: PropositionAvecScore
   onInteractionCreated?: () => void
 }
 
+const REACTIONS: { type: InteractionType; emoji: string; label: string }[] = [
+  { type: "LIKE", emoji: "👍", label: "J'aime" },
+  { type: "JADORE", emoji: "😍", label: "J'adore" },
+  { type: "WAOUH", emoji: "😮", label: "Waouh" },
+  { type: "FAVORI", emoji: "⭐", label: "Favori" },
+]
+
 export default function PropositionCard({ proposition, onInteractionCreated }: PropositionCardProps) {
   const [loading, setLoading] = useState<string | null>(null)
   const [commentaire, setCommentaire] = useState("")
   const [showCommentInput, setShowCommentInput] = useState(false)
 
-  const envoyerInteraction = async (type: "LIKE" | "FAVORI" | "COMMENTAIRE", contenu: string | null = null) => {
+  const envoyerInteraction = async (type: InteractionType, contenu: string | null = null) => {
     setLoading(type)
     try {
       await createInteraction({
@@ -46,27 +53,20 @@ export default function PropositionCard({ proposition, onInteractionCreated }: P
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-2 space-y-3">
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={loading !== null}
-            onClick={() => envoyerInteraction("LIKE")}
-            className="flex items-center gap-1"
-          >
-            <Heart className="w-4 h-4" />
-            {loading === "LIKE" ? "..." : "J'aime"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={loading !== null}
-            onClick={() => envoyerInteraction("FAVORI")}
-            className="flex items-center gap-1"
-          >
-            <Star className="w-4 h-4" />
-            {loading === "FAVORI" ? "..." : "Favori"}
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          {REACTIONS.map(({ type, emoji, label }) => (
+            <Button
+              key={type}
+              variant="outline"
+              size="sm"
+              disabled={loading !== null}
+              onClick={() => envoyerInteraction(type)}
+              className="flex items-center gap-1"
+            >
+              <span>{emoji}</span>
+              {loading === type ? "..." : label}
+            </Button>
+          ))}
           <Button
             variant="outline"
             size="sm"
