@@ -16,6 +16,7 @@ from app.controllers import (
     reservation_controller,
     participant_controller,
     categorie_billet_controller,
+    notification_controller,
 )
 
 from app.database import engine, Base
@@ -50,6 +51,7 @@ app.include_router(dashboard_controller.router, prefix="/api/v1")
 app.include_router(reservation_controller.router, prefix="/api/v1")
 app.include_router(participant_controller.router, prefix="/api/v1")
 app.include_router(categorie_billet_controller.router, prefix="/api/v1")
+app.include_router(notification_controller.router, prefix="/api/v1")
 
 @app.get("/", tags=["system"])
 

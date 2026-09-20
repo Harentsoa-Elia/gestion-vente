@@ -12,6 +12,7 @@ from app.models.evenement import Evenement
 from app.models.categorie_billet import CategorieBillet
 from app.schemas.reservation import ReservationCreate
 from app.utils.crypto import encrypt_data
+from app.models.notification import Notification
 
 
 class ReservationService:
@@ -92,6 +93,20 @@ class ReservationService:
 
         reservation.statut = "confirmee"
         self.db.add(reservation)
+        # Recupere l'evenement pour identifier son organisateur et son titre,
+        # afin de creer la notification qui lui est destinee.
+        result_evenement = await self.db.execute(
+            select(Evenement).filter(Evenement.id == reservation.evenement_id)
+        )
+        evenement = result_evenement.scalar_one_or_none()
+        if evenement:
+             notification = Notification(
+                organisateur_id=evenement.organisateur_id,
+                message=f"Nouvelle reservation confirmee pour '{evenement.titre}' ({montant:.0f} Ar).",
+                lu=False,
+                reservation_id=reservation_id,
+            )
+             self.db.add(notification)
 
         await self.db.commit()
         await self.db.refresh(paiement)

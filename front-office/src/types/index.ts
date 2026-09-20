@@ -9,3 +9,4 @@ export * from "./dashboard";
 export * from "./reservation";
 export * from "./evenement";
 export * from "./participant";
+export * from "./notification";

@@ -18,6 +18,7 @@ import clsx from "clsx";
 import { fetchUserData, logout } from "@/services/auth.service";
 import type { AuthUser } from "@/types/auth";
 import { API_BASE_URL } from "@/services/apiConfig";
+import { NotificationBell } from "@/components/notification-bell";
 
 export function AppHeader() {
 const pathname = usePathname();
@@ -37,7 +38,7 @@ const [showAdminMenu, setShowAdminMenu] = useState(false);
 
 // ---------------- BASE LINKS ----------------
 const baseLinks = [
-{ href: "/", label: "Tableau de bord", icon: LayoutDashboard },
+{ href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
 { href: "/concerts/new", label: "Concerts", icon: PlusCircle },
 ];
 
@@ -247,6 +248,9 @@ onClick={() => setIsOpen(!isOpen)}
             </Link> 
           </Button> 
         )} 
+
+         {/* NOTIFICATIONS */} 
+        <NotificationBell /> 
 
         {/* USER INFO */} 
         <div className="hidden sm:flex items-center gap-2 text-sm"> 
