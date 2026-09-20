@@ -16,8 +16,11 @@ export default function LoginPage() {
         const currentTime = Date.now() / 1000
 
         if (payload.expires > currentTime) {
-          // User is authenticated, redirect to home
-          router.push("/")
+          // User is authenticated, redirect to dashboard.
+          // (avant, "/" redirigeait lui-meme vers "/dashboard" ; ce n'est
+          // plus le cas depuis que "/" est devenu l'accueil public du site,
+          // donc on pointe directement vers /dashboard ici.)
+          router.push("/dashboard")
         }
       } catch (error) {
         // Invalid token, stay on login page
@@ -27,8 +30,8 @@ export default function LoginPage() {
   }, [router])
 
   const handleLoginSuccess = (token: string) => {
-    // Redirect to home page after successful login
-    router.push("/")
+    // Redirect to dashboard after successful login (voir commentaire ci-dessus)
+    router.push("/dashboard")
   }
 
   return <LoginForm onLoginSuccess={handleLoginSuccess} />
