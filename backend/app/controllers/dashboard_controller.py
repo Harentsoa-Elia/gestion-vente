@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from app.schemas.dashboard import DashboardEvenementResponse, EvenementPopulaireResponse
+from app.schemas.dashboard import (
+    DashboardEvenementResponse,
+    EvenementPopulaireResponse,
+    DashboardOrganisateurResponse,
+)
 from app.services.dashboard_service import DashboardService
 from app.services.evenement_service import EvenementService
 from app.auth.auth_bearer import JWTBearer
@@ -35,6 +39,22 @@ async def get_dashboard_evenement(
     if not data:
         raise HTTPException(status_code=404, detail="Evenement not found.")
     return data
+
+
+@router.get(
+    "/organisateurs/moi/dashboard",
+    response_model=DashboardOrganisateurResponse,
+    summary="Get global dashboard KPIs across all evenements of the current organisateur",
+)
+async def get_dashboard_organisateur(
+    auth_data: dict = Depends(JWTBearer()),
+    db: AsyncSession = Depends(get_db),
+):
+    organisateur_id = auth_data.get("user_id")
+    if not organisateur_id:
+        raise HTTPException(status_code=403, detail="Utilisateur non identifie.")
+    service = DashboardService(db)
+    return await service.get_dashboard_organisateur(organisateur_id)
 
 
 @router.get(

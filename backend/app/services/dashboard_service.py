@@ -88,6 +88,90 @@ class DashboardService:
         resultats.sort(key=lambda x: x["score_popularite"], reverse=True)
         return resultats[:limit]
 
+    async def get_dashboard_organisateur(self, organisateur_id: int) -> Dict:
+        from app.models.reservation import Reservation
+        from app.models.paiement import Paiement
+        from app.models.categorie_billet import CategorieBillet
+
+        result_ev = await self.db.execute(
+            select(Evenement).filter(Evenement.organisateur_id == organisateur_id)
+        )
+        evenements = result_ev.scalars().all()
+        evenement_ids = [e.id for e in evenements]
+        evenements_publies = sum(1 for e in evenements if e.statut_validation == "valide")
+
+        if not evenement_ids:
+            return {
+                "evenements_publies": 0,
+                "billets_vendus": 0,
+                "taux_remplissage_moyen": 0.0,
+                "recettes_totales": 0.0,
+                "ventes_par_jour": [],
+                "categories_populaires": [],
+            }
+
+        result_billets = await self.db.execute(
+            select(func.count(Billet.id))
+            .join(Reservation, Billet.reservation_id == Reservation.id)
+            .filter(Reservation.evenement_id.in_(evenement_ids))
+        )
+        billets_vendus = result_billets.scalar() or 0
+
+        result_recettes = await self.db.execute(
+            select(func.coalesce(func.sum(Paiement.montant), 0.0))
+            .join(Reservation, Paiement.reservation_id == Reservation.id)
+            .filter(
+                Reservation.evenement_id.in_(evenement_ids),
+                Paiement.statut_paiement == "paye",
+            )
+        )
+        recettes_totales = result_recettes.scalar() or 0.0
+
+        taux_list = []
+        for e in evenements:
+            if e.statut_validation == "valide" and e.capacite and e.capacite > 0:
+                t = await self.get_taux_remplissage(e.id)
+                if t is not None:
+                    taux_list.append(t)
+        taux_remplissage_moyen = round(sum(taux_list) / len(taux_list), 2) if taux_list else 0.0
+
+        result_ventes = await self.db.execute(
+            select(func.date(Reservation.date_reservation), func.count(Reservation.id))
+            .filter(
+                Reservation.evenement_id.in_(evenement_ids),
+                Reservation.statut == "confirmee",
+            )
+            .group_by(func.date(Reservation.date_reservation))
+            .order_by(func.date(Reservation.date_reservation))
+        )
+        ventes_par_jour = [
+            {"date": str(row[0]), "nombre": row[1]} for row in result_ventes.all()
+        ]
+
+        result_categories = await self.db.execute(
+            select(CategorieBillet.nom, func.count(Reservation.id))
+            .join(Reservation, Reservation.categorie_billet_id == CategorieBillet.id)
+            .filter(
+                Reservation.evenement_id.in_(evenement_ids),
+                Reservation.statut == "confirmee",
+            )
+            .group_by(CategorieBillet.nom)
+            .order_by(func.count(Reservation.id).desc())
+            .limit(5)
+        )
+        categories_populaires = [
+            {"categorie": row[0], "nombre": row[1]} for row in result_categories.all()
+        ]
+
+        return {
+            "evenements_publies": evenements_publies,
+            "billets_vendus": billets_vendus,
+            "taux_remplissage_moyen": taux_remplissage_moyen,
+            "recettes_totales": recettes_totales,
+            "ventes_par_jour": ventes_par_jour,
+            "categories_populaires": categories_populaires,
+        }
+
     async def get_dashboard_evenement(self, evenement_id: int) -> Dict:
         result = await self.db.execute(
             select(Evenement).filter(Evenement.id == evenement_id)
