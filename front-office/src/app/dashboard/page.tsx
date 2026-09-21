@@ -441,7 +441,10 @@ function DashboardContent() {
                   Statistiques en temps réel et gestion des billets
                   {lastUpdate && (
                     <span className="text-xs text-green-600 dark:text-green-400 ml-2">
-                      ● Mis à jour: {lastUpdate.toLocaleTimeString()}
+                      <span className="ml-2 inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                        <span className="inline-block h-2 w-2 rounded-full bg-green-600 dark:bg-green-400" />
+                        Mis à jour: {lastUpdate.toLocaleTimeString()}
+                      </span>
                     </span>
                   )}
                 </p>

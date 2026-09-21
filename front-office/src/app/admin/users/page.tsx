@@ -18,6 +18,7 @@ import {
   MoreVertical,
   UserPlus,
   Edit3,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -137,7 +138,7 @@ function Select({ value, onValueChange, children, placeholder }: SelectProps) {
             ? selectedChild.props.children
             : placeholder || "Sélectionnez..."}
         </span>
-        <span className="ml-2 text-xs text-slate-400">▼</span>
+        <ChevronDown className="ml-2 h-4 w-4 text-slate-400" />
       </button>
 
       {isOpen && (

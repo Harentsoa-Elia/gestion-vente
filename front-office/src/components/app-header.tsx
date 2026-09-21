@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
 LayoutDashboard,
 PlusCircle,
+CalendarRange,
 Ticket,
 Menu,
 ChevronDown,
@@ -40,6 +41,7 @@ const [showAdminMenu, setShowAdminMenu] = useState(false);
 const baseLinks = [
 { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
 { href: "/concerts/new", label: "Concerts", icon: PlusCircle },
+{ href: "/organisateur/dashboard", label: "Mes evenements", icon: CalendarRange },
 ];
 
 // ---------------- LION HILL ----------------
