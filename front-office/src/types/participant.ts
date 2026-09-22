@@ -1,3 +1,5 @@
+export type Genre = "Masculin" | "Feminin" | "Autre"
+
 export interface Participant {
   id: number
   nom: string
@@ -6,7 +8,7 @@ export interface Participant {
   telephone: string | null
   adresse: string | null
   date_naissance: string | null
-  genre: string | null
+  genre: Genre | null
   avatar: string | null
   statut: string
   date_creation: string
@@ -19,8 +21,8 @@ export interface ParticipantSignupPayload {
   mot_de_passe: string
   telephone?: string
   adresse?: string
-  date_naissance?: string
-  genre?: string
+  date_naissance: string
+  genre: Genre
 }
 
 export interface ParticipantLoginPayload {
