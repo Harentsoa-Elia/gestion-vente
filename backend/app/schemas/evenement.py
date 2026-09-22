@@ -37,6 +37,7 @@ class EvenementResponse(EvenementBase):
     statut_validation: StatutValidation
     date_creation: datetime
     prix_a_partir_de: Optional[float] = Field(None, description="Prix minimum parmi les categories de billet disponibles")
+    nombre_vues: int = Field(0, description="Nombre de fois ou la page detail a ete consultee")
 
     class Config:
         from_attributes = True

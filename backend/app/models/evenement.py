@@ -14,11 +14,12 @@ class Evenement(Base):
     capacite = Column(Integer, nullable=True)
     statut_validation = Column(String, default="brouillon", nullable=False)
     date_creation = Column(DateTime(timezone=True), server_default=func.now())
+    nombre_vues = Column(Integer, default=0, nullable=False)
 
     lieu_id = Column(Integer, ForeignKey("lieux.id"), nullable=True)
     categorie_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     organisateur_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-
+    
     lieu = relationship("Lieu", back_populates="evenements")
     categorie = relationship("Categorie", back_populates="evenements")
     propositions = relationship("Proposition", back_populates="evenement")

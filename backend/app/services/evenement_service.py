@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func
 from typing import List, Optional
+from sqlalchemy import func, update
 
 from app.models.evenement import Evenement
 from app.models.categorie_billet import CategorieBillet
@@ -18,6 +19,17 @@ class EvenementService:
         )
         evenement.prix_a_partir_de = result.scalar()
         return evenement
+
+    async def incrementer_vues(self, evenement_id: int) -> None:
+        """Incremente le compteur de vues de maniere atomique (UPDATE direct,
+        pas de lecture-puis-ecriture, pour eviter toute perte de vues en cas
+        de requetes concurrentes)."""
+        await self.db.execute(
+            update(Evenement)
+            .where(Evenement.id == evenement_id)
+            .values(nombre_vues=Evenement.nombre_vues + 1)
+        )
+        await self.db.commit()
 
     async def create_evenement(self, evenement: EvenementCreate, organisateur_id: int) -> Evenement:
         db_evenement = Evenement(**evenement.dict(), organisateur_id=organisateur_id)

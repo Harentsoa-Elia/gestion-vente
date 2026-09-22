@@ -69,6 +69,9 @@ async def get_evenement(
     evenement = await service.get_evenement(evenement_id)
     if not evenement:
         raise HTTPException(status_code=404, detail="Evenement not found.")
+
+    await service.incrementer_vues(evenement_id)
+    evenement.nombre_vues = (evenement.nombre_vues or 0) + 1
     return evenement
 
 
