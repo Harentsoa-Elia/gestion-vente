@@ -2,13 +2,13 @@
 
 import AuthWrapper from "@/components/auth-wrapper"
 import { OrganisateurSidebarLayout } from "@/components/organisateur-sidebar-layout"
-import { OrganisateurDashboard } from "@/components/organisateur-dashboard"
+import { OrganisateurPaiements } from "@/components/organisateur-paiements"
 
-export default function OrganisateurDashboardPage() {
+export default function OrganisateurPaiementsPage() {
   return (
     <AuthWrapper>
       <OrganisateurSidebarLayout>
-        <OrganisateurDashboard />
+        <OrganisateurPaiements />
       </OrganisateurSidebarLayout>
     </AuthWrapper>
   )

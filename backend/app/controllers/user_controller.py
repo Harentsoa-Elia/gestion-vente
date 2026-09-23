@@ -120,7 +120,6 @@ async def update_user(
         }
     }
 
-
 @router.get("/users", tags=["user"])
 async def list_users(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
     user_id = auth_data["user_id"]

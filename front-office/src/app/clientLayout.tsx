@@ -13,8 +13,11 @@ const inter = Inter({ subsets: ["latin"] })
 
 export default function ClientLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname()
-  const isLoginPage = pathname === "/login"
+  const isStaffLoginPage = pathname === "/login"
   const isPublic = isPublicRoute(pathname)
+  // Les pages /organisateur/* fournissent leur propre navigation complete
+  // (barre laterale), donc on n'affiche jamais le AppHeader du haut dessus.
+  const isSidebarSection = pathname.startsWith("/organisateur")
 
   return (
     <html lang="fr">
@@ -37,13 +40,18 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
           }
         `}</style>
 
-        {isPublic ? (
-          <PublicHeader />
-        ) : (
-          !isLoginPage && <AppHeader />
-        )}
+        {/*
+          IMPORTANT : AppHeader (staff) contient sa propre logique de
+          redirection vers /login si aucun token staff n'est present.
+          On ne le monte donc JAMAIS sur les routes publiques, sinon un
+          visiteur ou un participant sans compte staff serait redirige
+          de force vers la page de connexion staff.
+        */}
+        {isPublic && <PublicHeader />}
+        {!isPublic && !isStaffLoginPage && !isSidebarSection && <AppHeader />}
 
-        <main className={isLoginPage || isPublic ? "pt-0" : "pt-[55px]"}>{children}</main>
+        {/* Pas de padding sur les pages de login, ni sur les pages a barre laterale (qui gerent leur propre mise en page pleine hauteur) */}
+        <main className={isStaffLoginPage || isSidebarSection ? "pt-0" : "pt-[55px]"}>{children}</main>
 
         <Toaster richColors position="top-right" />
       </body>
