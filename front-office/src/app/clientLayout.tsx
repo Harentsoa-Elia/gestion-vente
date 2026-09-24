@@ -23,7 +23,10 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
 
   return (
     <html lang="fr">
-      <body className={`${inter.className} ${variablesPolices}`}>
+      {/* suppressHydrationWarning : certaines extensions de navigateur (ex. TinaMind) ajoutent
+          des attributs à <body> avant le chargement de React. Sans cette option, Next.js
+          signale une erreur d'hydratation qui ne vient pas du code. Ne s'applique qu'à <body>. */}
+      <body className={`${inter.className} ${variablesPolices}`} suppressHydrationWarning>
         <style jsx global>{`
           @media print {
             header {

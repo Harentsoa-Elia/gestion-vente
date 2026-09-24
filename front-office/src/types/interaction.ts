@@ -5,7 +5,7 @@ export interface InteractionPublique {
   type_interaction: InteractionType
   contenu: string | null
   proposition_id: number
-  participant_id: number
+  participant_id: number | null
   date_interaction: string
 }
 

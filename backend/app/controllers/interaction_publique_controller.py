@@ -30,11 +30,14 @@ async def create_interaction(
 @router.get(
     "/propositions/{proposition_id}/interactions",
     response_model=List[InteractionPubliqueResponse],
-    summary="Get all interactions for a proposition",
+    summary="Get all interactions for a proposition - lecture publique, comme les reactions et commentaires d'un reseau social",
 )
 async def get_interactions_by_proposition(
     proposition_id: int,
-    auth_data: dict = Depends(FlexibleBearer()),
+    # Lecture ouverte aux visiteurs : la page d'accueil affiche le resume des reactions
+    # et les commentaires. La creation reste ouverte (POST) et la suppression reservee
+    # a l'auteur ou a l'administrateur (DELETE).
+    auth_data: dict = Depends(OptionalParticipantBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = InteractionPubliqueService(db)

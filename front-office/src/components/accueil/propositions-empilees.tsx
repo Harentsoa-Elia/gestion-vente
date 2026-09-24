@@ -2,32 +2,21 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import Link from "next/link"
-import { toast } from "sonner"
-import { Heart, MapPin, Mic2, Shapes, Star, ThumbsUp, Vote, type LucideIcon } from "lucide-react"
-import { WaouhFace } from "@/components/ui/WaouhFace"
-import { createInteraction } from "@/services/interactionService"
-import type { InteractionType, PropositionType } from "@/types"
+import { MapPin, Mic2, Shapes, Vote, type LucideIcon } from "lucide-react"
+import type { PropositionType } from "@/types"
 import { cn } from "@/utils"
-import { POIDS_REACTION, type PropositionEnVote } from "@/lib/use-propositions"
+import type { PropositionEnVote } from "@/lib/use-propositions"
 import { formatDateLongue } from "@/lib/evenements"
 import { TitreSection } from "./titre-section"
 import { DecorationVote } from "./decoration-vote"
+import { BoiteReactions } from "./boite-reactions"
 
 /*
  * Propositions ouvertes au vote, présentées comme la section
  * « Vous aussi, engagez-vous simplement » de HelloAsso : de grandes cartes
  * en deux parties (aplat de couleur + visuel) qui s'empilent au défilement.
- * Chaque carte porte les réactions publiques, envoyées à POST /interactions.
+ * Chaque carte porte les réactions et les commentaires du public, façon Facebook (voir boite-reactions.tsx).
  */
-
-type Reaction = Exclude<InteractionType, "COMMENTAIRE">
-
-const REACTIONS: { type: Reaction; libelle: string; icone: LucideIcon | typeof WaouhFace }[] = [
-  { type: "LIKE", libelle: "J'aime", icone: ThumbsUp },
-  { type: "WAOUH", libelle: "Waouh", icone: WaouhFace },
-  { type: "FAVORI", libelle: "Favori", icone: Star },
-  { type: "JADORE", libelle: "J'adore", icone: Heart },
-]
 
 const TYPES: Record<PropositionType, { libelle: string; icone: LucideIcon }> = {
   ARTISTE: { libelle: "Artiste proposé pour", icone: Mic2 },
@@ -47,22 +36,6 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
   const ton = TONS[index % TONS.length]
   const type = TYPES[proposition.type]
   const [score, setScore] = useState(proposition.score)
-  const [envoi, setEnvoi] = useState<Reaction | null>(null)
-  const [choisie, setChoisie] = useState<Reaction | null>(null)
-
-  const reagir = async (reaction: Reaction) => {
-    setEnvoi(reaction)
-    try {
-      await createInteraction({ type_interaction: reaction, contenu: null, proposition_id: proposition.id })
-      setScore((s) => s + POIDS_REACTION[reaction])
-      setChoisie(reaction)
-      toast.success("Réaction enregistrée. Merci pour votre avis !")
-    } catch {
-      toast.error("La réaction n'a pas été enregistrée. Réessayez dans un instant.")
-    } finally {
-      setEnvoi(null)
-    }
-  }
 
   const texte = ton.clair ? "text-white" : "text-gw-nuit"
   const texteDoux = ton.clair ? "text-white/75" : "text-gw-nuit/70"
@@ -70,7 +43,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
 
   return (
     <article
-      className="group grid overflow-hidden rounded-[1.75rem] shadow-[0_30px_60px_-30px_rgba(30,26,60,0.55)] md:h-[26rem] md:grid-cols-[1.15fr_1fr]"
+      className="group grid overflow-hidden rounded-[1.75rem] shadow-[0_30px_60px_-30px_rgba(30,26,60,0.55)] md:min-h-[26rem] md:grid-cols-[1.15fr_1fr]"
       style={{ backgroundColor: ton.fond }}
     >
       {/* aplat de couleur : le texte, en grand, comme HelloAsso */}
@@ -91,45 +64,12 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
             : " pour l'instant seule en lice"}
         </p>
 
-        <div className="mt-auto pt-8">
-          <p className={cn("mb-3 text-sm font-medium", texteDoux)}>
-            {choisie ? "Votre réaction est comptée. Merci !" : "Qu'en pensez-vous ?"}
-          </p>
-          <div role="group" aria-label={`Réagir à ${proposition.libelle}`} className="flex flex-wrap gap-2">
-            {REACTIONS.map(({ type: r, libelle, icone: Icone }) => {
-              const active = choisie === r
-              return (
-                <button
-                  key={r}
-                  type="button"
-                  disabled={envoi !== null || choisie !== null}
-                  aria-pressed={active}
-                  onClick={() => reagir(r)}
-                  className={cn(
-                    "flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-default",
-                    ton.clair
-                      ? "focus-visible:outline-white"
-                      : "focus-visible:outline-gw-nuit",
-                    active
-                      ? ton.clair
-                        ? "bg-white text-gw-nuit"
-                        : "bg-gw-nuit text-white"
-                      : ton.clair
-                        ? "bg-white/12 text-white enabled:hover:bg-white/25 disabled:opacity-60"
-                        : "bg-white/60 text-gw-nuit enabled:hover:bg-white disabled:opacity-60",
-                  )}
-                >
-                  {r === "WAOUH" ? (
-                    <WaouhFace size={18} />
-                  ) : (
-                    <Icone className={cn("h-4 w-4", envoi === r && "animate-reaction-bounce")} aria-hidden />
-                  )}
-                  {libelle}
-                  <span className="sr-only"> (vaut {POIDS_REACTION[r]} point{POIDS_REACTION[r] > 1 ? "s" : ""})</span>
-                </button>
-              )
-            })}
-          </div>
+        <div className="mt-auto pt-6">
+          <BoiteReactions
+            propositionId={proposition.id}
+            libelle={proposition.libelle}
+            onScore={(delta) => setScore((v) => v + delta)}
+          />
         </div>
       </div>
 
