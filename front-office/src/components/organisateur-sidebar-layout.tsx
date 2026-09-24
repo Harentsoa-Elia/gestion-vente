@@ -94,13 +94,13 @@ function BarreLaterale({
               <div
                 key={href}
                 aria-disabled
-                className="flex cursor-not-allowed items-center justify-between gap-3 rounded-l-full py-3 pr-5 pl-4 text-sm text-white/45"
+                className="flex cursor-not-allowed items-center justify-between gap-2 rounded-l-full py-3 pr-4 pl-4 text-sm text-white/45"
               >
-                <span className="flex items-center gap-3">
-                  <Icone className="h-[18px] w-[18px]" aria-hidden />
-                  {label}
+                <span className="flex min-w-0 items-center gap-3">
+                  <Icone className="h-[18px] w-[18px] shrink-0" aria-hidden />
+                  <span className="truncate">{label}</span>
                 </span>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium">Bientôt</span>
+                <span className="shrink-0 rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium">Bientôt</span>
               </div>
             )
           }
@@ -222,7 +222,7 @@ export function OrganisateurSidebarLayout({ children }: OrganisateurSidebarLayou
     <div className={cn("gw-orga", darkMode && "dark")}>
       <div className={cn("flex min-h-screen", fondBarre)}>
         {/* barre latérale : fixe sur grand écran */}
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto lg:block">{barre}</aside>
+        <aside className="sticky top-0 hidden h-screen w-[17rem] shrink-0 overflow-y-auto [scrollbar-width:none] lg:block">{barre}</aside>
 
         {/* tiroir sur mobile */}
         {tiroirOuvert && (

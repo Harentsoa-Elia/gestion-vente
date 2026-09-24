@@ -202,7 +202,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
   const piste = darkMode ? "rgba(255,255,255,0.06)" : "#F1EEFB"
 
   return (
-    <div className="grid gap-6 px-4 py-6 lg:px-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid gap-6 px-4 py-6 lg:px-8 lg:py-8 2xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="min-w-0 space-y-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="font-titre text-2xl font-semibold">Tableau de bord</h1>
@@ -212,8 +212,8 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
         </div>
 
         {/* bandeau de bienvenue */}
-        <section className="gw-carte relative flex min-h-40 items-center overflow-hidden px-6 py-7 sm:px-8">
-          <div className="relative z-10 max-w-md">
+        <section className="gw-carte flex min-h-40 items-stretch gap-4 overflow-hidden pl-6 sm:pl-8">
+          <div className="min-w-0 flex-1 self-center py-7 pr-6 md:pr-0">
             <p className="text-sm text-gw-texte-doux dark:text-white/65">
               {salutation()}
               {prenom ? `, ${prenom}` : ""}
@@ -227,7 +227,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
                 : "Aucun événement à venir pour le moment. Bonne journée !"}
             </p>
           </div>
-          <IllustrationBienvenue className="absolute right-2 bottom-0 hidden h-[112%] text-white md:block dark:text-gw-carte-sombre" />
+          <IllustrationBienvenue className="hidden w-[38%] max-w-[300px] shrink-0 self-end text-white md:block dark:text-gw-carte-sombre" />
         </section>
 
         <div className="grid gap-6 md:grid-cols-3">
@@ -243,7 +243,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
           </div>
 
           {/* anneau de remplissage */}
-          <section className="gw-carte flex items-center gap-4 p-5">
+          <section className="gw-carte flex flex-wrap items-center justify-center gap-4 p-5">
             <div className="relative shrink-0">
               <Anneau pourcentage={data.taux_remplissage_moyen} id="anneau-remplissage" taille={88} epaisseur={10} />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -421,8 +421,8 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
       </div>
 
       {/* colonne de droite : profil et agenda */}
-      <aside className="space-y-6">
-        <section className="gw-carte p-5">
+      <aside className="grid content-start gap-6 md:grid-cols-2 2xl:grid-cols-1">
+        <section className="gw-carte self-start p-5">
           <div className="flex items-center justify-between">
             <h2 className="font-titre text-lg font-semibold">Mon profil</h2>
             <NotificationBell boutonClassName="text-gw-nuit hover:bg-gw-fond dark:text-white dark:hover:bg-white/10" />

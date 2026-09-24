@@ -51,7 +51,7 @@ export function CalendrierAgenda({ evenements }: { evenements: Evenement[] }) {
   const changerMois = (delta: number) => setMois((m) => new Date(m.getFullYear(), m.getMonth() + delta, 1))
 
   return (
-    <section aria-labelledby="agenda-titre" className="gw-carte p-5">
+    <section aria-labelledby="agenda-titre" className="gw-carte self-start p-5">
       <div className="flex items-center justify-between">
         <h2 id="agenda-titre" className="font-titre text-lg font-semibold">
           Mon agenda
