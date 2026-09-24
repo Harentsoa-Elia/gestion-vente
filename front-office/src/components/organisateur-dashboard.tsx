@@ -1,62 +1,135 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import Link from "next/link"
+import { ArrowRight, ChevronRight, Sparkles, TrendingUp } from "lucide-react"
 import {
-  CalendarCheck,
-  Ticket,
-  Percent,
-  Wallet,
-  Calendar,
-} from "lucide-react"
-import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
   ResponsiveContainer,
-  LineChart,
-  Line,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  BarChart,
-  Bar,
 } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { fetchDashboardOrganisateur } from "@/services/dashboardService"
+import { fetchDashboardOrganisateur, fetchEvenementsPopulaires } from "@/services/dashboardService"
 import { fetchUserData } from "@/services/auth.service"
 import { fetchAllEvenements } from "@/services/evenementService"
-import type { DashboardOrganisateur, AuthUser, Evenement } from "@/types"
+import type { AuthUser, DashboardOrganisateur, Evenement, EvenementPopulaire } from "@/types"
+import { NotificationBell } from "@/components/notification-bell"
+import { CalendrierAgenda } from "@/components/organisateur/calendrier-agenda"
+import { IllustrationBienvenue } from "@/components/organisateur/illustration-bienvenue"
+import { cn } from "@/utils"
 
-function formatAr(montant: number) {
-  return `${montant.toLocaleString("fr-FR")} Ar`
+/*
+ * Tableau de bord de l'organisateur, sur le modèle « uTask » :
+ * bandeau de bienvenue, trois chiffres clés, anneau de remplissage, courbe des ventes,
+ * événements populaires, réservations par catégorie, puis profil et agenda à droite.
+ * Couleurs guichetweb ; thème clair ou sombre selon la barre latérale (prop darkMode).
+ */
+
+const compact = new Intl.NumberFormat("fr-FR", { notation: "compact", maximumFractionDigits: 1 })
+const entier = new Intl.NumberFormat("fr-FR")
+
+function salutation() {
+  const h = new Date().getHours()
+  return h < 12 ? "Bonjour" : h < 18 ? "Bon après-midi" : "Bonsoir"
 }
 
-function formatDateCourte(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })
+/* ---------- petites briques ---------- */
+
+function TitreCarte({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <h2 className="font-titre text-lg font-semibold">{children}</h2>
+      {action}
+    </div>
+  )
 }
 
-function formatDateLongue(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })
+function Vide({ children }: { children: React.ReactNode }) {
+  return <p className="py-10 text-center text-sm text-gw-texte-doux dark:text-white/60">{children}</p>
 }
 
-function getSalutation() {
-  const heure = new Date().getHours()
-  if (heure < 12) return "Bonjour"
-  if (heure < 18) return "Bon apres-midi"
-  return "Bonsoir"
+/** Petit motif de barres, décoratif, comme sur les cartes du modèle. */
+function MotifBarres() {
+  return (
+    <svg viewBox="0 0 36 28" className="h-8 w-10 shrink-0" aria-hidden>
+      <defs>
+        <linearGradient id="motif-barres" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#E8479A" />
+          <stop offset="1" stopColor="#6C5CE7" />
+        </linearGradient>
+      </defs>
+      {[10, 18, 13, 24, 16].map((h, i) => (
+        <rect key={i} x={i * 7.5} y={28 - h} width="4" height={h} rx="2" fill="url(#motif-barres)" />
+      ))}
+    </svg>
+  )
 }
 
-const KPI_CONFIG = [
-  { key: "evenements_publies", label: "Evenements publies", icon: CalendarCheck, color: "#3B82F6" },
-  { key: "billets_vendus", label: "Billets vendus", icon: Ticket, color: "#22C55E" },
-  { key: "taux_remplissage_moyen", label: "Taux de remplissage moyen", icon: Percent, color: "#F59E0B" },
-  { key: "recettes_totales", label: "Recettes totales", icon: Wallet, color: "#8B5CF6" },
-] as const
-
-const STATUT_LABELS: Record<string, string> = {
-  brouillon: "Brouillon",
-  en_attente_validation: "En attente",
-  valide: "Valide",
-  rejete: "Rejete",
+function CarteChiffre({ valeur, libelle, titre }: { valeur: string; libelle: string; titre?: string }) {
+  return (
+    <div className="gw-carte flex flex-col justify-between gap-3 p-5" title={titre}>
+      <MotifBarres />
+      <div>
+        <p className="font-titre text-2xl leading-none font-semibold whitespace-nowrap">{valeur}</p>
+        <p className="mt-1.5 text-sm text-gw-texte-doux dark:text-white/65">{libelle}</p>
+      </div>
+    </div>
+  )
 }
+
+function Anneau({ pourcentage, taille = 132, epaisseur = 14, id }: { pourcentage: number; taille?: number; epaisseur?: number; id: string }) {
+  const r = (taille - epaisseur) / 2
+  const c = 2 * Math.PI * r
+  const p = Math.max(0, Math.min(100, pourcentage))
+  return (
+    <svg width={taille} height={taille} viewBox={`0 0 ${taille} ${taille}`} className="-rotate-90" aria-hidden>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#6C5CE7" />
+          <stop offset="1" stopColor="#E8479A" />
+        </linearGradient>
+      </defs>
+      <circle cx={taille / 2} cy={taille / 2} r={r} fill="none" strokeWidth={epaisseur} className="stroke-gw-lavande/60 dark:stroke-white/10" />
+      {p > 0 && (
+        <circle
+          cx={taille / 2}
+          cy={taille / 2}
+          r={r}
+          fill="none"
+          stroke={`url(#${id})`}
+          strokeWidth={epaisseur}
+          strokeLinecap="round"
+          strokeDasharray={`${(p / 100) * c} ${c}`}
+        />
+      )}
+    </svg>
+  )
+}
+
+/** Props injectées par Recharts dans une info-bulle personnalisée. */
+interface InfoBulleProps {
+  active?: boolean
+  payload?: { value?: number | string }[]
+  label?: string | number
+}
+
+function InfoBulleVentes({ active, payload, label }: InfoBulleProps) {
+  if (!active || !payload?.length) return null
+  const n = Number(payload[0].value ?? 0)
+  return (
+    <div className="rounded-full bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] px-3 py-1.5 text-xs font-semibold text-white shadow-lg">
+      {label} : {entier.format(n)} billet{n > 1 ? "s" : ""}
+    </div>
+  )
+}
+
+/* ---------- tableau de bord ---------- */
 
 interface OrganisateurDashboardProps {
   darkMode?: boolean
@@ -66,177 +139,320 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
   const [data, setData] = useState<DashboardOrganisateur | null>(null)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [evenements, setEvenements] = useState<Evenement[]>([])
+  const [populaires, setPopulaires] = useState<EvenementPopulaire[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    Promise.all([fetchDashboardOrganisateur(), fetchUserData(), fetchAllEvenements()])
-      .then(([dashboard, userData, evenementsData]) => {
-        setData(dashboard)
-        setUser(userData)
-        setEvenements(evenementsData)
+    Promise.allSettled([fetchDashboardOrganisateur(), fetchUserData(), fetchAllEvenements(), fetchEvenementsPopulaires()])
+      .then(([d, u, e, p]) => {
+        if (d.status === "rejected") {
+          setError(d.reason instanceof Error ? d.reason.message : "Erreur de chargement du tableau de bord.")
+          return
+        }
+        setData(d.value)
+        const utilisateur = u.status === "fulfilled" ? u.value : null
+        setUser(utilisateur)
+        // /evenements/all renvoie les événements de tous les organisateurs : on garde les siens
+        if (e.status === "fulfilled") {
+          setEvenements(utilisateur ? e.value.filter((x) => x.organisateur_id === utilisateur.id) : e.value)
+        }
+        if (p.status === "fulfilled") setPopulaires(p.value)
       })
-      .catch((err) => setError(err instanceof Error ? err.message : "Erreur de chargement"))
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p className="text-center py-16 text-muted-foreground dark:text-gray-400">Chargement du dashboard...</p>
-  if (error) return <p className="text-center py-16 text-red-600">{error}</p>
+  const ventes = useMemo(
+    () =>
+      (data?.ventes_par_jour ?? []).map((v) => ({
+        jour: new Date(v.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }),
+        ventes: v.nombre,
+      })),
+    [data],
+  )
+  const categories = useMemo(
+    () => [...(data?.categories_populaires ?? [])].sort((a, b) => b.nombre - a.nombre),
+    [data],
+  )
+
+  if (loading) {
+    return (
+      <div className="grid gap-6 px-4 py-8 lg:px-8" aria-busy>
+        <div className="h-40 animate-pulse rounded-3xl bg-white/70 dark:bg-white/5" />
+        <div className="grid gap-6 md:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-28 animate-pulse rounded-3xl bg-white/70 dark:bg-white/5" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+  if (error) return <p className="px-8 py-16 text-center text-gw-rose-action">{error}</p>
   if (!data) return null
 
-  const ventesData = data.ventes_par_jour.map((v) => ({
-    date: formatDateCourte(v.date),
-    ventes: v.nombre,
-  }))
-
-  const categoriesData = data.categories_populaires.map((c) => ({
-    categorie: c.categorie,
-    reservations: c.nombre,
-  }))
-
-  const gridColor = darkMode ? "#334155" : "#E5E7EB"
-  const tickColor = darkMode ? "#94A3B8" : "#374151"
   const prenom = user?.fullname?.split(" ")[0]
+  const maintenant = Date.now()
+  const aVenir = evenements.filter((e) => new Date(e.date_debut).getTime() >= maintenant)
+  const totalVentes = ventes.reduce((s, v) => s + v.ventes, 0)
+  const totalCategories = categories.reduce((s, c) => s + c.nombre, 0)
+  const partTete = totalCategories > 0 ? Math.round((categories[0].nombre / totalCategories) * 100) : 0
 
-  const prochainsEvenements = evenements
-    .filter((e) => new Date(e.date_debut) >= new Date())
-    .sort((a, b) => new Date(a.date_debut).getTime() - new Date(b.date_debut).getTime())
-    .slice(0, 5)
+  const axe = darkMode ? "rgba(255,255,255,0.55)" : "#6E6987"
+  const grille = darkMode ? "rgba(255,255,255,0.08)" : "#ECE8F7"
+  const piste = darkMode ? "rgba(255,255,255,0.06)" : "#F1EEFB"
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">
-            {getSalutation()}{prenom ? `, ${prenom}` : ""}
-          </h1>
-          <p className="text-muted-foreground dark:text-gray-400">Voici un apercu de vos evenements</p>
+    <div className="grid gap-6 px-4 py-6 lg:px-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="min-w-0 space-y-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h1 className="font-titre text-2xl font-semibold">Tableau de bord</h1>
+          <p className="text-sm capitalize text-gw-texte-doux dark:text-white/60">
+            {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {KPI_CONFIG.map(({ key, label, icon: Icon, color }) => {
-            const raw = data[key]
-            const value =
-              key === "recettes_totales"
-                ? formatAr(raw)
-                : key === "taux_remplissage_moyen"
-                ? `${raw}%`
-                : raw.toLocaleString("fr-FR")
-            return (
-              <Card
-                key={key}
-                className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700 hover:shadow-md transition-shadow"
+        {/* bandeau de bienvenue */}
+        <section className="gw-carte relative flex min-h-40 items-center overflow-hidden px-6 py-7 sm:px-8">
+          <div className="relative z-10 max-w-md">
+            <p className="text-sm text-gw-texte-doux dark:text-white/65">
+              {salutation()}
+              {prenom ? `, ${prenom}` : ""}
+            </p>
+            <p className="font-titre mt-1 text-2xl leading-tight font-semibold sm:text-[1.7rem]">
+              Suivez vos ventes et l&apos;avis de votre public
+            </p>
+            <p className="mt-2 text-sm text-gw-texte-doux dark:text-white/65">
+              {aVenir.length > 0
+                ? `${aVenir.length} événement${aVenir.length > 1 ? "s" : ""} à venir. Bonne journée !`
+                : "Aucun événement à venir pour le moment. Bonne journée !"}
+            </p>
+          </div>
+          <IllustrationBienvenue className="absolute right-2 bottom-0 hidden h-[112%] text-white md:block dark:text-gw-carte-sombre" />
+        </section>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* trois chiffres clés */}
+          <div className="grid gap-4 sm:grid-cols-3 md:col-span-2">
+            <CarteChiffre valeur={entier.format(data.evenements_publies)} libelle="Événements publiés" />
+            <CarteChiffre valeur={entier.format(data.billets_vendus)} libelle="Billets vendus" />
+            <CarteChiffre
+              valeur={`${compact.format(data.recettes_totales)} Ar`}
+              libelle="Recettes"
+              titre={`${entier.format(data.recettes_totales)} Ar`}
+            />
+          </div>
+
+          {/* anneau de remplissage */}
+          <section className="gw-carte flex items-center gap-4 p-5">
+            <div className="relative shrink-0">
+              <Anneau pourcentage={data.taux_remplissage_moyen} id="anneau-remplissage" taille={88} epaisseur={10} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-titre text-lg font-semibold">{Math.round(data.taux_remplissage_moyen)} %</span>
+                <span className="text-[10px] text-gw-texte-doux dark:text-white/60">remplissage</span>
+              </div>
+            </div>
+            <div className="min-w-0 space-y-2 text-xs">
+              <p className="flex items-center gap-2 whitespace-nowrap">
+                <span className="h-2.5 w-2.5 rounded-full bg-[linear-gradient(135deg,#6C5CE7,#E8479A)]" aria-hidden />
+                Places vendues
+              </p>
+              <p className="flex items-center gap-2 whitespace-nowrap text-gw-texte-doux dark:text-white/60">
+                <span className="h-2.5 w-2.5 rounded-full bg-gw-lavande dark:bg-white/20" aria-hidden />
+                Places libres
+              </p>
+              <Link
+                href="/organisateur/reservations"
+                className="inline-flex items-center gap-1 pt-1 text-xs font-semibold text-gw-violet hover:underline dark:text-gw-lavande"
               >
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: `${color}1A` }}
-                  >
-                    <Icon className="w-5 h-5" style={{ color }} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground dark:text-gray-400">{label}</p>
-                    <p className="text-xl font-bold text-[#0F172A] dark:text-white">{value}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+                Réservations <ArrowRight className="h-3 w-3" aria-hidden />
+              </Link>
+            </div>
+          </section>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-base dark:text-white">Billets vendus par jour</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {ventesData.length === 0 ? (
-                <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
-                  Pas encore de ventes a afficher.
-                </p>
-              ) : (
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={ventesData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: tickColor }} />
-                      <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: tickColor }} />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="ventes" stroke="#3B82F6" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {/* courbe des ventes */}
+          <section className="gw-carte p-5 md:col-span-2">
+            <TitreCarte
+              action={
+                <span className="rounded-full bg-gw-fond px-3 py-1 text-xs font-semibold text-gw-violet dark:bg-white/10 dark:text-white">
+                  {entier.format(totalVentes)} billets sur la période
+                </span>
+              }
+            >
+              Ventes de billets
+            </TitreCarte>
+            {ventes.length === 0 ? (
+              <Vide>Pas encore de ventes à afficher.</Vide>
+            ) : (
+              <div className="mt-4 h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={ventes} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="ventes-trait" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0" stopColor="#6C5CE7" />
+                        <stop offset="1" stopColor="#E8479A" />
+                      </linearGradient>
+                      <linearGradient id="ventes-aire" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stopColor="#E8479A" stopOpacity={darkMode ? 0.35 : 0.25} />
+                        <stop offset="1" stopColor="#6C5CE7" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid vertical={false} stroke={grille} />
+                    <XAxis dataKey="jour" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: axe }} minTickGap={18} interval="preserveStartEnd" />
+                    <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: axe }} />
+                    <Tooltip content={<InfoBulleVentes />} cursor={{ stroke: "#E8479A", strokeDasharray: "4 4" }} />
+                    <Area
+                      type="monotone"
+                      dataKey="ventes"
+                      stroke="url(#ventes-trait)"
+                      strokeWidth={3}
+                      fill="url(#ventes-aire)"
+                      activeDot={{ r: 6, fill: "#E8479A", stroke: darkMode ? "#221D40" : "#FFFFFF", strokeWidth: 3 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </section>
 
-          <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-base dark:text-white">Categories populaires</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {categoriesData.length === 0 ? (
-                <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
-                  Pas encore de reservations a afficher.
-                </p>
-              ) : (
-                <div className="h-64">
+          {/* événements populaires */}
+          <section className="gw-carte p-5 md:row-span-2">
+            <TitreCarte>Événements populaires</TitreCarte>
+            <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/60">Classés selon les réactions du public.</p>
+            {populaires.length === 0 ? (
+              <Vide>Aucune réaction du public pour l&apos;instant.</Vide>
+            ) : (
+              <ol className="mt-4 space-y-3">
+                {populaires.slice(0, 6).map((e, i) => (
+                  <li key={e.id}>
+                    <Link
+                      href={`/evenements/${e.id}`}
+                      target="_blank"
+                      className="group flex items-center gap-3 rounded-2xl bg-gw-fond p-3 transition-colors hover:bg-gw-lavande/50 dark:bg-white/5 dark:hover:bg-white/10"
+                    >
+                      <span
+                        className={cn(
+                          "font-titre flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white",
+                          i === 0 ? "bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)]" : "bg-gw-violet/85",
+                        )}
+                      >
+                        {i === 0 ? <Sparkles className="h-4 w-4" aria-label="Premier" /> : i + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="line-clamp-2 text-sm leading-snug font-semibold">{e.titre}</span>
+                        <span className="mt-0.5 block text-xs text-gw-texte-doux dark:text-white/60">
+                          {entier.format(e.score_popularite)} pts de popularité
+                        </span>
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-gw-texte-doux transition-transform group-hover:translate-x-0.5 dark:text-white/50" aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+
+          {/* réservations par catégorie */}
+          <section className="gw-carte p-5 md:col-span-2">
+            <TitreCarte>Réservations par catégorie</TitreCarte>
+            {categories.length === 0 ? (
+              <Vide>Pas encore de réservations à afficher.</Vide>
+            ) : (
+              <div className="mt-4 grid items-center gap-6 sm:grid-cols-[minmax(0,1fr)_160px]">
+                <div className="h-52">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={categoriesData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                      <XAxis dataKey="categorie" tick={{ fontSize: 12, fill: tickColor }} />
-                      <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: tickColor }} />
-                      <Tooltip />
-                      <Bar dataKey="reservations" fill="#22C55E" radius={[6, 6, 0, 0]} />
+                    <BarChart data={categories} margin={{ top: 4, right: 0, left: -18, bottom: 0 }} barCategoryGap="28%">
+                      <defs>
+                        <linearGradient id="barre-tete" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stopColor="#E8479A" />
+                          <stop offset="1" stopColor="#6C5CE7" />
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="categorie" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: axe }} interval={0} />
+                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: axe }} />
+                      <Tooltip
+                        cursor={false}
+                        formatter={(v) => [`${entier.format(Number(v))} réservations`, ""]}
+                        separator=""
+                        contentStyle={{
+                          borderRadius: 12,
+                          border: "none",
+                          background: darkMode ? "#1E1A3C" : "#FFFFFF",
+                          color: darkMode ? "#FFFFFF" : "#1E1A3C",
+                          boxShadow: "0 10px 30px -10px rgba(30,26,60,0.35)",
+                        }}
+                      />
+                      <Bar dataKey="nombre" radius={[10, 10, 10, 10]} background={{ fill: piste, radius: 10 }}>
+                        {categories.map((c, i) => (
+                          <Cell key={c.categorie} fill={i === 0 ? "url(#barre-tete)" : darkMode ? "#8B7CF5" : "#B5A8F5"} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <div className="flex gap-6 sm:flex-col">
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0">
+                      <Anneau pourcentage={partTete} id="anneau-tete" taille={52} epaisseur={6} />
+                      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold">{partTete}%</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-1 truncate text-sm font-semibold">
+                        <TrendingUp className="h-3.5 w-3.5 shrink-0 text-gw-rose" aria-hidden />
+                        {categories[0].categorie}
+                      </p>
+                      <p className="text-xs text-gw-texte-doux dark:text-white/60">en tête</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0">
+                      <Anneau pourcentage={100 - partTete} id="anneau-autres" taille={52} epaisseur={6} />
+                      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold">{100 - partTete}%</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">{entier.format(totalCategories)}</p>
+                      <p className="text-xs text-gw-texte-doux dark:text-white/60">réservations au total</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
         </div>
       </div>
 
-      <div>
-        <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700 sticky top-6">
-          <CardHeader>
-            <CardTitle className="text-base dark:text-white flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#3B82F6]" />
-              Prochains evenements
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {prochainsEvenements.length === 0 ? (
-              <p className="text-sm text-muted-foreground dark:text-gray-400">
-                Aucun evenement a venir.
-              </p>
-            ) : (
-              prochainsEvenements.map((e) => (
-                <div
-                  key={e.id}
-                  className="p-3 rounded-xl border border-gray-100 dark:border-gray-700 dark:bg-[#0F172A]"
-                >
-                  <p className="text-sm font-semibold text-[#0F172A] dark:text-white truncate">{e.titre}</p>
-                  <p className="text-xs text-muted-foreground dark:text-gray-400 mt-0.5">
-                    {formatDateLongue(e.date_debut)}
-                  </p>
-                  <span
-                    className={`inline-block mt-2 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ${
-                      e.statut_validation === "valide"
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : e.statut_validation === "en_attente_validation"
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                        : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                    }`}
-                  >
-                    {STATUT_LABELS[e.statut_validation] ?? e.statut_validation}
-                  </span>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      {/* colonne de droite : profil et agenda */}
+      <aside className="space-y-6">
+        <section className="gw-carte p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="font-titre text-lg font-semibold">Mon profil</h2>
+            <NotificationBell boutonClassName="text-gw-nuit hover:bg-gw-fond dark:text-white dark:hover:bg-white/10" />
+          </div>
+          <div className="mt-4 flex items-center gap-4">
+            <span className="font-titre flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-lg font-semibold text-white">
+              {(user?.fullname ?? "?")
+                .split(" ")
+                .filter(Boolean)
+                .map((m) => m[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase()}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate font-semibold">{user?.fullname ?? "Organisateur"}</p>
+              {user?.email && <p className="truncate text-xs text-gw-texte-doux dark:text-white/60">{user.email}</p>}
+              <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/60">Organisateur</p>
+            </div>
+          </div>
+          <Link
+            href="/organisateur/reservations"
+            className="mt-4 flex items-center justify-center gap-2 rounded-full bg-gw-rose-action px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gw-rose-action-fonce"
+          >
+            Voir mes réservations
+          </Link>
+        </section>
+
+        <CalendrierAgenda evenements={evenements} />
+      </aside>
     </div>
   )
 }

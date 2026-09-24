@@ -89,6 +89,10 @@ body {
   --color-gw-texte-pale: #8b86a3;
   --color-gw-bordure: #ece8f7;
   --color-gw-rose-pale: #fde7f2;
+  /* espace organisateur, thème sombre */
+  --color-gw-nuit-profond: #15122b;
+  --color-gw-carte-sombre: #221d40;
+  --color-gw-bordure-sombre: #332c5a;
 }
 
 /* ---------- Site public ---------- */
@@ -114,4 +118,56 @@ body {
     conic-gradient(from 172deg at 82% -10%, transparent 0deg, rgba(201, 184, 255, 0.35) 10deg, transparent 22deg),
     conic-gradient(from 176deg at 50% -20%, transparent 0deg, rgba(255, 255, 255, 0.12) 5deg, transparent 12deg),
     linear-gradient(180deg, #16122e 0%, #2a1f55 100%);
+}
+
+/* ---------- Espace organisateur ---------- */
+
+/* Couleur du contenu principal : l'onglet actif de la barre latérale prend
+   la même couleur pour « se fondre » dans la page (voir .gw-onglet-actif). */
+.gw-orga {
+  --gw-contenu: var(--color-gw-fond);
+}
+.dark .gw-orga,
+.gw-orga.dark {
+  --gw-contenu: var(--color-gw-nuit-profond);
+}
+
+/* Onglet actif façon « onglet de classeur » : deux quarts de cercle creusés
+   au-dessus et au-dessous raccordent l'onglet au contenu principal. */
+.gw-onglet-actif::before,
+.gw-onglet-actif::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  pointer-events: none;
+}
+.gw-onglet-actif::before {
+  top: -24px;
+  border-bottom-right-radius: 24px;
+  box-shadow: 8px 8px 0 8px var(--gw-contenu);
+}
+.gw-onglet-actif::after {
+  bottom: -24px;
+  border-top-right-radius: 24px;
+  box-shadow: 8px -8px 0 8px var(--gw-contenu);
+}
+
+@layer components {
+  /* Carte de l'espace organisateur (blanche en clair, prune en sombre) */
+  .gw-carte {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow:
+      0 1px 2px rgba(30, 26, 60, 0.04),
+      0 14px 34px -22px rgba(108, 92, 231, 0.45);
+  }
+  .dark .gw-carte {
+    background: var(--color-gw-carte-sombre);
+    box-shadow: none;
+    outline: 1px solid var(--color-gw-bordure-sombre);
+    outline-offset: -1px;
+  }
 }

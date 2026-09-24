@@ -12,7 +12,12 @@ import type { Notification } from "@/types"
 
 const POLL_INTERVAL_MS = 30_000
 
-export function NotificationBell() {
+interface NotificationBellProps {
+  /** Classes du bouton : par défaut, cloche blanche pour l'en-tête bleu (app-header). */
+  boutonClassName?: string
+}
+
+export function NotificationBell({ boutonClassName = "text-white hover:bg-blue-700" }: NotificationBellProps = {}) {
   const [count, setCount] = useState(0)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [open, setOpen] = useState(false)
@@ -66,7 +71,8 @@ export function NotificationBell() {
         variant="ghost"
         size="sm"
         onClick={handleToggle}
-        className="relative text-white hover:bg-blue-700"
+        className={`relative ${boutonClassName}`}
+        aria-label={count > 0 ? `Notifications, ${count} non lue${count > 1 ? "s" : ""}` : "Notifications"}
       >
         <Bell className="w-5 h-5" />
         {count > 0 && (
