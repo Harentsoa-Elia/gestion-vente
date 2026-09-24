@@ -153,12 +153,15 @@ CATEGORIES = [
 
 def upgrade() -> None:
     bind = op.get_bind()
+    # Types explicites (CAST) : asyncpg refuse un paramètre utilisé deux fois
+    # si PostgreSQL en déduit deux types différents (text et varchar).
 
     for nom, genre in ARTISTES:
         bind.execute(
             sa.text(
-                "INSERT INTO artistes (nom, genre_artistique) SELECT :nom, :genre "
-                "WHERE NOT EXISTS (SELECT 1 FROM artistes WHERE lower(nom) = lower(:nom))"
+                "INSERT INTO artistes (nom, genre_artistique) "
+                "SELECT CAST(:nom AS VARCHAR), CAST(:genre AS VARCHAR) "
+                "WHERE NOT EXISTS (SELECT 1 FROM artistes WHERE lower(nom) = lower(CAST(:nom AS VARCHAR)))"
             ),
             {"nom": nom, "genre": genre},
         )
@@ -166,8 +169,9 @@ def upgrade() -> None:
     for nom, ville, capacite in LIEUX:
         bind.execute(
             sa.text(
-                "INSERT INTO lieux (nom, ville, capacite) SELECT :nom, :ville, :capacite "
-                "WHERE NOT EXISTS (SELECT 1 FROM lieux WHERE lower(nom) = lower(:nom))"
+                "INSERT INTO lieux (nom, ville, capacite) "
+                "SELECT CAST(:nom AS VARCHAR), CAST(:ville AS VARCHAR), CAST(:capacite AS INTEGER) "
+                "WHERE NOT EXISTS (SELECT 1 FROM lieux WHERE lower(nom) = lower(CAST(:nom AS VARCHAR)))"
             ),
             {"nom": nom, "ville": ville, "capacite": capacite},
         )
@@ -175,8 +179,9 @@ def upgrade() -> None:
     for nom, description in CATEGORIES:
         bind.execute(
             sa.text(
-                "INSERT INTO categories (nom, description) SELECT :nom, :description "
-                "WHERE NOT EXISTS (SELECT 1 FROM categories WHERE lower(nom) = lower(:nom))"
+                "INSERT INTO categories (nom, description) "
+                "SELECT CAST(:nom AS VARCHAR), CAST(:description AS VARCHAR) "
+                "WHERE NOT EXISTS (SELECT 1 FROM categories WHERE lower(nom) = lower(CAST(:nom AS VARCHAR)))"
             ),
             {"nom": nom, "description": description},
         )
