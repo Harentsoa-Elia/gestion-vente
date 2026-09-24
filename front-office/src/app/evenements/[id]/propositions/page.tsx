@@ -23,7 +23,7 @@ function PropositionsContent() {
 export default function PropositionsPage() {
   return (
     <AuthWrapper>
-      <PropositionsContent />qs
+      <PropositionsContent />
     </AuthWrapper>
   )
 }

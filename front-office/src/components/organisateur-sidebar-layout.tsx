@@ -46,7 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/participants", label: "Participants", icon: Users, disponible: true },
   { href: "/organisateur/paiements", label: "Paiements", icon: Wallet, disponible: true },
   { href: "/organisateur/statistiques", label: "Statistiques", icon: BarChart3, disponible: false },
-  { href: "/organisateur/intelligence-decisionnelle", label: "Recommandations", icon: Sparkles, disponible: false },
+  { href: "/organisateur/intelligence-decisionnelle", label: "Recommandations", icon: Sparkles, disponible: true },
 ]
 
 interface OrganisateurSidebarLayoutProps {
