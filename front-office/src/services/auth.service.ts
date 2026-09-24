@@ -14,13 +14,25 @@ export async function fetchUserData(): Promise<AuthUser> {
   return data;
 }
 
+/**
+ * Déconnexion : le jeton est révoqué côté serveur, puis TOUJOURS retiré du navigateur,
+ * même si le serveur répond une erreur (jeton déjà révoqué ou expiré, serveur arrêté).
+ * Sans ce retrait, un jeton révoqué restait dans localStorage : l'interface se croyait
+ * connectée et chaque nouvelle déconnexion échouait avec « Token has been revoked ».
+ */
 export async function logout(): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/logout`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-  });
-  if (!res.ok) {
-    const data = await parseJsonSafe(res);
-    throw new Error(data?.detail || `Failed to logout: ${res.statusText}`);
+  try {
+    const res = await fetch(`${API_BASE_URL}/logout`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) {
+      const data = await parseJsonSafe(res);
+      console.warn("Déconnexion côté serveur impossible :", data?.detail || res.statusText);
+    }
+  } catch (erreur) {
+    console.warn("Déconnexion côté serveur impossible :", erreur);
+  } finally {
+    localStorage.removeItem("access_token");
   }
 }

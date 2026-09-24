@@ -198,8 +198,9 @@ export function OrganisateurSidebarLayout({ children }: OrganisateurSidebarLayou
   }
 
   const deconnexion = async () => {
+    // logout() retire toujours le jeton du navigateur, même en cas d'erreur du serveur
     await logout()
-    router.push("/login")
+    router.replace("/login")
   }
 
   if (!mounted) return null
