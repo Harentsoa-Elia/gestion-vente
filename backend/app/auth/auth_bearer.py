@@ -21,11 +21,15 @@ class JWTBearer(HTTPBearer):
         payload = decode_jwt(token)
         if not payload:
             raise HTTPException(status_code=403, detail="Invalid or expired token.")
+        # un jeton participant ne donne pas accès aux routes du staff
+        if payload.get("account_type") == "participant":
+            raise HTTPException(status_code=403, detail="This endpoint requires a staff account.")
         return {
             "token": token,
             "user_id": payload.get("user_id"),
             "email": payload.get("email"),
             "concert_id": payload.get("concert_id"),
+            "role": payload.get("role"),
         }
 
     async def clean_blacklist():

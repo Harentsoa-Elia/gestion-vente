@@ -104,6 +104,8 @@ loadUser();
 
 // ---------------- FILTER LINKS ----------------
 const links = baseLinks.filter((l) => {
+// l'administrateur n'a pas d'espace organisateur
+if (concertId === 0 && l.href === "/organisateur/dashboard") return false;
 if (concertId !== 0) {
 const restrictedPaths = [
 "/concerts/new",

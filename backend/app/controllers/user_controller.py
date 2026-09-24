@@ -8,6 +8,7 @@ from app.models.user import User
 from app.database import get_db
 from app.auth.auth_bearer import BLACKLISTED_TOKENS
 from app.auth.auth_bearer import JWTBearer
+from app.auth.roles import ROLE_ADMIN, ROLE_ORGANISATEUR, concert_id_pour_role, exiger_admin
 from fastapi.security import HTTPAuthorizationCredentials
 
 router = APIRouter()
@@ -42,6 +43,8 @@ async def create_user(user: UserSchema = Body(...), db: AsyncSession = Depends(g
         email=user.email,
         password=hashed_password,
         concert_id=None,
+        # l'inscription libre ne crée que des organisateurs ; un admin est nommé par un admin
+        role=ROLE_ORGANISATEUR,
     )
     db.add(db_user)
     await db.commit()
@@ -54,7 +57,7 @@ async def user_login(user: UserLoginSchema = Body(...), db: AsyncSession = Depen
     
     if db_user:
         if verify_password(user.password, db_user.password):
-            return sign_jwt(db_user.email, db_user.id, db_user.concert_id)
+            return sign_jwt(db_user.email, db_user.id, db_user.concert_id, db_user.role)
         else:
             raise HTTPException(status_code=403, detail="Wrong login details!")
     else:
@@ -85,7 +88,8 @@ async def update_user(
 
     # Verification permissions
     # Si l'utilisateur connecté n'est PAS superadmin ET n'est PAS l'utilisateur qu'il modifie : FORBIDDEN
-    if auth_user.concert_id != 0 and auth_user_id != user_id:
+    est_admin = auth_user.role == ROLE_ADMIN
+    if not est_admin and auth_user_id != user_id:
         raise HTTPException(status_code=403, detail="Accès interdit")
 
     # Récupérer l'utilisateur à modifier
@@ -99,10 +103,13 @@ async def update_user(
     user.fullname = user_data.fullname or user.fullname
     user.email = user_data.email or user.email
 
-    if user_data.concert_id is not None:
-        if auth_user.concert_id != 0:
-            raise HTTPException(status_code=403, detail="Only admin can change concert_id")
-        user.concert_id = user_data.concert_id
+    if (user_data.concert_id is not None or user_data.role is not None) and not est_admin:
+        raise HTTPException(status_code=403, detail="Only admin can change concert_id or role")
+    if est_admin:
+        nouveau_role = user_data.role or user.role
+        concert = user_data.concert_id if user_data.concert_id is not None else user.concert_id
+        user.role = nouveau_role
+        user.concert_id = concert_id_pour_role(nouveau_role, concert)
 
     if user_data.password:
         user.password = hash_password(user_data.password)
@@ -116,13 +123,15 @@ async def update_user(
             "id": user.id,
             "fullname": user.fullname,
             "email": user.email,
-            "concert_id": user.concert_id
+            "concert_id": user.concert_id,
+            "role": user.role,
         }
     }
 
 @router.get("/users", tags=["user"])
 async def list_users(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
-    user_id = auth_data["user_id"]
+    # la liste des comptes (e-mails compris) est réservée à l'administrateur
+    exiger_admin(auth_data)
     result = await db.execute(select(User))
     users = result.scalars().all()
 
@@ -131,7 +140,8 @@ async def list_users(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = 
             "id": u.id,
             "fullname": u.fullname,
             "email": u.email,
-            "concert_id": u.concert_id
+            "concert_id": u.concert_id,
+            "role": u.role,
         }
         for u in users
     ]
@@ -162,6 +172,7 @@ async def get_me(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depe
         "email": user.email,
         "fullname": user.fullname,
         "concert_id": user.concert_id,
+        "role": user.role,
     }
 
 @router.delete("/users/{user_id}", tags=["user"])
@@ -180,7 +191,7 @@ async def delete_user(
         raise HTTPException(status_code=401, detail="Utilisateur non trouvé (auth)")
 
     # Permissions :
-    if auth_user.concert_id != 0 and auth_user_id != user_id:
+    if auth_user.role != ROLE_ADMIN and auth_user_id != user_id:
         raise HTTPException(status_code=403, detail="Accès interdit")
 
     # Récupérer l'utilisateur à supprimer
@@ -207,8 +218,7 @@ async def admin_create_user(
     auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
-    if auth_data.get("concert_id") != 0:
-        raise HTTPException(status_code=403, detail="Only admin can assign concert_id.")
+    exiger_admin(auth_data)
 
     result = await db.execute(select(User).where(User.email == user.email))
     existing_user = result.scalar_one_or_none()
@@ -220,7 +230,8 @@ async def admin_create_user(
         fullname=user.fullname,
         email=user.email,
         password=hashed_password,
-        concert_id=user.concert_id,
+        role=user.role or ROLE_ORGANISATEUR,
+        concert_id=concert_id_pour_role(user.role or ROLE_ORGANISATEUR, user.concert_id),
     )
     db.add(db_user)
     await db.commit()

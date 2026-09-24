@@ -9,11 +9,12 @@ JWT_ALGORITHM = config("algorithm")
 def token_response(token: str):
     return {"access_token": token}
 
-def sign_jwt(email: str, user_id: int, concert_id: Optional[int] = None) -> Dict[str, str]:
+def sign_jwt(email: str, user_id: int, concert_id: Optional[int] = None, role: str = "organisateur") -> Dict[str, str]:
     payload = {
         "email": email,
         "user_id": user_id,
         "concert_id": concert_id,
+        "role": role,  # "admin" ou "organisateur" (app/auth/roles.py)
         "account_type": "staff",
         "expires": time.time() + 86400  # 24h
     }

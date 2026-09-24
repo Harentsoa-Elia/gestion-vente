@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { jetonValide, lireJetonStaff, redirectionSiInterdit, roleDepuisJeton } from "@/lib/role"
 
 interface AuthWrapperProps {
   children: React.ReactNode
@@ -16,33 +17,22 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
   const pathname = usePathname()
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token")
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]))
-        const currentTime = Date.now() / 1000
-
-        if (payload.expires > currentTime) {
-          const isAdmin = payload.concert_id === 0
-          const isOrganisateurRoute = pathname?.startsWith("/organisateur")
-
-          if (isAdmin && isOrganisateurRoute) {
-            router.push("/dashboard")
-            return
-          }
-
-          setIsAuthenticated(true)
-        } else {
-          localStorage.removeItem("access_token")
-          router.push("/login")
-        }
-      } catch (error) {
-        localStorage.removeItem("access_token")
-        router.push("/login")
-      }
-    } else {
+    const charge = lireJetonStaff()
+    if (!jetonValide(charge)) {
+      localStorage.removeItem("access_token")
       router.push("/login")
+      setLoading(false)
+      return
     }
+
+    // chaque rôle reste dans son espace (voir src/lib/role.ts)
+    const redirection = redirectionSiInterdit(roleDepuisJeton(charge), pathname ?? "")
+    if (redirection) {
+      router.replace(redirection)
+      return
+    }
+
+    setIsAuthenticated(true)
     setLoading(false)
   }, [router, pathname])
 
