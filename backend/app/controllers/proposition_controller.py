@@ -35,7 +35,10 @@ async def create_proposition(
 ):
     service = PropositionService(db)
     await check_evenement_access(auth_data, service, proposition.evenement_id)
-    return await service.create_proposition(proposition)
+    try:
+        return await service.create_proposition(proposition)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get(

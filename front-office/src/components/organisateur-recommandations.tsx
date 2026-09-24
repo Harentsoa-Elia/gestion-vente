@@ -258,7 +258,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
               </p>
               {evenement && (
                 <Link
-                  href={`/evenements/${evenement.id}/propositions`}
+                  href={`/organisateur/evenements/${evenement.id}`}
                   className="mt-2 rounded-full bg-gw-rose-action px-5 py-2.5 text-sm font-semibold text-white hover:bg-gw-rose-action-fonce"
                 >
                   Gérer les propositions
@@ -461,7 +461,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
                 {typesAvecUneSeule.length > 0 && (
                   <p className="mt-6 flex items-start gap-2 rounded-xl bg-gw-fond px-4 py-3 text-xs text-gw-texte-doux dark:bg-white/5 dark:text-white/65">
                     <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-                    {typesAvecUneSeule.map((t) => t.titre.toLowerCase()).join(", ")} : une seule proposition, donc 100 % des points
+                    {(() => { const t = typesAvecUneSeule.map((x) => x.titre.toLowerCase()).join(", "); return t.charAt(0).toUpperCase() + t.slice(1) })()} : une seule proposition, donc 100 % des points
                     d&apos;office. Proposez au moins deux options par type pour une estimation plus fiable.
                   </p>
                 )}

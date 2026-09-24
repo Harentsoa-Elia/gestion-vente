@@ -178,7 +178,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
       <div className="min-w-0 space-y-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h1 className="font-titre text-2xl font-semibold">Tableau de bord</h1>
-          <p className="text-sm capitalize text-gw-texte-doux dark:text-white/60">
+          <p className="text-sm first-letter:uppercase text-gw-texte-doux dark:text-white/60">
             {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>

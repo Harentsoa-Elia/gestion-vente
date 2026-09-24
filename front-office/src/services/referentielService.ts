@@ -1,4 +1,4 @@
-import { API_BASE_URL, parseJsonSafe } from "./apiConfig";
+import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
 import type { Artiste, Categorie, Lieu } from "../types";
 
 export async function fetchLieux(): Promise<Lieu[]> {
@@ -21,3 +21,20 @@ export async function fetchArtistes(): Promise<Artiste[]> {
   if (!res.ok) throw new Error(data?.detail || "Impossible de charger les artistes.");
   return data;
 }
+
+async function creer<T>(chemin: string, corps: unknown, erreur: string): Promise<T> {
+  const res = await fetch(`${API_BASE_URL}${chemin}`, {
+    method: "POST",
+    headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+    body: JSON.stringify(corps),
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok) throw new Error(data?.detail || erreur);
+  return data;
+}
+
+export const createLieu = (saisie: { nom: string; ville: string | null; adresse: string | null; capacite: number | null }) =>
+  creer<Lieu>("/lieux", saisie, "Le lieu n'a pas été créé.");
+
+export const createArtiste = (saisie: { nom: string; genre_artistique: string | null; description: string | null }) =>
+  creer<Artiste>("/artistes", saisie, "L'artiste n'a pas été créé.");

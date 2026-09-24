@@ -5,6 +5,7 @@ from typing import List
 from app.schemas.lieu import LieuCreate, LieuResponse
 from app.services.lieu_service import LieuService
 from app.auth.auth_bearer import JWTBearer
+from app.auth.roles import exiger_admin
 from app.database import get_db
 
 router = APIRouter(tags=["lieux"])
@@ -18,6 +19,7 @@ router = APIRouter(tags=["lieux"])
 )
 async def create_lieu(
     lieu: LieuCreate,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = LieuService(db)
@@ -48,8 +50,11 @@ async def get_lieu(
 async def update_lieu(
     lieu_id: int,
     lieu: LieuCreate,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    # référentiel partagé par tous les organisateurs : seul l'administrateur le modifie
+    exiger_admin(auth_data)
     service = LieuService(db)
     updated_lieu = await service.update_lieu(lieu_id, lieu)
     if not updated_lieu:
@@ -60,8 +65,11 @@ async def update_lieu(
 @router.delete("/lieux/{lieu_id}", status_code=200, summary="Delete a lieu")
 async def delete_lieu(
     lieu_id: int,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    # référentiel partagé par tous les organisateurs : seul l'administrateur le modifie
+    exiger_admin(auth_data)
     service = LieuService(db)
     lieu = await service.get_lieu(lieu_id)
     if not lieu:

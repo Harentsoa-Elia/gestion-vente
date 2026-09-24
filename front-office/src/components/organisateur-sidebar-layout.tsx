@@ -41,7 +41,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/dashboard", label: "Tableau de bord", icon: LayoutDashboard, disponible: true },
-  { href: "/organisateur/evenements", label: "Mes événements", icon: CalendarRange, disponible: false },
+  { href: "/organisateur/evenements", label: "Mes événements", icon: CalendarRange, disponible: true },
   { href: "/organisateur/reservations", label: "Réservations", icon: Ticket, disponible: true },
   { href: "/organisateur/participants", label: "Participants", icon: Users, disponible: true },
   { href: "/organisateur/paiements", label: "Paiements", icon: Wallet, disponible: true },
@@ -88,7 +88,8 @@ function BarreLaterale({
 
       <nav aria-label="Espace organisateur" className="mt-6 flex-1 space-y-1 pl-5">
         {NAV_ITEMS.map(({ href, label, icon: Icone, disponible }) => {
-          const actif = pathname === href
+          // la fiche d'un événement (/organisateur/evenements/12) garde « Mes événements » actif
+          const actif = pathname === href || pathname.startsWith(`${href}/`)
           if (!disponible) {
             return (
               <div

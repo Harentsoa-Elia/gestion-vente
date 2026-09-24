@@ -12,7 +12,10 @@ class PropositionType(str, Enum):
 
 class PropositionBase(BaseModel):
     type: PropositionType = Field(..., description="Type de proposition")
-    libelle: str = Field(..., min_length=1, description="Libelle de la proposition")
+    # Facultatif à la création : s'il est absent, le service reprend le nom du lieu,
+    # de l'artiste ou de la catégorie choisi, pour que le libellé affiché au public
+    # corresponde toujours à l'élément réellement proposé.
+    libelle: Optional[str] = Field(None, description="Libelle de la proposition (par defaut : nom de l'element propose)")
     evenement_id: int = Field(..., description="ID de l'evenement concerne")
     artiste_id: Optional[int] = Field(None, description="ID de l'artiste propose")
     lieu_id: Optional[int] = Field(None, description="ID du lieu propose")
@@ -34,6 +37,7 @@ class PropositionCreate(PropositionBase):
 
 
 class PropositionResponse(PropositionBase):
+    libelle: str
     id: int = Field(..., description="Unique ID de la proposition")
     date_proposition: datetime
 

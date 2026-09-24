@@ -5,6 +5,7 @@ from typing import List
 from app.schemas.categorie import CategorieCreate, CategorieResponse
 from app.services.categorie_service import CategorieService
 from app.auth.auth_bearer import JWTBearer
+from app.auth.roles import exiger_admin
 from app.database import get_db
 
 router = APIRouter(tags=["categories"])
@@ -18,6 +19,7 @@ router = APIRouter(tags=["categories"])
 )
 async def create_categorie(
     categorie: CategorieCreate,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = CategorieService(db)
@@ -48,8 +50,11 @@ async def get_categorie(
 async def update_categorie(
     categorie_id: int,
     categorie: CategorieCreate,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    # référentiel partagé par tous les organisateurs : seul l'administrateur le modifie
+    exiger_admin(auth_data)
     service = CategorieService(db)
     updated_categorie = await service.update_categorie(categorie_id, categorie)
     if not updated_categorie:
@@ -60,8 +65,11 @@ async def update_categorie(
 @router.delete("/categories/{categorie_id}", status_code=200, summary="Delete a categorie")
 async def delete_categorie(
     categorie_id: int,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    # référentiel partagé par tous les organisateurs : seul l'administrateur le modifie
+    exiger_admin(auth_data)
     service = CategorieService(db)
     categorie = await service.get_categorie(categorie_id)
     if not categorie:

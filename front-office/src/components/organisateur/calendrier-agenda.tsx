@@ -75,7 +75,7 @@ export function CalendrierAgenda({ evenements }: { evenements: Evenement[] }) {
           </button>
         </div>
       </div>
-      <p className="mt-1 text-sm capitalize text-gw-texte-doux dark:text-white/60">
+      <p className="mt-1 text-sm first-letter:uppercase text-gw-texte-doux dark:text-white/60">
         {mois.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })}
       </p>
 
@@ -120,7 +120,7 @@ export function CalendrierAgenda({ evenements }: { evenements: Evenement[] }) {
       </div>
 
       <div className="mt-5 border-t border-gw-bordure pt-4 dark:border-gw-bordure-sombre">
-        <p className="text-sm font-semibold capitalize">
+        <p className="text-sm font-semibold first-letter:uppercase">
           {jourChoisi.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
         </p>
         {duJour.length === 0 ? (

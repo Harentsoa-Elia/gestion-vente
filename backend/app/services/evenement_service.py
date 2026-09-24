@@ -81,8 +81,9 @@ class EvenementService:
         db_evenement = await self.get_evenement(evenement_id)
         if not db_evenement:
             return None
-        if db_evenement.statut_validation != "brouillon":
-            raise ValueError("Seul un evenement en brouillon peut etre soumis pour validation.")
+        # un événement rejeté peut être corrigé puis soumis à nouveau
+        if db_evenement.statut_validation not in ("brouillon", "rejete"):
+            raise ValueError("Seul un evenement en brouillon ou rejete peut etre soumis pour validation.")
 
         for type_requis in ["LIEU", "CATEGORIE", "ARTISTE"]:
             result = await self.db.execute(

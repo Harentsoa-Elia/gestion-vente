@@ -5,6 +5,7 @@ from typing import List
 from app.schemas.artiste import ArtisteCreate, ArtisteResponse
 from app.services.artiste_service import ArtisteService
 from app.auth.auth_bearer import JWTBearer
+from app.auth.roles import exiger_admin
 from app.database import get_db
 
 router = APIRouter(tags=["artistes"])
@@ -18,6 +19,7 @@ router = APIRouter(tags=["artistes"])
 )
 async def create_artiste(
     artiste: ArtisteCreate,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
     service = ArtisteService(db)
@@ -48,8 +50,11 @@ async def get_artiste(
 async def update_artiste(
     artiste_id: int,
     artiste: ArtisteCreate,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    # référentiel partagé par tous les organisateurs : seul l'administrateur le modifie
+    exiger_admin(auth_data)
     service = ArtisteService(db)
     updated_artiste = await service.update_artiste(artiste_id, artiste)
     if not updated_artiste:
@@ -60,8 +65,11 @@ async def update_artiste(
 @router.delete("/artistes/{artiste_id}", status_code=200, summary="Delete an artiste")
 async def delete_artiste(
     artiste_id: int,
+    auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
+    # référentiel partagé par tous les organisateurs : seul l'administrateur le modifie
+    exiger_admin(auth_data)
     service = ArtisteService(db)
     artiste = await service.get_artiste(artiste_id)
     if not artiste:
