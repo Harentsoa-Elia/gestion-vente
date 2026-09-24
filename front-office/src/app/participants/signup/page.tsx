@@ -1,127 +1,241 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { signupParticipant, saveParticipantToken } from "@/services/participantService"
+import { Suspense, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { ArrowLeft, ArrowRight, CalendarDays, KeyRound, Lock, Mail, User, UserPlus } from "lucide-react"
 import { toast } from "sonner"
+import { signupParticipant, saveParticipantToken } from "@/services/participantService"
+import { BoutonAuth, CadreAuth, ChampAuth, ChoixSegmente, MessageErreur } from "@/components/auth/cadre-auth"
+import { cn } from "@/utils"
 import type { Genre } from "@/types"
 
-export default function ParticipantSignupPage() {
+/*
+ * Inscription d'un participant en deux étapes :
+ * 1. « Vous » : prénom, nom, date de naissance, genre ;
+ * 2. « Votre compte » : e-mail et mot de passe.
+ * Barre de pied Retour / Continuer, comme sur le modèle.
+ */
+
+const GENRES: { valeur: Genre; libelle: string }[] = [
+  { valeur: "Feminin", libelle: "Femme" },
+  { valeur: "Masculin", libelle: "Homme" },
+  { valeur: "Autre", libelle: "Autre" },
+]
+
+const ETAPES = ["Vous", "Votre compte"]
+
+function ParticipantSignupForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get("redirect") || "/"
+  const suite = searchParams.get("redirect") ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
+
+  const [etape, setEtape] = useState(0)
   const [nom, setNom] = useState("")
   const [prenom, setPrenom] = useState("")
   const [email, setEmail] = useState("")
   const [motDePasse, setMotDePasse] = useState("")
+  const [confirmation, setConfirmation] = useState("")
   const [dateNaissance, setDateNaissance] = useState("")
   const [genre, setGenre] = useState<Genre | "">("")
   const [loading, setLoading] = useState(false)
+  const [erreur, setErreur] = useState("")
+
+  const aujourdhui = new Date().toISOString().split("T")[0]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErreur("")
 
+    // étape 1 : les champs requis sont vérifiés par le navigateur, le genre ici
+    if (etape === 0) {
+      if (!genre) {
+        setErreur("Choisissez votre genre pour continuer.")
+        return
+      }
+      setEtape(1)
+      return
+    }
+
+    if (motDePasse !== confirmation) {
+      setErreur("Les deux mots de passe ne sont pas identiques.")
+      return
+    }
     if (!dateNaissance || !genre) {
-      toast.error("La date de naissance et le genre sont obligatoires.")
+      setEtape(0)
+      setErreur("La date de naissance et le genre sont obligatoires.")
       return
     }
 
     setLoading(true)
     try {
       const result = await signupParticipant({
-        nom,
-        prenom,
-        email,
+        nom: nom.trim(),
+        prenom: prenom.trim(),
+        email: email.trim(),
         mot_de_passe: motDePasse,
         date_naissance: dateNaissance,
         genre,
       })
       saveParticipantToken(result.access_token)
-      toast.success("Inscription reussie. Bienvenue !")
-      router.push("/")
-    } catch (err: any) {
-      toast.error(err.message || "Erreur lors de l'inscription.")
+      toast.success(`Bienvenue sur guichetweb, ${prenom.trim()} !`)
+      router.push(redirectTo)
+    } catch (err) {
+      setErreur(
+        err instanceof TypeError
+          ? "Le serveur ne répond pas. Réessayez dans un instant."
+          : err instanceof Error && err.message
+            ? err.message
+            : "L'inscription a échoué.",
+      )
     } finally {
       setLoading(false)
     }
   }
 
+  const retour = () => {
+    setErreur("")
+    if (etape === 0) router.push(`/participants/login${suite}`)
+    else setEtape(0)
+  }
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Creer un compte</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="prenom">Prenom</Label>
-                <Input id="prenom" value={prenom} onChange={(e) => setPrenom(e.target.value)} required />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="nom">Nom</Label>
-                <Input id="nom" value={nom} onChange={(e) => setNom(e.target.value)} required />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
+    <CadreAuth
+      sousEntete
+      onglets={[
+        { libelle: "Connexion", href: `/participants/login${suite}` },
+        { libelle: "Inscription", actif: true },
+      ]}
+      icone={UserPlus}
+      surtitre={`Étape ${etape + 1} sur ${ETAPES.length}`}
+      titre={etape === 0 ? "Faisons connaissance" : "Votre compte"}
+      sousTitre={
+        etape === 0
+          ? "Ces informations aident les organisateurs à proposer des événements qui vous ressemblent."
+          : "Votre e-mail servira à vous connecter et à recevoir vos billets."
+      }
+    >
+      {/* barre de progression */}
+      <ol className="mx-auto mb-7 flex max-w-sm items-center gap-2" aria-label="Progression">
+        {ETAPES.map((libelle, i) => (
+          <li key={libelle} className="flex flex-1 flex-col gap-1.5" aria-current={i === etape ? "step" : undefined}>
+            <span className={cn("h-1.5 rounded-full transition-colors", i <= etape ? "bg-gw-rose-action" : "bg-gw-bordure")} />
+            <span className={cn("text-[11px] font-semibold", i === etape ? "text-gw-nuit" : "text-gw-texte-doux")}>{libelle}</span>
+          </li>
+        ))}
+      </ol>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="date_naissance">Date de naissance</Label>
-                <Input
-                  id="date_naissance"
-                  type="date"
-                  value={dateNaissance}
-                  onChange={(e) => setDateNaissance(e.target.value)}
-                  required
-                  max={new Date().toISOString().split("T")[0]}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="genre">Genre</Label>
-                <Select value={genre} onValueChange={(v) => setGenre(v as Genre)} required>
-                  <SelectTrigger id="genre" className="w-full">
-                    <SelectValue placeholder="Selectionner..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Masculin">Masculin</SelectItem>
-                    <SelectItem value="Feminin">Feminin</SelectItem>
-                    <SelectItem value="Autre">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={motDePasse}
-                onChange={(e) => setMotDePasse(e.target.value)}
+      <form id="form-inscription" onSubmit={handleSubmit} className="mx-auto max-w-sm space-y-6">
+        {etape === 0 ? (
+          <>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <ChampAuth
+                libelle="Prénom"
+                icone={User}
+                value={prenom}
+                onChange={(e) => setPrenom(e.target.value)}
+                placeholder="Ex. Hery"
+                autoComplete="given-name"
                 required
-                minLength={6}
+              />
+              <ChampAuth
+                libelle="Nom"
+                icone={User}
+                value={nom}
+                onChange={(e) => setNom(e.target.value)}
+                placeholder="Ex. Rakoto"
+                autoComplete="family-name"
+                required
               />
             </div>
-            <Button type="submit" disabled={loading} className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90">
-              {loading ? "Inscription..." : "S'inscrire"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+            <ChampAuth
+              libelle="Date de naissance"
+              icone={CalendarDays}
+              type="date"
+              value={dateNaissance}
+              onChange={(e) => setDateNaissance(e.target.value)}
+              max={aujourdhui}
+              autoComplete="bday"
+              required
+            />
+            <ChoixSegmente
+              libelle="Genre"
+              options={GENRES}
+              valeur={genre}
+              onChange={(g) => {
+                setGenre(g)
+                setErreur("")
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <ChampAuth
+              libelle="Adresse e-mail"
+              icone={Mail}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="vous@exemple.mg"
+              autoComplete="email"
+              autoFocus
+              required
+            />
+            <ChampAuth
+              libelle="Mot de passe"
+              icone={Lock}
+              type="password"
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
+              placeholder="6 caractères minimum"
+              autoComplete="new-password"
+              minLength={6}
+              required
+            />
+            <ChampAuth
+              libelle="Confirmer le mot de passe"
+              icone={KeyRound}
+              type="password"
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+              placeholder="Retapez le mot de passe"
+              autoComplete="new-password"
+              minLength={6}
+              required
+            />
+          </>
+        )}
+
+        <MessageErreur>{erreur}</MessageErreur>
+      </form>
+
+      {/* barre Retour / Continuer, en bas du formulaire */}
+      <div className="mx-auto mt-8 flex max-w-sm items-center justify-between gap-3 border-t border-gw-bordure pt-6">
+        <BoutonAuth type="button" variante="contour" onClick={retour} disabled={loading}>
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Retour
+        </BoutonAuth>
+        <BoutonAuth type="submit" form="form-inscription" chargement={loading}>
+          {etape === 0 ? (
+            <>
+              Continuer
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </>
+          ) : loading ? (
+            "Inscription…"
+          ) : (
+            "Créer mon compte"
+          )}
+        </BoutonAuth>
+      </div>
+    </CadreAuth>
+  )
+}
+
+export default function ParticipantSignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <ParticipantSignupForm />
+    </Suspense>
   )
 }
