@@ -63,3 +63,55 @@ body {
 .animate-reaction-bounce {
   animation: reaction-bounce 0.35s ease-out;
 }
+/*
+ * Palette guichetweb, reprise de la maquette de dashboard.
+ * Chaque couleur donne des classes Tailwind : bg-gw-nuit, text-gw-violet, border-gw-lavande...
+ * et une variable CSS : var(--color-gw-nuit).
+ *
+ * Rôles :
+ *   rose-action  boutons d'achat et d'action principale (texte blanc, contraste AA 5,1:1)
+ *   violet       navigation, filtres, sélection (texte blanc, contraste AA 4,9:1)
+ *   rose         accents décoratifs uniquement (logo, vagues, halos) : trop clair pour du petit texte blanc
+ *   texte-pale   indications de saisie (placeholders) uniquement
+ */
+@theme {
+  --color-gw-nuit: #1e1a3c;
+  --color-gw-indigo: #4b3fc4;
+  --color-gw-violet: #6c5ce7;
+  --color-gw-violet-fonce: #5a4bd6;
+  --color-gw-lavande: #d9d2ff;
+  --color-gw-fond: #f6f4fc;
+  --color-gw-rose: #e8479a;
+  --color-gw-rose-action: #c92a7a;
+  --color-gw-rose-action-fonce: #ae1f68;
+  --color-gw-texte: #4a4566;
+  --color-gw-texte-doux: #6e6987;
+  --color-gw-texte-pale: #8b86a3;
+  --color-gw-bordure: #ece8f7;
+  --color-gw-rose-pale: #fde7f2;
+}
+
+/* ---------- Site public ---------- */
+
+.font-titre {
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+/*
+ * "Scène" : faisceaux de projecteurs sur fond nuit.
+ * Sert de fond au hero et de couverture aux événements sans affiche.
+ * --accent colore le faisceau principal.
+ */
+.scene {
+  --accent: var(--color-gw-rose);
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 108%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 70%),
+    conic-gradient(from 160deg at 18% -10%, transparent 0deg, color-mix(in srgb, var(--accent) 45%, transparent) 12deg, transparent 26deg),
+    conic-gradient(from 172deg at 82% -10%, transparent 0deg, rgba(201, 184, 255, 0.35) 10deg, transparent 22deg),
+    conic-gradient(from 176deg at 50% -20%, transparent 0deg, rgba(255, 255, 255, 0.12) 5deg, transparent 12deg),
+    linear-gradient(180deg, #16122e 0%, #2a1f55 100%);
+}

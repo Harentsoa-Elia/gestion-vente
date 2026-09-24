@@ -6,6 +6,8 @@ import "./globals.css"
 import { Toaster } from "sonner"
 import { AppHeader } from "@/components/app-header"
 import { PublicHeader } from "@/components/public-header"
+import { PublicFooter } from "@/components/public-footer"
+import { variablesPolices } from "@/components/accueil/fonts"
 import { usePathname } from "next/navigation"
 import { isPublicRoute } from "@/utils"
 
@@ -21,7 +23,7 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
 
   return (
     <html lang="fr">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${variablesPolices}`}>
         <style jsx global>{`
           @media print {
             header {
@@ -50,8 +52,10 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
         {isPublic && <PublicHeader />}
         {!isPublic && !isStaffLoginPage && !isSidebarSection && <AppHeader />}
 
-        {/* Pas de padding sur les pages de login, ni sur les pages a barre laterale (qui gerent leur propre mise en page pleine hauteur) */}
-        <main className={isStaffLoginPage || isSidebarSection ? "pt-0" : "pt-[55px]"}>{children}</main>
+        {/* Pas de padding sur les pages de login, ni sur les pages a barre laterale (qui gerent leur propre mise en page pleine hauteur).
+            Pas de padding non plus sur les pages publiques : PublicHeader est "sticky", il occupe deja sa place dans le flux. */}
+        <main className={isStaffLoginPage || isSidebarSection || isPublic ? "pt-0" : "pt-[55px]"}>{children}</main>
+        {isPublic && <PublicFooter />}
 
         <Toaster richColors position="top-right" />
       </body>
