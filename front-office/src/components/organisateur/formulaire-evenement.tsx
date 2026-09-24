@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import type { Categorie, Evenement, Lieu } from "@/types"
@@ -190,15 +190,22 @@ export function ModaleNouveauLieu({
   ouverte,
   onFermer,
   onCree,
+  nomInitial,
 }: {
   ouverte: boolean
   onFermer: () => void
   onCree: (lieu: Lieu) => void
+  /** Nom déjà tapé dans la recherche, repris à l'ouverture */
+  nomInitial?: string
 }) {
   const [nom, setNom] = useState("")
   const [ville, setVille] = useState("")
   const [capacite, setCapacite] = useState("")
   const [envoi, setEnvoi] = useState(false)
+
+  useEffect(() => {
+    if (ouverte && nomInitial) setNom(nomInitial)
+  }, [ouverte, nomInitial])
 
   const creer = async () => {
     if (!nom.trim()) return

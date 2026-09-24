@@ -38,6 +38,7 @@ import type { Artiste, Categorie, CategorieBillet, Evenement, Lieu, PropositionA
 import { cn } from "@/utils"
 import { BadgeStatut, Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui"
 import { FormulaireEvenement, ModaleNouveauLieu } from "@/components/organisateur/formulaire-evenement"
+import { SelecteurRecherche } from "@/components/organisateur/selecteur-recherche"
 
 /*
  * Fiche d'un événement de l'organisateur (cas d'utilisation « Gérer un événement ») :
@@ -50,10 +51,17 @@ import { FormulaireEvenement, ModaleNouveauLieu } from "@/components/organisateu
 
 type Onglet = "propositions" | "billets" | "informations"
 
-const TYPES: { type: PropositionType; titre: string; icone: LucideIcon; cle: "lieu_id" | "artiste_id" | "categorie_id"; aide: string }[] = [
-  { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?" },
-  { type: "ARTISTE", titre: "Artistes", icone: Mic2, cle: "artiste_id", aide: "Qui programmer ?" },
-  { type: "CATEGORIE", titre: "Formules", icone: Shapes, cle: "categorie_id", aide: "Quel type d'événement ?" },
+const TYPES: {
+  type: PropositionType
+  titre: string
+  icone: LucideIcon
+  cle: "lieu_id" | "artiste_id" | "categorie_id"
+  aide: string
+  recherche: string
+}[] = [
+  { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?", recherche: "Rechercher un lieu ou une ville…" },
+  { type: "ARTISTE", titre: "Artistes", icone: Mic2, cle: "artiste_id", aide: "Qui programmer ?", recherche: "Rechercher un artiste ou un genre…" },
+  { type: "CATEGORIE", titre: "Formules", icone: Shapes, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement…" },
 ]
 
 const entier = new Intl.NumberFormat("fr-FR")
@@ -399,12 +407,12 @@ function OngletPropositions({
   onArtisteCree: (a: Artiste) => void
   onChangement: () => Promise<void>
 }) {
-  const [choix, setChoix] = useState<Record<PropositionType, string>>({ LIEU: "", ARTISTE: "", CATEGORIE: "" })
   const [ajout, setAjout] = useState<PropositionType | null>(null)
   const [aRetirer, setARetirer] = useState<PropositionAvecScore | null>(null)
   const [retrait, setRetrait] = useState(false)
-  const [nouveauLieu, setNouveauLieu] = useState(false)
-  const [nouvelArtiste, setNouvelArtiste] = useState(false)
+  // nom tapé dans la recherche quand l'élément n'existe pas encore (null = fenêtre fermée)
+  const [nouveauLieu, setNouveauLieu] = useState<string | null>(null)
+  const [nouvelArtiste, setNouvelArtiste] = useState<string | null>(null)
 
   const elements: Record<PropositionType, { id: number; nom: string; detail?: string }[]> = {
     LIEU: lieux.map((l) => ({
@@ -416,15 +424,13 @@ function OngletPropositions({
     CATEGORIE: categories.map((c) => ({ id: c.id, nom: c.nom })),
   }
 
-  const ajouter = async (type: PropositionType, cle: "lieu_id" | "artiste_id" | "categorie_id", idElement?: number) => {
-    const id = idElement ?? Number(choix[type])
-    if (!id) return
+  // appelée dès qu'un élément est choisi dans la recherche : pas de bouton « Ajouter » séparé
+  const ajouter = async (type: PropositionType, cle: "lieu_id" | "artiste_id" | "categorie_id", id: number, nom: string) => {
     setAjout(type)
     try {
       await createProposition({ evenement_id: evenementId, type, [cle]: id })
-      setChoix((c) => ({ ...c, [type]: "" }))
       await onChangement()
-      toast.success("Proposition ajoutée : le public peut maintenant réagir.")
+      toast.success(`« ${nom} » est proposé au public.`)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "La proposition n'a pas été ajoutée.")
     } finally {
@@ -457,10 +463,16 @@ function OngletPropositions({
         . Proposez au moins deux options par type pour que le vote ait du sens.
       </p>
       <div className="grid gap-6 lg:grid-cols-3">
-        {TYPES.map(({ type, titre, icone: Icone, cle, aide }) => {
+        {TYPES.map(({ type, titre, icone: Icone, cle, aide, recherche }) => {
           const liste = parType[type]
           const dejaProposes = new Set(liste.map((p) => p[cle]))
           const disponibles = elements[type].filter((el) => !dejaProposes.has(el.id))
+          const creer =
+            type === "LIEU"
+              ? (texte: string) => setNouveauLieu(texte)
+              : type === "ARTISTE"
+                ? (texte: string) => setNouvelArtiste(texte)
+                : undefined // les catégories sont gérées par l'administrateur
           return (
             <section key={type} className="gw-carte flex flex-col p-5" aria-label={titre}>
               <div className="flex items-center gap-3">
@@ -501,43 +513,21 @@ function OngletPropositions({
               )}
 
               <div className="mt-auto pt-4">
-                <label className="sr-only" htmlFor={`ajout-${type}`}>
-                  Ajouter {titre.toLowerCase()}
-                </label>
-                <div className="flex gap-2">
-                  <select
-                    id={`ajout-${type}`}
-                    value={choix[type]}
-                    onChange={(e) => setChoix((c) => ({ ...c, [type]: e.target.value }))}
-                    className={classeChamp}
-                  >
-                    <option value="">{disponibles.length ? "Choisir…" : "Tout est déjà proposé"}</option>
-                    {disponibles.map((el) => (
-                      <option key={el.id} value={el.id}>
-                        {el.detail ? `${el.nom} (${el.detail})` : el.nom}
-                      </option>
-                    ))}
-                  </select>
-                  <Bouton
-                    variante="secondaire"
-                    className="shrink-0 px-3"
-                    onClick={() => ajouter(type, cle)}
-                    disabled={!choix[type]}
-                    chargement={ajout === type}
-                    aria-label={`Ajouter la proposition`}
-                  >
-                    {ajout !== type && <Plus className="h-4 w-4" aria-hidden />}
-                  </Bouton>
-                </div>
-                {type !== "CATEGORIE" && (
-                  <button
-                    type="button"
-                    onClick={() => (type === "LIEU" ? setNouveauLieu(true) : setNouvelArtiste(true))}
-                    className="mt-2 text-xs font-semibold text-gw-violet hover:underline dark:text-gw-lavande"
-                  >
-                    {type === "LIEU" ? "+ Le lieu n'est pas dans la liste" : "+ L'artiste n'est pas dans la liste"}
-                  </button>
-                )}
+                <SelecteurRecherche
+                  options={disponibles}
+                  libelle={`Ajouter ${titre.toLowerCase()}`}
+                  placeholder={recherche}
+                  occupe={ajout === type}
+                  vide={type === "CATEGORIE" ? "Toutes les formules sont déjà proposées" : "Tout est déjà proposé"}
+                  onChoisir={(o) => ajouter(type, cle, o.id, o.nom)}
+                  onCreer={creer}
+                  libelleCreer={(t) => (type === "LIEU" ? `Créer le lieu « ${t} »` : `Créer l'artiste « ${t} »`)}
+                />
+                <p className="mt-1.5 text-xs text-gw-texte-doux dark:text-white/50">
+                  {type === "CATEGORIE"
+                    ? "Cliquez sur un type d'événement pour le proposer."
+                    : `Cliquez sur un nom pour le proposer. Absent de la liste ? Tapez-le pour le créer.`}
+                </p>
               </div>
             </section>
           )
@@ -545,21 +535,23 @@ function OngletPropositions({
       </div>
 
       <ModaleNouveauLieu
-        ouverte={nouveauLieu}
-        onFermer={() => setNouveauLieu(false)}
+        ouverte={nouveauLieu !== null}
+        nomInitial={nouveauLieu ?? undefined}
+        onFermer={() => setNouveauLieu(null)}
         onCree={async (lieu) => {
           onLieuCree(lieu)
-          setNouveauLieu(false)
-          await ajouter("LIEU", "lieu_id", lieu.id)
+          setNouveauLieu(null)
+          await ajouter("LIEU", "lieu_id", lieu.id, lieu.nom)
         }}
       />
       <ModaleNouvelArtiste
-        ouverte={nouvelArtiste}
-        onFermer={() => setNouvelArtiste(false)}
+        ouverte={nouvelArtiste !== null}
+        nomInitial={nouvelArtiste ?? undefined}
+        onFermer={() => setNouvelArtiste(null)}
         onCree={async (artiste) => {
           onArtisteCree(artiste)
-          setNouvelArtiste(false)
-          await ajouter("ARTISTE", "artiste_id", artiste.id)
+          setNouvelArtiste(null)
+          await ajouter("ARTISTE", "artiste_id", artiste.id, artiste.nom)
         }}
       />
 
@@ -591,14 +583,20 @@ function ModaleNouvelArtiste({
   ouverte,
   onFermer,
   onCree,
+  nomInitial,
 }: {
   ouverte: boolean
   onFermer: () => void
   onCree: (artiste: Artiste) => void
+  nomInitial?: string
 }) {
   const [nom, setNom] = useState("")
   const [genre, setGenre] = useState("")
   const [envoi, setEnvoi] = useState(false)
+
+  useEffect(() => {
+    if (ouverte && nomInitial) setNom(nomInitial)
+  }, [ouverte, nomInitial])
 
   const creer = async () => {
     if (!nom.trim()) return
