@@ -40,6 +40,7 @@ class PropositionResponse(PropositionBase):
     libelle: str
     id: int = Field(..., description="Unique ID de la proposition")
     date_proposition: datetime
+    image_url: Optional[str] = Field(None, description="Visuel de la proposition (/media/...), modifie via PUT /propositions/{id}/image")
 
     class Config:
         from_attributes = True

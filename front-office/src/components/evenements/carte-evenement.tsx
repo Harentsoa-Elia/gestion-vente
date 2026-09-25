@@ -1,10 +1,13 @@
-import type { CSSProperties } from "react"
+"use client"
+
+import { useState, type CSSProperties } from "react"
 import Link from "next/link"
 import { Eye, MapPin } from "lucide-react"
 import type { Categorie, Evenement, Lieu } from "@/types"
 import { cn } from "@/utils"
 import { iconeCategorie } from "@/lib/categories"
 import { formatDateCourte, formatDateLongue, formatPrix, repereTemporel } from "@/lib/evenements"
+import { IMAGES_TEST_EVENEMENTS, imageTest, urlMedia } from "@/lib/media"
 
 interface CarteEvenementProps {
   evenement: Evenement
@@ -15,8 +18,8 @@ interface CarteEvenementProps {
 }
 
 /**
- * Affiche de l'événement. Tant que l'API ne fournit pas d'image, on dessine
- * une couverture : jeux de lumière de scène, icône de la catégorie et date.
+ * Affiche de l'événement : celle de l'organisateur, sinon une image de test (lib/media.ts),
+ * sinon (image introuvable) une couverture dessinée : lumières de scène, icône et date.
  */
 function Couverture({ evenement, categorie, passe }: { evenement: Evenement; categorie?: Categorie; passe: boolean }) {
   const Icone = iconeCategorie(categorie?.nom)
@@ -24,14 +27,21 @@ function Couverture({ evenement, categorie, passe }: { evenement: Evenement; cat
   // teinte dérivée de l'id : deux événements voisins n'ont pas la même couverture
   const teintes = ["var(--color-gw-violet)", "var(--color-gw-rose)", "#8B5CF6", "#C2410C", "#0E7490"]
   const accent = teintes[evenement.id % teintes.length]
+  const [imageEnErreur, setImageEnErreur] = useState(false)
+  const image = urlMedia(evenement.image_url) ?? imageTest(evenement.id, IMAGES_TEST_EVENEMENTS)
 
-  if (evenement.image_url) {
+  if (!imageEnErreur) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={evenement.image_url}
+        src={image}
         alt=""
-        className={cn("h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]", passe && "grayscale")}
+        loading="lazy"
+        onError={() => setImageEnErreur(true)}
+        className={cn(
+          "h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none",
+          passe && "grayscale",
+        )}
       />
     )
   }

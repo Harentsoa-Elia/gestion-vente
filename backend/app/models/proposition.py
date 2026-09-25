@@ -16,6 +16,8 @@ class Proposition(Base):
     type = Column(Enum(PropositionType, name="propositiontype"), nullable=False)
     libelle = Column(String, nullable=False)
     date_proposition = Column(DateTime(timezone=True), server_default=func.now())
+    # visuel envoyé par l'organisateur (/media/propositions/...), voir media_controller
+    image_url = Column(String, nullable=True)
 
     evenement_id = Column(Integer, ForeignKey("evenements.id"), nullable=False)
     artiste_id = Column(Integer, ForeignKey("artistes.id"), nullable=True)

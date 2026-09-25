@@ -7,6 +7,7 @@ import type { PropositionType } from "@/types"
 import { cn } from "@/utils"
 import type { PropositionEnVote } from "@/lib/use-propositions"
 import { formatDateLongue } from "@/lib/evenements"
+import { IMAGES_TEST_PROPOSITIONS, imageTest, urlMedia } from "@/lib/media"
 import { TitreSection } from "./titre-section"
 import { DecorationVote } from "./decoration-vote"
 import { BoiteReactions } from "./boite-reactions"
@@ -39,7 +40,11 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
 
   const texte = ton.clair ? "text-white" : "text-gw-nuit"
   const texteDoux = ton.clair ? "text-white/75" : "text-gw-nuit/70"
-  const photo = proposition.artiste?.image_url
+  // visuel : celui de l'organisateur, sinon la photo de l'artiste, sinon une image de test
+  const [photoEnErreur, setPhotoEnErreur] = useState(false)
+  const photo = photoEnErreur
+    ? null
+    : (urlMedia(proposition.image_url) ?? urlMedia(proposition.artiste?.image_url) ?? imageTest(proposition.id, IMAGES_TEST_PROPOSITIONS))
 
   return (
     <article
@@ -73,25 +78,32 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
         </div>
       </div>
 
-      {/* visuel : photo de l'artiste si l'API en fournit une, sinon la part des voix sur fond de scène */}
+      {/* visuel : image de la proposition (ou de test), avec la part des points par-dessus */}
       <div className="relative min-h-56 overflow-hidden md:min-h-0">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt={proposition.libelle} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none" />
+          <img
+            src={photo}
+            alt=""
+            loading="lazy"
+            onError={() => setPhotoEnErreur(true)}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none"
+          />
         ) : (
-          <div className="scene absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none" style={{ "--accent": ton.accent } as CSSProperties}>
-            <type.icone className="absolute top-7 right-7 h-10 w-10 text-white/80" strokeWidth={1.5} aria-hidden />
-            <div className="font-titre absolute bottom-7 left-7 text-white">
-              <p className="text-7xl leading-none font-bold tracking-[-0.04em]">
-                {proposition.part}
-                <span className="text-4xl"> %</span>
-              </p>
-              <p className="mt-2 max-w-[16rem] text-sm text-white/80">
-                des points parmi les {proposition.type === "LIEU" ? "lieux" : proposition.type === "ARTISTE" ? "artistes" : "formules"} proposés
-              </p>
-            </div>
-          </div>
+          <div className="scene absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none" style={{ "--accent": ton.accent } as CSSProperties} />
         )}
+        {/* dégradé pour que la part des points reste lisible sur n'importe quelle photo */}
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,18,46,0)_35%,rgba(22,18,46,0.85)_100%)]" />
+        <type.icone className="absolute top-5 right-5 h-9 w-9 text-white/85 drop-shadow" strokeWidth={1.5} aria-hidden />
+        <div className="font-titre absolute bottom-7 left-7 text-white">
+          <p className="text-7xl leading-none font-bold tracking-[-0.04em]">
+            {proposition.part}
+            <span className="text-4xl"> %</span>
+          </p>
+          <p className="mt-2 max-w-[16rem] text-sm text-white/85">
+            des points parmi les {proposition.type === "LIEU" ? "lieux" : proposition.type === "ARTISTE" ? "artistes" : "formules"} proposés
+          </p>
+        </div>
         <p className="absolute top-4 left-4 rounded-full bg-gw-nuit/75 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
           {formatDateLongue(proposition.evenement.date_debut)}
         </p>

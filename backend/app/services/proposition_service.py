@@ -66,6 +66,7 @@ class PropositionService:
                 "lieu_id": proposition.lieu_id,
                 "categorie_id": proposition.categorie_id,
                 "date_proposition": proposition.date_proposition,
+                "image_url": proposition.image_url,
                 "score": score,
             })
         return resultats

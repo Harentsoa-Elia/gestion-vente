@@ -26,19 +26,28 @@ import {
   createCategorieBillet,
   deleteCategorieBillet,
   deleteEvenement,
+  envoyerImageEvenement,
   fetchAllEvenements,
   fetchCategoriesBilletByEvenement,
   soumettreEvenement,
+  retirerImageEvenement,
   updateCategorieBillet,
   updateEvenement,
 } from "@/services/evenementService"
-import { createProposition, deleteProposition, fetchPropositionsAvecScores } from "@/services/propositionService"
+import {
+  createProposition,
+  deleteProposition,
+  envoyerImageProposition,
+  fetchPropositionsAvecScores,
+  retirerImageProposition,
+} from "@/services/propositionService"
 import { createArtiste, fetchArtistes, fetchCategories, fetchLieux } from "@/services/referentielService"
 import type { Artiste, Categorie, CategorieBillet, Evenement, Lieu, PropositionAvecScore, PropositionType } from "@/types"
 import { cn } from "@/utils"
 import { BadgeStatut, Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui"
 import { FormulaireEvenement, ModaleNouveauLieu } from "@/components/organisateur/formulaire-evenement"
 import { SelecteurRecherche } from "@/components/organisateur/selecteur-recherche"
+import { VignetteImage, ZoneImage } from "@/components/organisateur/zone-image"
 
 /*
  * Fiche d'un événement de l'organisateur (cas d'utilisation « Gérer un événement ») :
@@ -46,7 +55,8 @@ import { SelecteurRecherche } from "@/components/organisateur/selecteur-recherch
  *  - propositions soumises au public (lieux, artistes, formules) : le libellé reprend
  *    automatiquement le nom de l'élément choisi ;
  *  - catégories de billets (tarifs, quantités) ;
- *  - informations générales et suppression.
+ *  - affiche (image), informations générales et suppression.
+ * Tant qu'aucune image n'est ajoutée, le site public affiche une image de test (lib/media.ts).
  */
 
 type Onglet = "propositions" | "billets" | "informations"
@@ -280,6 +290,16 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
                   {billets.length > 0 ? <Check className="h-4 w-4" aria-hidden /> : <Circle className="h-4 w-4" aria-hidden />}
                   des tarifs (conseillé)
                 </li>
+                <li className={cn("flex items-center gap-1.5", evenement.image_url ? "text-emerald-700 dark:text-emerald-300" : "text-gw-texte-doux dark:text-white/55")}>
+                  {evenement.image_url ? <Check className="h-4 w-4" aria-hidden /> : <Circle className="h-4 w-4" aria-hidden />}
+                  {evenement.image_url ? (
+                    "une affiche (conseillé)"
+                  ) : (
+                    <button type="button" onClick={() => setOnglet("informations")} className="underline-offset-2 hover:text-gw-violet hover:underline dark:hover:text-white">
+                      une affiche (conseillé)
+                    </button>
+                  )}
+                </li>
               </ul>
             </div>
             <Bouton onClick={soumettre} chargement={soumission} disabled={manquants.length > 0} title={manquants.length > 0 ? "Complétez d'abord les propositions" : undefined}>
@@ -339,6 +359,20 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
       {onglet === "billets" && <OngletBillets evenementId={evenement.id} billets={billets} onChangement={rechargerBillets} />}
       {onglet === "informations" && (
         <section className="gw-carte p-5 sm:p-6">
+          <ZoneImage
+            className="mb-8 max-w-2xl border-b border-gw-bordure pb-8 dark:border-gw-bordure-sombre"
+            titre="Affiche de l'événement"
+            aide="Elle illustre l'événement sur l'accueil, dans le catalogue et sur sa page publique."
+            image={evenement.image_url}
+            onEnvoyer={async (fichier) => {
+              setEvenement(await envoyerImageEvenement(evenement.id, fichier))
+              toast.success("Affiche enregistrée.")
+            }}
+            onRetirer={async () => {
+              setEvenement(await retirerImageEvenement(evenement.id))
+              toast.success("Affiche retirée.")
+            }}
+          />
           <FormulaireEvenement
             key={evenement.id}
             initial={evenement}
@@ -460,7 +494,8 @@ function OngletPropositions({
         <Link href="/organisateur/intelligence-decisionnelle" className="font-semibold text-gw-violet underline dark:text-gw-lavande">
           Recommandations
         </Link>
-        . Proposez au moins deux options par type pour que le vote ait du sens.
+        . Proposez au moins deux options par type pour que le vote ait du sens. Cliquez sur le carré à gauche d&apos;une
+        proposition pour lui ajouter une image : elle s&apos;affichera sur sa carte, sur l&apos;accueil.
       </p>
       <div className="grid gap-6 lg:grid-cols-3">
         {TYPES.map(({ type, titre, icone: Icone, cle, aide, recherche }) => {
@@ -493,6 +528,20 @@ function OngletPropositions({
                 <ul className="mt-4 space-y-2">
                   {liste.map((p) => (
                     <li key={p.id} className="flex items-center gap-3 rounded-xl bg-gw-fond px-3 py-2.5 dark:bg-white/5">
+                      <VignetteImage
+                        image={p.image_url}
+                        libelle={p.libelle}
+                        onEnvoyer={async (fichier) => {
+                          await envoyerImageProposition(p.id, fichier)
+                          await onChangement()
+                          toast.success(`Image ajoutée à « ${p.libelle} ».`)
+                        }}
+                        onRetirer={async () => {
+                          await retirerImageProposition(p.id)
+                          await onChangement()
+                          toast.success("Image retirée.")
+                        }}
+                      />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-semibold">{p.libelle}</span>
                         <span className="text-xs text-gw-texte-doux dark:text-white/55">

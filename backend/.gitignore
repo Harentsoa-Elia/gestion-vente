@@ -2,3 +2,5 @@ venv/
 .env
 __pycache__/
 *.pyc
+# images envoyées par les organisateurs
+media/

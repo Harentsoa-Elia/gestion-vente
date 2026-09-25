@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from app.controllers import (
     concert_controller,
@@ -17,7 +18,9 @@ from app.controllers import (
     participant_controller,
     categorie_billet_controller,
     notification_controller,
+    media_controller,
 )
+from app.utils.media import MEDIA_DIR
 
 from app.database import engine, Base
 from app.auth.auth_bearer import JWTBearer  # Import JWTBearer
@@ -52,6 +55,11 @@ app.include_router(reservation_controller.router, prefix="/api/v1")
 app.include_router(participant_controller.router, prefix="/api/v1")
 app.include_router(categorie_billet_controller.router, prefix="/api/v1")
 app.include_router(notification_controller.router, prefix="/api/v1")
+app.include_router(media_controller.router, prefix="/api/v1")
+
+# Images envoyées par les organisateurs (affiches, visuels des propositions)
+MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
 @app.get("/", tags=["system"])
 

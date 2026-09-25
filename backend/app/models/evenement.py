@@ -15,6 +15,8 @@ class Evenement(Base):
     statut_validation = Column(String, default="brouillon", nullable=False)
     date_creation = Column(DateTime(timezone=True), server_default=func.now())
     nombre_vues = Column(Integer, default=0, nullable=False)
+    # affiche envoyée par l'organisateur (/media/evenements/...), voir media_controller
+    image_url = Column(String, nullable=True)
 
     lieu_id = Column(Integer, ForeignKey("lieux.id"), nullable=True)
     categorie_id = Column(Integer, ForeignKey("categories.id"), nullable=True)

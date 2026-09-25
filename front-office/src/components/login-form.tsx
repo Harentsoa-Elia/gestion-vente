@@ -29,26 +29,22 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
     setLoading(true)
     setError("")
 
-    try {
-      const endpoint = isLogin ? "/login" : "/signup"
-      const payload = isLogin ? { email, password } : { fullname: fullName, email, password }
-
+    const appeler = async (endpoint: string, payload: object, erreurParDefaut: string) => {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
-
       const data = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        throw new Error(
-          typeof data.detail === "string"
-            ? data.detail
-            : isLogin
-              ? "Email ou mot de passe incorrect."
-              : "L'inscription a échoué.",
-        )
-      }
+      if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : erreurParDefaut)
+      return data
+    }
+
+    try {
+      // /signup crée le compte sans renvoyer de jeton : on se connecte juste après
+      if (!isLogin) await appeler("/signup", { fullname: fullName, email, password }, "L'inscription a échoué.")
+      const data = await appeler("/login", { email, password }, "Email ou mot de passe incorrect.")
+      if (!data.access_token) throw new Error("La connexion a échoué.")
 
       localStorage.setItem("access_token", data.access_token)
       onLoginSuccess(data.access_token)

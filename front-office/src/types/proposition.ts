@@ -9,6 +9,8 @@ export interface Proposition {
   lieu_id: number | null
   categorie_id: number | null
   date_proposition: string
+  /** Visuel envoyé par l'organisateur (/media/..., voir lib/media.ts), null sinon. */
+  image_url?: string | null
 }
 
 export interface PropositionAvecScore extends Proposition {

@@ -14,6 +14,6 @@ export interface Evenement {
   date_creation: string
   prix_a_partir_de: number | null
   nombre_vues?: number
-  /** Pas encore renvoyé par l'API : prévu pour l'affiche de l'événement. */
+  /** Affiche envoyée par l'organisateur (/media/..., voir lib/media.ts), null sinon. */
   image_url?: string | null
 }

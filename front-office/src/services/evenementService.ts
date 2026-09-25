@@ -85,3 +85,27 @@ export const updateCategorieBillet = (id: number, saisie: { nom?: string; prix?:
 
 export const deleteCategorieBillet = (id: number) =>
   envoyer<{ message: string }>(`${API_BASE_URL}/categories-billet/${id}`, "DELETE");
+
+/* ---------- affiche de l'événement ---------- */
+
+/** Ajoute ou remplace l'affiche (le fichier est envoyé tel quel, l'API le redimensionne). */
+export async function envoyerImageEvenement(id: number, fichier: File): Promise<Evenement> {
+  const res = await fetch(`${API_BASE_URL}/evenements/${id}/image`, {
+    method: "PUT",
+    headers: { ...getAuthHeaders(), "Content-Type": fichier.type },
+    body: fichier,
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok) throw new Error(data?.detail || "L'image n'a pas été enregistrée.");
+  return data;
+}
+
+export async function retirerImageEvenement(id: number): Promise<Evenement> {
+  const res = await fetch(`${API_BASE_URL}/evenements/${id}/image`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok) throw new Error(data?.detail || "L'image n'a pas été retirée.");
+  return data;
+}

@@ -44,3 +44,26 @@ export async function deleteProposition(id: number): Promise<void> {
     throw new Error(data?.detail || "La proposition n'a pas été supprimée.");
   }
 }
+
+/* ---------- visuel d'une proposition ---------- */
+
+export async function envoyerImageProposition(id: number, fichier: File): Promise<Proposition> {
+  const res = await fetch(`${API_BASE_URL}/propositions/${id}/image`, {
+    method: "PUT",
+    headers: { ...getAuthHeaders(), "Content-Type": fichier.type },
+    body: fichier,
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok) throw new Error(data?.detail || "L'image n'a pas été enregistrée.");
+  return data;
+}
+
+export async function retirerImageProposition(id: number): Promise<Proposition> {
+  const res = await fetch(`${API_BASE_URL}/propositions/${id}/image`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok) throw new Error(data?.detail || "L'image n'a pas été retirée.");
+  return data;
+}
