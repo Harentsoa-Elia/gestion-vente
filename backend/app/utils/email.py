@@ -100,9 +100,8 @@ def envoyer_email_sans_erreur(destinataire: str, sujet: str, texte: str, html: O
 
 def _gabarit_html(titre: str, intro: str, code: str, pied: str) -> str:
     chiffres = "".join(
-        f'<span style="display:inline-block;width:40px;height:52px;line-height:52px;margin:0 3px;'
-        f'border-radius:10px;background:#F6F4FC;border:2px solid #D9D2FF;color:#1E1A3C;'
-        f'font-size:26px;font-weight:700;font-family:Arial,sans-serif">{escape(c)}</span>'
+        f'<td style="width:34px;height:46px;border-radius:9px;background:#F6F4FC;border:2px solid #D9D2FF;'
+        f'color:#1E1A3C;font-size:24px;font-weight:700;font-family:Arial,sans-serif;text-align:center">{escape(c)}</td>'
         for c in code
     )
     return f"""\
@@ -117,7 +116,8 @@ def _gabarit_html(titre: str, intro: str, code: str, pied: str) -> str:
         <tr><td style="padding:28px">
           <h1 style="margin:0 0 12px;font-size:22px;color:#1E1A3C">{escape(titre)}</h1>
           <p style="margin:0 0 22px;font-size:15px;line-height:1.5;color:#4A4566">{escape(intro)}</p>
-          <p style="margin:0 0 22px;text-align:center">{chiffres}</p>
+          <!-- tableau : les 6 chiffres restent sur une ligne même sur un petit écran -->
+          <table role="presentation" cellpadding="0" cellspacing="4" align="center" style="margin:0 auto 22px"><tr>{chiffres}</tr></table>
           <p style="margin:0;font-size:13px;line-height:1.5;color:#6E6987">{escape(pied)}</p>
         </td></tr>
       </table>
