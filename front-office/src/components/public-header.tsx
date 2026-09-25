@@ -7,7 +7,6 @@ import {
   Menu,
   X,
   Search,
-  User,
   LogOut,
   Ticket,
   CalendarDays,
@@ -24,6 +23,7 @@ import {
   fetchParticipantMe,
   logoutParticipant,
 } from "@/services/participantService"
+import { MenuCompte, type CompteParticipant } from "@/components/menu-compte"
 
 /*
  * En-tête du site public, construit sur le modèle de HelloAsso :
@@ -53,6 +53,7 @@ export function PublicHeader() {
   const [rechercheMobile, setRechercheMobile] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [participantName, setParticipantName] = useState<string | null>(null)
+  const [compte, setCompte] = useState<CompteParticipant | null>(null)
   const [loadingParticipant, setLoadingParticipant] = useState(true)
   const [recherche, setRecherche] = useState("")
   const panneauRef = useRef<HTMLDivElement>(null)
@@ -70,10 +71,14 @@ export function PublicHeader() {
       return
     }
     fetchParticipantMe()
-      .then((participant) => setParticipantName(`${participant.prenom} ${participant.nom}`.trim()))
+      .then((participant) => {
+        setParticipantName(`${participant.prenom} ${participant.nom}`.trim())
+        setCompte(participant)
+      })
       .catch(() => {
         clearParticipantToken()
         setParticipantName(null)
+        setCompte(null)
       })
       .finally(() => setLoadingParticipant(false))
   }, [isMounted])
@@ -113,6 +118,7 @@ export function PublicHeader() {
     }
     clearParticipantToken()
     setParticipantName(null)
+    setCompte(null)
     setMenuOuvert(false)
     router.push("/")
   }
@@ -176,14 +182,9 @@ export function PublicHeader() {
           </button>
 
           {!loadingParticipant &&
-            (participantName ? (
-              <Link
-                href="/participants/mes-reservations"
-                className="hidden h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond sm:flex"
-              >
-                <User className="h-4 w-4" aria-hidden />
-                <span className="max-w-[10rem] truncate">{participantName}</span>
-              </Link>
+            (compte ? (
+              // clic sur le nom : Mes réservations, confirmation de l'e-mail, Déconnexion
+              <MenuCompte compte={compte} onDeconnexion={handleLogout} />
             ) : (
               <Link
                 href="/participants/login"
