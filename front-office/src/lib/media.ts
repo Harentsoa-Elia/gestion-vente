@@ -58,8 +58,19 @@ export function imageTestEvenement(evenement: { id: number; titre: string }): st
   return imageParNom(evenement.titre) ?? imageTest(evenement.id, IMAGES_TEST_EVENEMENTS)
 }
 
-/** Pas de règle par nom ici : une affiche en largeur serait trop recadrée dans la carte, plus haute que large. */
-export function imageTestProposition(proposition: { id: number; type: PropositionType }): string {
+/**
+ * Images de test choisies d'après le libellé de la proposition.
+ * image: null = pas de photo : la carte garde son fond « scène » dessiné.
+ */
+const IMAGES_PROPOSITIONS_PAR_NOM: { motif: RegExp; image: string | null }[] = [
+  { motif: /coliseum/i, image: "/images/test/lieu-coliseum.jpg" },
+  { motif: /rossy/i, image: null },
+]
+
+/** Image de test d'une proposition, ou null pour garder le fond « scène » sans photo. */
+export function imageTestProposition(proposition: { id: number; type: PropositionType; libelle: string }): string | null {
+  const regle = IMAGES_PROPOSITIONS_PAR_NOM.find((r) => r.motif.test(proposition.libelle))
+  if (regle) return regle.image
   return imageTest(proposition.id, IMAGES_TEST_PROPOSITIONS[proposition.type])
 }
 
