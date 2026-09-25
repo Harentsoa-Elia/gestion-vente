@@ -60,6 +60,26 @@ body {
   animation: reaction-pop 0.25s ease-out backwards;
 }
 
+/* Hero de l'accueil : zoom lent des photos de fond et flottement de la pile (diaporama-hero.tsx) */
+@keyframes gw-survol {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+@keyframes gw-flotte {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 .animate-reaction-bounce {
   animation: reaction-bounce 0.35s ease-out;
 }
