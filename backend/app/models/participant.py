@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -18,6 +18,8 @@ class Participant(Base):
     genre = Column(String, nullable=True)
     avatar = Column(String, nullable=True)
     statut = Column(String, default="actif", nullable=False)
+    # adresse confirmée par un code reçu par e-mail : obligatoire pour réserver (les billets y sont envoyés)
+    email_verifie = Column(Boolean, default=False, server_default="false", nullable=False)
     date_creation = Column(DateTime(timezone=True), server_default=func.now())
 
     interactions = relationship("InteractionPublique", back_populates="participant")

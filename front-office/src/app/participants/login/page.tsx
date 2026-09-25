@@ -1,6 +1,7 @@
 "use client"
 
 import { Suspense, useState } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Lock, Mail, User } from "lucide-react"
 import { toast } from "sonner"
@@ -14,7 +15,7 @@ function ParticipantLoginForm() {
   // l'onglet « Inscription » garde la page de retour (ex. réservation en cours)
   const suite = searchParams.get("redirect") ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
 
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState(searchParams.get("email") ?? "")
   const [motDePasse, setMotDePasse] = useState("")
   const [loading, setLoading] = useState(false)
   const [erreur, setErreur] = useState("")
@@ -84,6 +85,14 @@ function ParticipantLoginForm() {
           autoComplete="current-password"
           required
         />
+        <p className="-mt-3 text-right">
+          <Link
+            href={`/participants/mot-de-passe-oublie?${new URLSearchParams({ ...(email ? { email } : {}), ...(searchParams.get("redirect") ? { redirect: redirectTo } : {}) })}`}
+            className="text-xs font-semibold text-gw-violet hover:text-gw-rose-action hover:underline"
+          >
+            Mot de passe oublié ?
+          </Link>
+        </p>
 
         <MessageErreur>{erreur}</MessageErreur>
 

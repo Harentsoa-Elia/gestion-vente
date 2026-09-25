@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.participant import (
@@ -11,12 +11,15 @@ from app.services.participant_service import ParticipantService, verify_password
 from app.auth.auth_handler import sign_jwt_participant
 from app.auth.auth_bearer import ParticipantBearer, BLACKLISTED_TOKENS
 from app.database import get_db
+from app.services.code_email_service import COMPTE_PARTICIPANT, USAGE_VERIFICATION, CodeEmailService, RenvoiTropRapide
+from app.utils.email import email_code_verification, envoyer_email_sans_erreur
 
 router = APIRouter(tags=["participants"])
 
 
 @router.post("/participants/signup", status_code=status.HTTP_201_CREATED)
 async def signup_participant(
+    taches: BackgroundTasks,
     data: ParticipantSignup = Body(...),
     db: AsyncSession = Depends(get_db),
 ):
@@ -25,6 +28,12 @@ async def signup_participant(
     if existing:
         raise HTTPException(status_code=400, detail="Un compte existe deja avec cet email")
     participant = await service.create_participant(data)
+    # code de confirmation de l'adresse, envoyé après la réponse (renvoi possible depuis le site)
+    try:
+        code = await CodeEmailService(db).creer(participant.email, COMPTE_PARTICIPANT, USAGE_VERIFICATION)
+        taches.add_task(envoyer_email_sans_erreur, participant.email, *email_code_verification(participant.prenom, code))
+    except RenvoiTropRapide:
+        pass
     return sign_jwt_participant(participant.email, participant.id)
 
 

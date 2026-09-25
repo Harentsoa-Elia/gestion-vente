@@ -78,8 +78,8 @@ function ParticipantSignupForm() {
         genre,
       })
       saveParticipantToken(result.access_token)
-      toast.success(`Bienvenue sur guichetweb, ${prenom.trim()} !`)
-      router.push(redirectTo)
+      toast.success(`Bienvenue sur guichetweb, ${prenom.trim()} ! Un code vient de vous être envoyé par e-mail.`)
+      router.push(`/participants/verifier-email?redirect=${encodeURIComponent(redirectTo)}`)
     } catch (err) {
       setErreur(
         err instanceof TypeError
@@ -112,7 +112,7 @@ function ParticipantSignupForm() {
       sousTitre={
         etape === 0
           ? "Ces informations aident les organisateurs à proposer des événements qui vous ressemblent."
-          : "Votre e-mail servira à vous connecter et à recevoir vos billets."
+          : "Votre e-mail servira à vous connecter et à recevoir vos billets : nous vous enverrons un code pour le confirmer."
       }
     >
       {/* barre de progression */}

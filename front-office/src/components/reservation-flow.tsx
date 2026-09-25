@@ -7,7 +7,9 @@ import { createReservation, payerReservation, fetchCategoriesBillet } from "@/se
 import type { PaiementConfirme, CategorieBillet } from "@/types"
 import { toast } from "sonner"
 import QRCode from "react-qr-code"
-import { Ticket, CreditCard } from "lucide-react"
+import { Ticket, CreditCard, MailWarning } from "lucide-react"
+import { fetchParticipantMe } from "@/services/participantService"
+import { VerificationEmail } from "@/components/auth/verification-email"
 
 interface ReservationFlowProps {
   evenementId: number
@@ -22,6 +24,18 @@ export default function ReservationFlow({ evenementId }: ReservationFlowProps) {
   const [reservationId, setReservationId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [billet, setBillet] = useState<PaiementConfirme | null>(null)
+  // les billets sont envoyés par e-mail : l'adresse doit être confirmée avant de réserver
+  const [emailVerifie, setEmailVerifie] = useState<boolean | null>(null)
+  const [email, setEmail] = useState<string>()
+
+  useEffect(() => {
+    fetchParticipantMe()
+      .then((p) => {
+        setEmailVerifie(p.email_verifie)
+        setEmail(p.email)
+      })
+      .catch(() => setEmailVerifie(true)) // en cas d'échec, l'API refusera de toute façon la réservation
+  }, [])
 
   useEffect(() => {
     fetchCategoriesBillet(evenementId)
@@ -41,7 +55,9 @@ export default function ReservationFlow({ evenementId }: ReservationFlowProps) {
       setEtape("reservee")
       toast.success("Reservation creee. Vous pouvez maintenant proceder au paiement.")
     } catch (err: any) {
-      toast.error(err.message || "Erreur lors de la reservation.")
+      const message: string = err.message || "Erreur lors de la reservation."
+      if (message.startsWith("EMAIL_NON_VERIFIE")) setEmailVerifie(false)
+      else toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -68,7 +84,17 @@ export default function ReservationFlow({ evenementId }: ReservationFlowProps) {
         <CardTitle>Reservation</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {etape === "choix" && (
+        {etape === "choix" && emailVerifie === false && (
+          <div className="space-y-4">
+            <p className="flex items-start gap-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <MailWarning className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+              Avant de réserver, confirmez votre adresse e-mail : c&apos;est là que vous recevrez votre billet et son QR code.
+            </p>
+            <VerificationEmail email={email} envoyerAuDemarrage onConfirme={() => setEmailVerifie(true)} />
+          </div>
+        )}
+
+        {etape === "choix" && emailVerifie !== false && (
           <>
             <div className="space-y-2">
               {categories.map((cat) => (

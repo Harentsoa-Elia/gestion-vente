@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Link from "next/link"
 import { KeyRound, Lock, Mail, User, UserPlus } from "lucide-react"
 import { API_BASE_URL } from "@/services/apiConfig"
 import { BoutonAuth, CadreAuth, ChampAuth, LienPied, MessageErreur } from "@/components/auth/cadre-auth"
@@ -23,6 +24,12 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [fullName, setFullName] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // retour de « mot de passe oublié » : l'adresse est préremplie (/login?email=…)
+  useEffect(() => {
+    const adresse = new URLSearchParams(window.location.search).get("email")
+    if (adresse) setEmail(adresse)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -123,6 +130,16 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
           minLength={isLogin ? undefined : 6}
           required
         />
+        {isLogin && (
+          <p className="-mt-3 text-right">
+            <Link
+              href={email ? `/login/mot-de-passe-oublie?email=${encodeURIComponent(email)}` : "/login/mot-de-passe-oublie"}
+              className="text-xs font-semibold text-gw-violet hover:text-gw-rose-action hover:underline"
+            >
+              Mot de passe oublié ?
+            </Link>
+          </p>
+        )}
 
         <MessageErreur>{error}</MessageErreur>
 

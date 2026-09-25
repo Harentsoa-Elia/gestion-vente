@@ -10,6 +10,7 @@ from app.auth.auth_bearer import ParticipantBearer, FlexibleBearer
 from app.database import get_db
 from app.auth.auth_bearer import JWTBearer
 from app.models.evenement import Evenement
+from app.models.participant import Participant
 from app.schemas.reservation import ParticipantOrganisateurResponse
 
 router = APIRouter(tags=["reservations"])
@@ -28,6 +29,10 @@ async def create_reservation(
 ):
     service = ReservationService(db)
     participant_id = auth_data.get("participant_id")
+    # les billets (QR code) sont envoyés par e-mail : l'adresse doit être confirmée
+    participant = await db.get(Participant, participant_id)
+    if participant is None or not participant.email_verifie:
+        raise HTTPException(status_code=403, detail="EMAIL_NON_VERIFIE: Confirmez votre adresse e-mail avant de réserver.")
     try:
         return await service.create_reservation(reservation, participant_id)
     except ValueError as e:

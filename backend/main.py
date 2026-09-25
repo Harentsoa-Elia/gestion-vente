@@ -19,6 +19,7 @@ from app.controllers import (
     categorie_billet_controller,
     notification_controller,
     media_controller,
+    compte_controller,
 )
 from app.utils.media import MEDIA_DIR
 
@@ -56,6 +57,7 @@ app.include_router(participant_controller.router, prefix="/api/v1")
 app.include_router(categorie_billet_controller.router, prefix="/api/v1")
 app.include_router(notification_controller.router, prefix="/api/v1")
 app.include_router(media_controller.router, prefix="/api/v1")
+app.include_router(compte_controller.router, prefix="/api/v1")
 
 # Images envoyées par les organisateurs (affiches, visuels des propositions)
 MEDIA_DIR.mkdir(parents=True, exist_ok=True)

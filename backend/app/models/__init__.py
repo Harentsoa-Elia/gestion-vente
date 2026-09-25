@@ -16,6 +16,7 @@ from .billet import Billet
 from .participant import Participant
 from .categorie_billet import CategorieBillet
 from .notification import Notification
+from .code_email import CodeEmail
 
 __all__ = [
     'Concert',
@@ -35,4 +36,5 @@ __all__ = [
     'Participant',
     'CategorieBillet',
     'Notification',
+    'CodeEmail',
 ]

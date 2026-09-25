@@ -11,6 +11,8 @@ export interface Participant {
   genre: Genre | null
   avatar: string | null
   statut: string
+  /** Adresse confirmée par un code reçu par e-mail : obligatoire pour réserver. */
+  email_verifie: boolean
   date_creation: string
 }
 

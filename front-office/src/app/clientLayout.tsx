@@ -15,7 +15,8 @@ const inter = Inter({ subsets: ["latin"] })
 
 export default function ClientLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname()
-  const isStaffLoginPage = pathname === "/login"
+  // /login et ses sous-pages (ex. /login/mot-de-passe-oublie) : pas d'en-tête, accessibles sans compte
+  const isStaffLoginPage = pathname === "/login" || pathname.startsWith("/login/")
   const isPublic = isPublicRoute(pathname)
   // Les pages /organisateur/* fournissent leur propre navigation complete
   // (barre laterale), donc on n'affiche jamais le AppHeader du haut dessus.

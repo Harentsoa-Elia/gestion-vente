@@ -40,11 +40,13 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
 
   const texte = ton.clair ? "text-white" : "text-gw-nuit"
   const texteDoux = ton.clair ? "text-white/75" : "text-gw-nuit/70"
-  // visuel : celui de l'organisateur, sinon la photo de l'artiste, sinon une image de test
-  const [photoEnErreur, setPhotoEnErreur] = useState(false)
-  const photo = photoEnErreur
-    ? null
-    : (urlMedia(proposition.image_url) ?? urlMedia(proposition.artiste?.image_url) ?? imageTestProposition(proposition))
+  // visuel : celui de l'organisateur, sinon la photo de l'artiste, sinon une image de test ;
+  // une image introuvable (lien cassé) passe à la suivante, et sans image on garde le fond « scène »
+  const candidates = [urlMedia(proposition.image_url), urlMedia(proposition.artiste?.image_url), imageTestProposition(proposition)].filter(
+    (x): x is string => !!x,
+  )
+  const [essai, setEssai] = useState(0)
+  const photo = candidates[essai] ?? null
 
   return (
     <article
@@ -86,7 +88,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
             src={photo}
             alt=""
             loading="lazy"
-            onError={() => setPhotoEnErreur(true)}
+            onError={() => setEssai((i) => i + 1)}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none"
           />
         ) : (

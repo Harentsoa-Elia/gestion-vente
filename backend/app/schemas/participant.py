@@ -55,7 +55,24 @@ class ParticipantUpdate(BaseModel):
 class ParticipantResponse(ParticipantBase):
     id: int
     statut: str
+    email_verifie: bool = False
     date_creation: datetime
 
     class Config:
         from_attributes = True
+
+
+# ---------- codes reçus par e-mail ----------
+
+class SaisieCode(BaseModel):
+    code: str = Field(..., pattern=r"^\s*\d{6}\s*$", description="Code à 6 chiffres reçu par e-mail")
+
+
+class DemandeReinitialisation(BaseModel):
+    email: EmailStr
+
+
+class Reinitialisation(BaseModel):
+    email: EmailStr
+    code: str = Field(..., pattern=r"^\s*\d{6}\s*$")
+    nouveau_mot_de_passe: str = Field(..., min_length=6)
