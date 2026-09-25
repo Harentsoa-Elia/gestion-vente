@@ -37,6 +37,10 @@ def _config() -> dict:
         # Gmail affiche le mot de passe d'application par groupes de 4 : on retire les espaces
         "password": os.getenv("SMTP_PASSWORD", "").replace(" ", ""),
         "from_name": os.getenv("SMTP_FROM_NAME", "guichetweb"),
+        # Nom annoncé au serveur (EHLO). Par défaut Python prend le nom réseau de l'ordinateur,
+        # que certaines box donnent sous une forme refusée par Gmail
+        # (ex. « DESKTOP-XXX.flybox.home,airbox.home » -> erreur 501 5.5.4).
+        "local_hostname": os.getenv("SMTP_LOCAL_HOSTNAME", "localhost").strip() or "localhost",
     }
 
 
@@ -68,11 +72,11 @@ def envoyer_email(destinataire: str, sujet: str, texte: str, html: Optional[str]
     try:
         contexte = ssl.create_default_context()
         if c["port"] == 465:
-            with smtplib.SMTP_SSL(c["host"], c["port"], context=contexte, timeout=20) as smtp:
+            with smtplib.SMTP_SSL(c["host"], c["port"], local_hostname=c["local_hostname"], context=contexte, timeout=20) as smtp:
                 smtp.login(c["user"], c["password"])
                 smtp.send_message(message)
         else:
-            with smtplib.SMTP(c["host"], c["port"], timeout=20) as smtp:
+            with smtplib.SMTP(c["host"], c["port"], local_hostname=c["local_hostname"], timeout=20) as smtp:
                 smtp.starttls(context=contexte)
                 smtp.login(c["user"], c["password"])
                 smtp.send_message(message)
