@@ -7,7 +7,7 @@ import type { Categorie, Evenement, Lieu } from "@/types"
 import { cn } from "@/utils"
 import { iconeCategorie } from "@/lib/categories"
 import { formatDateCourte, formatDateLongue, formatPrix, repereTemporel } from "@/lib/evenements"
-import { IMAGES_TEST_EVENEMENTS, imageTest, urlMedia } from "@/lib/media"
+import { imageTestEvenement, urlMedia } from "@/lib/media"
 
 interface CarteEvenementProps {
   evenement: Evenement
@@ -28,7 +28,7 @@ function Couverture({ evenement, categorie, passe }: { evenement: Evenement; cat
   const teintes = ["var(--color-gw-violet)", "var(--color-gw-rose)", "#8B5CF6", "#C2410C", "#0E7490"]
   const accent = teintes[evenement.id % teintes.length]
   const [imageEnErreur, setImageEnErreur] = useState(false)
-  const image = urlMedia(evenement.image_url) ?? imageTest(evenement.id, IMAGES_TEST_EVENEMENTS)
+  const image = urlMedia(evenement.image_url) ?? imageTestEvenement(evenement)
 
   if (!imageEnErreur) {
     return (

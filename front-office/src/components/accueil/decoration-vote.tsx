@@ -4,15 +4,15 @@ import { cn } from "@/utils"
 
 /*
  * Décoration de la colonne de texte de « Donnez votre avis ».
- * Une photo de concert inclinée, entourée des quatre réactions publiques qui flottent.
+ * Une photo d'amis qui réagissent sur leur téléphone, inclinée, entourée des quatre réactions publiques qui flottent.
  * Chaque bulle affiche le poids de la réaction dans le score
  * (mêmes valeurs que backend/app/utils/scoring.py) : la décoration
  * explique aussi comment le vote fonctionne.
  *
- * Photo : public/images/accueil/avis-dj.jpg (noter son auteur pour les crédits).
+ * Photo : public/images/accueil/avis-amis.jpg (noter son auteur pour les crédits).
  */
 
-const PHOTO = "/images/accueil/avis-dj.jpg"
+const PHOTO = "/images/accueil/avis-amis.jpg"
 
 const BULLES = [
   { icone: ThumbsUp, fond: "var(--color-gw-violet)", poids: 1, position: "left-0 top-4 sm:-left-2", rotation: "-rotate-6", delai: "0s" },
@@ -31,7 +31,7 @@ export function DecorationVote() {
       {/* photo de concert, inclinée comme une carte posée */}
       <figure className="absolute top-1/2 left-1/2 m-0 h-52 w-[78%] -translate-x-1/2 -translate-y-1/2 -rotate-[6deg] overflow-hidden rounded-[1.6rem] bg-gw-nuit shadow-[0_30px_50px_-20px_rgba(30,26,60,0.75)] ring-[6px] ring-white sm:h-56">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={PHOTO} alt="" loading="lazy" className="h-full w-full object-cover object-[60%_55%]" />
+        <img src={PHOTO} alt="" loading="lazy" className="h-full w-full object-cover object-[50%_40%]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,18,46,0)_45%,rgba(22,18,46,0.75)_100%)]" />
         <figcaption className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/95 py-1.5 pr-3.5 pl-1.5 text-xs font-semibold text-gw-nuit shadow">
           <span className="grid h-6 w-6 place-items-center rounded-full bg-gw-rose-action text-white">

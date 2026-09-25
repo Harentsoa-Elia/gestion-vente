@@ -7,7 +7,7 @@ import type { PropositionType } from "@/types"
 import { cn } from "@/utils"
 import type { PropositionEnVote } from "@/lib/use-propositions"
 import { formatDateLongue } from "@/lib/evenements"
-import { IMAGES_TEST_PROPOSITIONS, imageTest, urlMedia } from "@/lib/media"
+import { imageTestProposition, urlMedia } from "@/lib/media"
 import { TitreSection } from "./titre-section"
 import { DecorationVote } from "./decoration-vote"
 import { BoiteReactions } from "./boite-reactions"
@@ -44,7 +44,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
   const [photoEnErreur, setPhotoEnErreur] = useState(false)
   const photo = photoEnErreur
     ? null
-    : (urlMedia(proposition.image_url) ?? urlMedia(proposition.artiste?.image_url) ?? imageTest(proposition.id, IMAGES_TEST_PROPOSITIONS))
+    : (urlMedia(proposition.image_url) ?? urlMedia(proposition.artiste?.image_url) ?? imageTestProposition(proposition))
 
   return (
     <article
