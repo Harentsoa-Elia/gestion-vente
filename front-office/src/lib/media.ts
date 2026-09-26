@@ -36,11 +36,11 @@ export const IMAGES_TEST_EVENEMENTS = [
   "/images/accueil/confettis-bleus.jpg",
 ]
 
-/** Une liste par type de proposition : un artiste, un lieu, une formule (type d'événement). */
+/** Une liste par type de proposition : un artiste, un lieu, un type d'événement. */
 export const IMAGES_TEST_PROPOSITIONS: Record<PropositionType, string[]> = {
   ARTISTE: ["/images/test/artiste.jpg"],
   LIEU: ["/images/test/lieu.jpg"],
-  // « Concert live » et les autres formules : en attendant une image dédiée
+  // « Concert live » et les autres types d'événement : en attendant une image dédiée
   CATEGORIE: ["/images/accueil/foule-violette.jpg", "/images/accueil/confettis-roses.jpg"],
 }
 

@@ -209,7 +209,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
             <CarteChiffre valeur={entier.format(data.billets_vendus)} libelle="Billets vendus" />
             <CarteChiffre
               valeur={`${compact.format(data.recettes_totales)} Ar`}
-              libelle="Recettes"
+              libelle="Total des ventes"
               titre={`${entier.format(data.recettes_totales)} Ar`}
             />
           </div>

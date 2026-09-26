@@ -22,7 +22,7 @@ import { BoiteReactions } from "./boite-reactions"
 const TYPES: Record<PropositionType, { libelle: string; icone: LucideIcon }> = {
   ARTISTE: { libelle: "Artiste proposé pour", icone: Mic2 },
   LIEU: { libelle: "Lieu proposé pour", icone: MapPin },
-  CATEGORIE: { libelle: "Formule proposée pour", icone: Shapes },
+  CATEGORIE: { libelle: "Type d'événement proposé pour", icone: Shapes },
 }
 
 /** Aplats des cartes, dans l'ordre : nuit, indigo, lavande, rose (palette du thème). */
@@ -103,7 +103,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
             <span className="text-4xl"> %</span>
           </p>
           <p className="mt-2 max-w-[16rem] text-sm text-white/85">
-            des points parmi les {proposition.type === "LIEU" ? "lieux" : proposition.type === "ARTISTE" ? "artistes" : "formules"} proposés
+            des points parmi les {proposition.type === "LIEU" ? "lieux" : proposition.type === "ARTISTE" ? "artistes" : "types d'événement"} proposés
           </p>
         </div>
         <p className="absolute top-4 left-4 rounded-full bg-gw-nuit/75 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
@@ -200,7 +200,7 @@ export function PropositionsEmpilees({
           <TitreSection
             id="avis-titre"
             titre="Donnez votre avis"
-            description="Les organisateurs hésitent entre plusieurs artistes, lieux ou formules. Réagissez : vos réactions pèsent dans leur décision."
+            description="Les organisateurs hésitent entre plusieurs artistes, lieux ou événements. Réagissez : vos réactions pèsent dans leur décision."
           />
           <DecorationVote />
           <p className="mx-auto mt-4 max-w-sm text-center text-sm text-gw-texte-doux">

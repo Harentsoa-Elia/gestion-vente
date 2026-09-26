@@ -36,7 +36,7 @@ import { cn } from "@/utils"
  * Pour l'événement choisi, on affiche :
  *  - la recommandation enregistrée (GET /evenements/{id}/recommandation) et un bouton
  *    pour la (re)calculer (POST .../recommandation/calculer) ;
- *  - les choix recommandés (lieu, artiste, formule) et le détail des votes par type,
+ *  - les choix recommandés (lieu, artiste, type d'événement) et le détail des votes par type,
  *    à partir des scores actuels (GET /evenements/{id}/propositions/scores) ;
  *  - une explication de la méthode de calcul (poids de backend/app/utils/scoring.py).
  */
@@ -46,7 +46,7 @@ const entier = new Intl.NumberFormat("fr-FR")
 const TYPES: { type: PropositionType; titre: string; pluriel: string; icone: LucideIcon; cle: "lieu_id" | "artiste_id" | "categorie_id" }[] = [
   { type: "LIEU", titre: "Lieu", pluriel: "lieux", icone: MapPin, cle: "lieu_id" },
   { type: "ARTISTE", titre: "Artiste", pluriel: "artistes", icone: Mic2, cle: "artiste_id" },
-  { type: "CATEGORIE", titre: "Formule", pluriel: "formules", icone: Shapes, cle: "categorie_id" },
+  { type: "CATEGORIE", titre: "Type d'événement", pluriel: "types d'événement", icone: Shapes, cle: "categorie_id" },
 ]
 
 const POIDS: { libelle: string; poids: number; icone: React.ReactNode }[] = [
@@ -200,7 +200,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
       <div>
         <h1 className="font-titre text-2xl font-semibold">Recommandations</h1>
         <p className="mt-1 max-w-2xl text-sm text-gw-texte-doux dark:text-white/65">
-          Avant de fixer un lieu, un artiste ou une formule, voyez ce que votre public préfère. La recommandation se
+          Avant de fixer un lieu, un artiste ou un type d'événement, voyez ce que votre public préfère. La recommandation se
           calcule à partir des réactions laissées sur vos propositions.
         </p>
       </div>
@@ -253,7 +253,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
               <Sparkles className="h-8 w-8 text-gw-violet" aria-hidden />
               <p className="font-titre text-lg font-semibold">Aucune proposition pour « {evenement?.titre} »</p>
               <p className="max-w-md text-sm text-gw-texte-doux dark:text-white/60">
-                Soumettez au public plusieurs lieux, artistes ou formules : leurs réactions permettront de calculer une
+                Soumettez au public plusieurs lieux, artistes ou types d'événement : leurs réactions permettront de calculer une
                 recommandation.
               </p>
               {evenement && (
@@ -393,13 +393,13 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
                                   <p className="font-titre mt-0.5 text-lg leading-snug font-semibold">{p.libelle}</p>
                                   <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/60">
                                     {nb > 1
-                                      ? `${p.part} % des points, parmi ${nb} ${pluriel} proposé${type === "CATEGORIE" ? "e" : ""}s`
+                                      ? `${p.part} % des points, parmi ${nb} ${pluriel} proposés`
                                       : "Seule proposition de ce type"}
                                   </p>
                                 </>
                               ) : (
                                 <p className="mt-1 text-sm text-gw-texte-doux dark:text-white/60">
-                                  {nb === 0 ? `Aucun${type === "CATEGORIE" ? "e" : ""} ${titre.toLowerCase()} proposé${type === "CATEGORIE" ? "e" : ""}` : "Non déterminé"}
+                                  {nb === 0 ? `Aucun ${titre.toLowerCase()} proposé` : "Non déterminé"}
                                 </p>
                               )}
                             </div>
@@ -492,7 +492,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
               <li>
                 <p className="font-semibold">2. Le meilleur score l&apos;emporte</p>
                 <p className="mt-1 text-gw-texte-doux dark:text-white/65">
-                  Pour chaque type (lieu, artiste, formule), la proposition qui totalise le plus de points est recommandée.
+                  Pour chaque type (lieu, artiste, type d'événement), la proposition qui totalise le plus de points est recommandée.
                 </p>
               </li>
               <li>

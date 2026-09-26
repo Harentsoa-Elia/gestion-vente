@@ -5,7 +5,9 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Lock, Mail, User } from "lucide-react"
 import { toast } from "sonner"
-import { loginParticipant, saveParticipantToken } from "@/services/participantService"
+import { saveParticipantToken } from "@/services/participantService"
+import { connexionEquipe, connexionParticipant, MESSAGE_IDENTIFIANTS } from "@/lib/connexion"
+import { accueilSelonRole, lireJetonStaff, roleDepuisJeton } from "@/lib/role"
 import { BoutonAuth, CadreAuth, ChampAuth, LienPied, MessageErreur } from "@/components/auth/cadre-auth"
 
 function ParticipantLoginForm() {
@@ -25,17 +27,34 @@ function ParticipantLoginForm() {
     setLoading(true)
     setErreur("")
     try {
-      const result = await loginParticipant({ email, mot_de_passe: motDePasse })
-      saveParticipantToken(result.access_token)
-      toast.success("Connexion réussie. Bon retour parmi nous !")
-      router.push(redirectTo)
+      const jeton = await connexionParticipant(email, motDePasse)
+      if (jeton) {
+        saveParticipantToken(jeton)
+        toast.success("Connexion réussie. Bon retour parmi nous !")
+        router.push(redirectTo)
+        return
+      }
+      // pas un compte participant : c'est peut-être un compte organisateur ou administrateur
+      const jetonEquipe = await connexionEquipe(email, motDePasse)
+      if (jetonEquipe) {
+        localStorage.setItem("access_token", jetonEquipe)
+        const role = roleDepuisJeton(lireJetonStaff())
+        toast.success(
+          role === "admin"
+            ? "Compte administrateur : vous êtes connecté à l'administration."
+            : "Compte organisateur : vous êtes connecté à votre espace organisateur.",
+        )
+        router.push(accueilSelonRole(role))
+        return
+      }
+      setErreur(MESSAGE_IDENTIFIANTS)
     } catch (err) {
       setErreur(
         err instanceof TypeError
           ? "Le serveur ne répond pas. Réessayez dans un instant."
           : err instanceof Error && err.message
             ? err.message
-            : "Email ou mot de passe incorrect.",
+            : MESSAGE_IDENTIFIANTS,
       )
     } finally {
       setLoading(false)
@@ -60,7 +79,7 @@ function ParticipantLoginForm() {
           <span aria-hidden className="hidden text-gw-bordure sm:inline">
             |
           </span>
-          <LienPied href="/login">Espace organisateur</LienPied>
+          <LienPied href="/login">Espace organisateurs et administrateurs</LienPied>
         </>
       }
     >

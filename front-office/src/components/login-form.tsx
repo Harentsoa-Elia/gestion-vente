@@ -3,6 +3,10 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { saveParticipantToken } from "@/services/participantService"
+import { connexionParticipant, MESSAGE_IDENTIFIANTS } from "@/lib/connexion"
 import { KeyRound, Lock, Mail, User, UserPlus } from "lucide-react"
 import { API_BASE_URL } from "@/services/apiConfig"
 import { BoutonAuth, CadreAuth, ChampAuth, LienPied, MessageErreur } from "@/components/auth/cadre-auth"
@@ -18,6 +22,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
+  const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -50,7 +55,23 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
     try {
       // /signup crée le compte sans renvoyer de jeton : on se connecte juste après
       if (!isLogin) await appeler("/signup", { fullname: fullName, email, password }, "L'inscription a échoué.")
-      const data = await appeler("/login", { email, password }, "Email ou mot de passe incorrect.")
+      let data: { access_token?: string }
+      try {
+        data = await appeler("/login", { email, password }, MESSAGE_IDENTIFIANTS)
+      } catch (err) {
+        // pas un compte de l'équipe : c'est peut-être un compte participant
+        if (isLogin && !(err instanceof TypeError)) {
+          const jetonParticipant = await connexionParticipant(email, password)
+          if (jetonParticipant) {
+            saveParticipantToken(jetonParticipant)
+            toast.success("Compte participant : vous êtes connecté. Retrouvez vos billets dans le menu à votre nom.")
+            router.push("/")
+            return
+          }
+          throw new Error(MESSAGE_IDENTIFIANTS)
+        }
+        throw err
+      }
       if (!data.access_token) throw new Error("La connexion a échoué.")
 
       localStorage.setItem("access_token", data.access_token)
@@ -83,11 +104,11 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         { libelle: "Inscription", actif: !isLogin, onClick: () => changerMode(false) },
       ]}
       icone={isLogin ? User : UserPlus}
-      surtitre="Espace organisateur"
+      surtitre={isLogin ? "Organisateurs et administrateurs" : "Espace organisateur"}
       titre={isLogin ? "Connexion" : "Créer un compte"}
       sousTitre={
         isLogin
-          ? "Gérez vos événements, vos ventes et les votes du public."
+          ? "Organisateurs : gérez vos événements et vos ventes. Administrateurs : validez les événements."
           : "Un compte pour préparer vos événements et suivre vos ventes."
       }
       pied={

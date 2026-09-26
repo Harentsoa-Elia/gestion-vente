@@ -52,7 +52,7 @@ import { VignetteImage, ZoneImage } from "@/components/organisateur/zone-image"
 /*
  * Fiche d'un événement de l'organisateur (cas d'utilisation « Gérer un événement ») :
  *  - parcours de publication : brouillon -> soumis à l'administrateur -> validé (ou rejeté) ;
- *  - propositions soumises au public (lieux, artistes, formules) : le libellé reprend
+ *  - propositions soumises au public (lieux, artistes, types d'événement) : le libellé reprend
  *    automatiquement le nom de l'élément choisi ;
  *  - catégories de billets (tarifs, quantités) ;
  *  - affiche (image), informations générales et suppression.
@@ -71,7 +71,7 @@ const TYPES: {
 }[] = [
   { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?", recherche: "Rechercher un lieu ou une ville…" },
   { type: "ARTISTE", titre: "Artistes", icone: Mic2, cle: "artiste_id", aide: "Qui programmer ?", recherche: "Rechercher un artiste ou un genre…" },
-  { type: "CATEGORIE", titre: "Formules", icone: Shapes, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement…" },
+  { type: "CATEGORIE", titre: "Types d'événement", icone: Shapes, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement…" },
 ]
 
 const entier = new Intl.NumberFormat("fr-FR")
@@ -282,7 +282,7 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
                   return (
                     <li key={t.type} className={cn("flex items-center gap-1.5", ok ? "text-emerald-700 dark:text-emerald-300" : "text-gw-texte-doux dark:text-white/55")}>
                       {ok ? <Check className="h-4 w-4" aria-hidden /> : <Circle className="h-4 w-4" aria-hidden />}
-                      au moins un{t.type === "CATEGORIE" ? "e formule" : t.type === "LIEU" ? " lieu" : " artiste"} proposé{t.type === "CATEGORIE" ? "e" : ""}
+                      au moins un {t.type === "CATEGORIE" ? "type d'événement" : t.type === "LIEU" ? "lieu" : "artiste"} proposé
                     </li>
                   )
                 })}
@@ -567,7 +567,7 @@ function OngletPropositions({
                   libelle={`Ajouter ${titre.toLowerCase()}`}
                   placeholder={recherche}
                   occupe={ajout === type}
-                  vide={type === "CATEGORIE" ? "Toutes les formules sont déjà proposées" : "Tout est déjà proposé"}
+                  vide={type === "CATEGORIE" ? "Tous les types d'événement sont déjà proposés" : "Tout est déjà proposé"}
                   onChoisir={(o) => ajouter(type, cle, o.id, o.nom)}
                   onCreer={creer}
                   libelleCreer={(t) => (type === "LIEU" ? `Créer le lieu « ${t} »` : `Créer l'artiste « ${t} »`)}
