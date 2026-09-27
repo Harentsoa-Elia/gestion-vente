@@ -108,18 +108,20 @@ class EvenementService:
         if db_evenement.statut_validation != "en_attente_validation":
             raise ValueError("Seul un evenement en attente peut etre valide.")
         db_evenement.statut_validation = "valide"
+        db_evenement.motif_rejet = None
         await self.db.commit()
         await self.db.refresh(db_evenement)
         await self._attacher_prix(db_evenement)
         return db_evenement
 
-    async def rejeter_evenement(self, evenement_id: int) -> Optional[Evenement]:
+    async def rejeter_evenement(self, evenement_id: int, motif: Optional[str] = None) -> Optional[Evenement]:
         db_evenement = await self.get_evenement(evenement_id)
         if not db_evenement:
             return None
         if db_evenement.statut_validation != "en_attente_validation":
             raise ValueError("Seul un evenement en attente peut etre rejete.")
         db_evenement.statut_validation = "rejete"
+        db_evenement.motif_rejet = (motif or "").strip() or None
         await self.db.commit()
         await self.db.refresh(db_evenement)
         await self._attacher_prix(db_evenement)

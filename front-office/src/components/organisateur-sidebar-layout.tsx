@@ -10,6 +10,8 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  ScrollText,
+  ShieldCheck,
   Moon,
   Sparkles,
   Sun,
@@ -30,6 +32,7 @@ import { cn } from "@/utils"
  * - Thème clair ou sombre, mémorisé dans le navigateur (clé organisateur_dark_mode),
  *   transmis aux pages via la prop darkMode (comme avant) et via la classe .dark.
  * - Sur mobile, la barre latérale s'ouvre en tiroir depuis un bouton « Menu ».
+ * - espace="admin" : même mise en page pour l'administrateur, avec ses propres liens.
  */
 
 interface NavItem {
@@ -49,17 +52,30 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/intelligence-decisionnelle", label: "Recommandations", icon: Sparkles, disponible: true },
 ]
 
+/** Espace administrateur : la validation est en tête ; les autres pages gardent pour l'instant leur ancien style. */
+const NAV_ADMIN: NavItem[] = [
+  { href: "/admin/evenements", label: "Événements à valider", icon: ShieldCheck, disponible: true },
+  { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, disponible: true },
+  { href: "/admin/users", label: "Utilisateurs", icon: Users, disponible: true },
+  { href: "/admin/logs", label: "Journal d'activité", icon: ScrollText, disponible: true },
+]
+
+export type EspaceStaff = "organisateur" | "admin"
+
 interface OrganisateurSidebarLayoutProps {
   children: React.ReactNode
+  espace?: EspaceStaff
 }
 
 function BarreLaterale({
+  espace,
   pathname,
   darkMode,
   onBasculerTheme,
   onDeconnexion,
   onNaviguer,
 }: {
+  espace: EspaceStaff
   pathname: string
   darkMode: boolean
   onBasculerTheme: () => void
@@ -70,7 +86,7 @@ function BarreLaterale({
     <div className="flex h-full flex-col text-white">
       <div className="px-7 pt-7 pb-6">
         <Logo ton="clair" />
-        <p className="mt-1 text-xs text-white/70">Espace organisateur</p>
+        <p className="mt-1 text-xs text-white/70">{espace === "admin" ? "Administration" : "Espace organisateur"}</p>
       </div>
 
       <div className="px-5">
@@ -86,8 +102,8 @@ function BarreLaterale({
         </Link>
       </div>
 
-      <nav aria-label="Espace organisateur" className="mt-6 flex-1 space-y-1 pl-5">
-        {NAV_ITEMS.map(({ href, label, icon: Icone, disponible }) => {
+      <nav aria-label={espace === "admin" ? "Administration" : "Espace organisateur"} className="mt-6 flex-1 space-y-1 pl-5">
+        {(espace === "admin" ? NAV_ADMIN : NAV_ITEMS).map(({ href, label, icon: Icone, disponible }) => {
           // la fiche d'un événement (/organisateur/evenements/12) garde « Mes événements » actif
           const actif = pathname === href || pathname.startsWith(`${href}/`)
           if (!disponible) {
@@ -126,7 +142,8 @@ function BarreLaterale({
       </nav>
 
       <div className="space-y-3 px-5 pt-4 pb-6">
-        {/* carte d'appel, à la place du « Go Pro » du modèle */}
+        {/* carte d'appel, à la place du « Go Pro » du modèle (organisateur seulement) */}
+        {espace === "organisateur" && (
         <Link
           href="/#avis"
           target="_blank"
@@ -138,6 +155,7 @@ function BarreLaterale({
           <p className="font-titre mt-3 text-base font-semibold leading-tight">Ce que vote votre public</p>
           <p className="mt-1 text-xs text-white/75">Voyez vos propositions telles que le public les découvre.</p>
         </Link>
+        )}
 
         <button
           type="button"
@@ -173,7 +191,7 @@ function BarreLaterale({
   )
 }
 
-export function OrganisateurSidebarLayout({ children }: OrganisateurSidebarLayoutProps) {
+export function OrganisateurSidebarLayout({ children, espace = "organisateur" }: OrganisateurSidebarLayoutProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [darkMode, setDarkMode] = useState(false)
@@ -212,6 +230,7 @@ export function OrganisateurSidebarLayout({ children }: OrganisateurSidebarLayou
 
   const barre = (
     <BarreLaterale
+      espace={espace}
       pathname={pathname}
       darkMode={darkMode}
       onBasculerTheme={basculerTheme}

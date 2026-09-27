@@ -141,3 +141,69 @@ def email_code_reinitialisation(prenom: str, code: str) -> tuple[str, str, str]:
     pied = "Ce code est valable 15 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail : votre mot de passe reste inchangé."
     texte = f"{intro}\n\nCode : {code}\n\n{pied}\n"
     return sujet, texte, _gabarit_html("Mot de passe oublié", intro, code, pied)
+
+
+# ---------- messages (sans code) ----------
+
+def lien_site(chemin: str) -> str:
+    """Adresse complète d'une page du site (SITE_URL dans backend/.env, par défaut le site local)."""
+    base = os.getenv("SITE_URL", "http://localhost:4000").rstrip("/")
+    return f"{base}{chemin}"
+
+
+def _gabarit_message(titre: str, paragraphes: list, bouton: Optional[tuple] = None, encadre: Optional[str] = None) -> str:
+    corps = "".join(
+        f'<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#4A4566">{escape(p)}</p>' for p in paragraphes
+    )
+    if encadre:
+        corps += (
+            '<div style="margin:4px 0 18px;padding:14px 16px;border-radius:12px;background:#FDE8F2;'
+            f'color:#8A1D55;font-size:14px;line-height:1.5"><strong>Motif :</strong> {escape(encadre)}</div>'
+        )
+    if bouton:
+        libelle, url = bouton
+        corps += (
+            f'<p style="margin:8px 0 0"><a href="{escape(url)}" style="display:inline-block;padding:12px 22px;'
+            'border-radius:999px;background:#C92A7A;color:#FFFFFF;font-weight:700;font-size:14px;'
+            f'text-decoration:none">{escape(libelle)}</a></p>'
+        )
+    return f"""\
+<!doctype html>
+<html lang="fr"><body style="margin:0;background:#F6F4FC;font-family:Arial,Helvetica,sans-serif;color:#1E1A3C">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border-radius:20px;overflow:hidden">
+        <tr><td style="background:#1E1A3C;background-image:linear-gradient(135deg,#1E1A3C,#6C5CE7 60%,#C92A7A);padding:22px 28px">
+          <span style="font-size:24px;font-weight:800;color:#FFFFFF;letter-spacing:-0.5px">guichetweb</span>
+        </td></tr>
+        <tr><td style="padding:28px">
+          <h1 style="margin:0 0 14px;font-size:22px;color:#1E1A3C">{escape(titre)}</h1>
+          {corps}
+        </td></tr>
+      </table>
+      <p style="margin:16px 0 0;font-size:12px;color:#6E6987">guichetweb, billetterie événementielle</p>
+    </td></tr>
+  </table>
+</body></html>"""
+
+
+def email_decision_evenement(prenom: str, titre_evenement: str, valide: bool, motif: Optional[str], lien: str) -> tuple:
+    if valide:
+        sujet = f"« {titre_evenement} » est validé et visible sur guichetweb"
+        titre = "Votre événement est validé"
+        paragraphes = [
+            f"Bonjour {prenom}, bonne nouvelle : l'administrateur a validé « {titre_evenement} ».",
+            "Il apparaît maintenant sur le site public, et le public peut réserver ses billets.",
+        ]
+        encadre = None
+    else:
+        sujet = f"« {titre_evenement} » n'a pas été validé"
+        titre = "Votre événement n'a pas été validé"
+        paragraphes = [
+            f"Bonjour {prenom}, l'administrateur n'a pas validé « {titre_evenement} » pour l'instant.",
+            "Corrigez-le depuis votre espace organisateur, puis soumettez-le à nouveau.",
+        ]
+        encadre = motif
+    texte = "\n\n".join(paragraphes + ([f"Motif : {motif}"] if (motif and not valide) else []) + [f"Voir l'événement : {lien}"]) + "\n"
+    html = _gabarit_message(titre, paragraphes, ("Voir mon événement", lien), encadre)
+    return sujet, texte, html

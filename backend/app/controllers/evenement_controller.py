@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 
-from app.schemas.evenement import EvenementCreate, EvenementUpdate, EvenementResponse
+from app.schemas.evenement import DecisionRejet, EvenementCreate, EvenementUpdate, EvenementResponse
 from app.services.evenement_service import EvenementService
 from app.auth.auth_bearer import JWTBearer
 from app.database import get_db
+from app.models.user import User
+from app.utils.email import email_decision_evenement, envoyer_email_sans_erreur, lien_site
 
 router = APIRouter(tags=["evenements"])
 
@@ -18,6 +20,20 @@ def check_access(auth_data: dict, evenement_organisateur_id: int):
     if user_id != evenement_organisateur_id:
         raise HTTPException(status_code=403, detail="Access denied for this evenement.")
     return True
+
+
+async def prevenir_organisateur(db: AsyncSession, taches: BackgroundTasks, evenement, valide: bool) -> None:
+    """E-mail à l'organisateur après la décision de l'administrateur (envoyé après la réponse)."""
+    organisateur = await db.get(User, evenement.organisateur_id)
+    if organisateur and organisateur.email:
+        prenom = (organisateur.fullname or "").split(" ")[0] or organisateur.fullname
+        taches.add_task(
+            envoyer_email_sans_erreur,
+            organisateur.email,
+            *email_decision_evenement(
+                prenom, evenement.titre, valide, evenement.motif_rejet, lien_site(f"/organisateur/evenements/{evenement.id}")
+            ),
+        )
 
 
 def check_admin(auth_data: dict):
@@ -113,6 +129,7 @@ async def publier_evenement(
 @router.post("/evenements/{evenement_id}/valider", response_model=EvenementResponse, summary="Valider un evenement (admin)")
 async def valider_evenement(
     evenement_id: int,
+    taches: BackgroundTasks,
     auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
@@ -123,14 +140,18 @@ async def valider_evenement(
         raise HTTPException(status_code=404, detail="Evenement not found.")
 
     try:
-        return await service.valider_evenement(evenement_id)
+        evenement = await service.valider_evenement(evenement_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    await prevenir_organisateur(db, taches, evenement, valide=True)
+    return evenement
 
 
 @router.post("/evenements/{evenement_id}/rejeter", response_model=EvenementResponse, summary="Rejeter un evenement (admin)")
 async def rejeter_evenement(
     evenement_id: int,
+    taches: BackgroundTasks,
+    decision: Optional[DecisionRejet] = Body(None),
     auth_data: dict = Depends(JWTBearer()),
     db: AsyncSession = Depends(get_db),
 ):
@@ -141,9 +162,11 @@ async def rejeter_evenement(
         raise HTTPException(status_code=404, detail="Evenement not found.")
 
     try:
-        return await service.rejeter_evenement(evenement_id)
+        evenement = await service.rejeter_evenement(evenement_id, decision.motif if decision else None)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    await prevenir_organisateur(db, taches, evenement, valide=False)
+    return evenement
 
 
 @router.delete("/evenements/{evenement_id}", status_code=200, summary="Delete an evenement")

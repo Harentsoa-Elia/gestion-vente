@@ -39,7 +39,7 @@ export function roleDepuisJeton(charge: ChargeJeton | null): RoleStaff | null {
 
 /** Page d'accueil de chaque rôle après la connexion. */
 export function accueilSelonRole(role: RoleStaff | null): string {
-  return role === "admin" ? "/dashboard" : "/organisateur/dashboard"
+  return role === "admin" ? "/admin/evenements" : "/organisateur/dashboard"
 }
 
 /**
@@ -52,7 +52,7 @@ export function redirectionSiInterdit(role: RoleStaff | null, chemin: string): s
     return "/organisateur/dashboard"
   }
   if (role === "admin" && chemin.startsWith("/organisateur")) {
-    return "/dashboard"
+    return "/admin/evenements"
   }
   return null
 }

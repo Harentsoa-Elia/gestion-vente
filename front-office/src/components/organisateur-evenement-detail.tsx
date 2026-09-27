@@ -271,9 +271,14 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gw-bordure pt-5 dark:border-gw-bordure-sombre">
             <div className="text-sm">
               {statut === "rejete" && (
-                <p className="mb-2 font-semibold text-gw-rose-action dark:text-pink-200">
-                  L&apos;administrateur a rejeté cet événement. Corrigez-le puis soumettez-le à nouveau.
-                </p>
+                <div className="mb-3 rounded-xl bg-gw-rose-pale px-4 py-3 text-gw-rose-action dark:bg-gw-rose/15 dark:text-pink-200">
+                  <p className="font-semibold">L&apos;administrateur a rejeté cet événement. Corrigez-le puis soumettez-le à nouveau.</p>
+                  {evenement.motif_rejet && (
+                    <p className="mt-1">
+                      <span className="font-semibold">Motif :</span> {evenement.motif_rejet}
+                    </p>
+                  )}
+                </div>
               )}
               <p className="font-medium">Avant d&apos;envoyer l&apos;événement à l&apos;administrateur :</p>
               <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5">

@@ -16,4 +16,6 @@ export interface Evenement {
   nombre_vues?: number
   /** Affiche envoyée par l'organisateur (/media/..., voir lib/media.ts), null sinon. */
   image_url?: string | null
+  /** Motif du dernier rejet par l'administrateur (affiché à l'organisateur). */
+  motif_rejet?: string | null
 }

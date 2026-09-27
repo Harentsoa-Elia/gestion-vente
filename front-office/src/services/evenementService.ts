@@ -86,6 +86,16 @@ export const updateCategorieBillet = (id: number, saisie: { nom?: string; prix?:
 export const deleteCategorieBillet = (id: number) =>
   envoyer<{ message: string }>(`${API_BASE_URL}/categories-billet/${id}`, "DELETE");
 
+/* ---------- décision de l'administrateur ---------- */
+
+/** Administrateur : l'événement devient public ; l'organisateur est prévenu par e-mail. */
+export const validerEvenement = (id: number) =>
+  envoyer<Evenement>(`${API_BASE_URL}/evenements/${id}/valider`, "POST");
+
+/** Administrateur : l'événement repasse à l'organisateur, avec le motif (envoyé par e-mail). */
+export const rejeterEvenement = (id: number, motif: string) =>
+  envoyer<Evenement>(`${API_BASE_URL}/evenements/${id}/rejeter`, "POST", { motif });
+
 /* ---------- affiche de l'événement ---------- */
 
 /** Ajoute ou remplace l'affiche (le fichier est envoyé tel quel, l'API le redimensionne). */

@@ -17,6 +17,8 @@ class Evenement(Base):
     nombre_vues = Column(Integer, default=0, nullable=False)
     # affiche envoyée par l'organisateur (/media/evenements/...), voir media_controller
     image_url = Column(String, nullable=True)
+    # motif donné par l'administrateur quand il rejette l'événement (vu par l'organisateur)
+    motif_rejet = Column(String, nullable=True)
 
     lieu_id = Column(Integer, ForeignKey("lieux.id"), nullable=True)
     categorie_id = Column(Integer, ForeignKey("categories.id"), nullable=True)

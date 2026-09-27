@@ -31,6 +31,10 @@ class EvenementUpdate(EvenementBase):
     date_debut: Optional[datetime] = None
 
 
+class DecisionRejet(BaseModel):
+    motif: Optional[str] = Field(None, max_length=1000, description="Pourquoi l'evenement est rejete (transmis a l'organisateur)")
+
+
 class EvenementResponse(EvenementBase):
     id: int = Field(..., description="Unique ID de l'evenement")
     organisateur_id: int
@@ -39,6 +43,7 @@ class EvenementResponse(EvenementBase):
     prix_a_partir_de: Optional[float] = Field(None, description="Prix minimum parmi les categories de billet disponibles")
     nombre_vues: int = Field(0, description="Nombre de fois ou la page detail a ete consultee")
     image_url: Optional[str] = Field(None, description="Affiche de l'evenement (/media/...), modifiee via PUT /evenements/{id}/image")
+    motif_rejet: Optional[str] = Field(None, description="Motif du dernier rejet par l'administrateur")
 
     class Config:
         from_attributes = True

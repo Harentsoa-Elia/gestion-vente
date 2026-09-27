@@ -13,6 +13,7 @@ ChevronDown,
 LogOut,
 User,
 Trophy,
+ShieldCheck,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import clsx from "clsx";
@@ -40,6 +41,7 @@ const [showAdminMenu, setShowAdminMenu] = useState(false);
 // ---------------- BASE LINKS ----------------
 const baseLinks = [
 { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
+{ href: "/admin/evenements", label: "Événements à valider", icon: ShieldCheck },
 { href: "/concerts/new", label: "Concerts", icon: PlusCircle },
 { href: "/organisateur/dashboard", label: "Mes evenements", icon: CalendarRange },
 ];
@@ -106,6 +108,8 @@ loadUser();
 const links = baseLinks.filter((l) => {
 // l'administrateur n'a pas d'espace organisateur
 if (concertId === 0 && l.href === "/organisateur/dashboard") return false;
+// la validation des événements est réservée à l'administrateur
+if (concertId !== 0 && l.href === "/admin/evenements") return false;
 if (concertId !== 0) {
 const restrictedPaths = [
 "/concerts/new",
