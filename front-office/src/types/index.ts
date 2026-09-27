@@ -12,3 +12,4 @@ export * from "./participant";
 export * from "./notification";
 export * from "./referentiel";
 export * from "./recommandation";
+export * from "./billetterie";

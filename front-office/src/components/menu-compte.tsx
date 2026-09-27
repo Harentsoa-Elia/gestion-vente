@@ -101,7 +101,7 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
             <li>
               <Link href="/participants/mes-reservations" className={element}>
                 <Ticket className="h-4 w-4 text-gw-violet" aria-hidden />
-                Mes réservations et billets
+                Mes billets
               </Link>
             </li>
             {!compte.email_verifie && (

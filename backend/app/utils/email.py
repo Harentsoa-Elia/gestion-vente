@@ -49,13 +49,25 @@ def envoi_configure() -> bool:
     return bool(c["user"] and c["password"])
 
 
-def envoyer_email(destinataire: str, sujet: str, texte: str, html: Optional[str] = None) -> None:
-    """Envoie un e-mail (bloquant : à appeler via run_in_threadpool ou BackgroundTasks)."""
+def envoyer_email(
+    destinataire: str,
+    sujet: str,
+    texte: str,
+    html: Optional[str] = None,
+    pieces_jointes: Optional[list] = None,
+    images_inline: Optional[list] = None,
+) -> None:
+    """Envoie un e-mail (bloquant : à appeler via run_in_threadpool ou BackgroundTasks).
+
+    pieces_jointes : [(nom_fichier, contenu_bytes, "application/pdf"), ...]
+    images_inline  : [(cid, contenu_png), ...] affichées dans le HTML avec <img src="cid:...">
+    """
     c = _config()
     if not envoi_configure():
+        jointes = ", ".join(nom for nom, _, _ in (pieces_jointes or [])) or "aucune"
         print(
             "\n----- E-MAIL (non envoyé : SMTP_USER / SMTP_PASSWORD absents de backend/.env) -----\n"
-            f"À : {destinataire}\nSujet : {sujet}\n\n{texte}\n"
+            f"À : {destinataire}\nSujet : {sujet}\nPièces jointes : {jointes}\n\n{texte}\n"
             "-------------------------------------------------------------------------------\n",
             flush=True,
         )
@@ -68,6 +80,13 @@ def envoyer_email(destinataire: str, sujet: str, texte: str, html: Optional[str]
     message.set_content(texte)
     if html:
         message.add_alternative(html, subtype="html")
+        if images_inline:
+            partie_html = message.get_payload()[-1]
+            for cid, png in images_inline:
+                partie_html.add_related(png, maintype="image", subtype="png", cid=f"<{cid}>")
+    for nom, contenu, type_mime in pieces_jointes or []:
+        principal, secondaire = type_mime.split("/", 1)
+        message.add_attachment(contenu, maintype=principal, subtype=secondaire, filename=nom)
 
     try:
         contexte = ssl.create_default_context()
@@ -88,10 +107,10 @@ def envoyer_email(destinataire: str, sujet: str, texte: str, html: Optional[str]
         raise EnvoiImpossible("L'e-mail n'a pas pu être envoyé. Réessayez dans un instant.") from e
 
 
-def envoyer_email_sans_erreur(destinataire: str, sujet: str, texte: str, html: Optional[str] = None) -> None:
+def envoyer_email_sans_erreur(destinataire: str, sujet: str, texte: str, html: Optional[str] = None, **options) -> None:
     """Pour les tâches de fond : une erreur d'envoi est journalisée, jamais levée."""
     try:
-        envoyer_email(destinataire, sujet, texte, html)
+        envoyer_email(destinataire, sujet, texte, html, **options)
     except EnvoiImpossible as e:
         print(f"[guichetweb] E-mail non envoyé à {destinataire} : {e}", flush=True)
 
@@ -206,4 +225,28 @@ def email_decision_evenement(prenom: str, titre_evenement: str, valide: bool, mo
         encadre = motif
     texte = "\n\n".join(paragraphes + ([f"Motif : {motif}"] if (motif and not valide) else []) + [f"Voir l'événement : {lien}"]) + "\n"
     html = _gabarit_message(titre, paragraphes, ("Voir mon événement", lien), encadre)
+    return sujet, texte, html
+
+
+def email_billets(prenom: str, evenement: str, date_texte: str, lieu: Optional[str], billets: list, lien: str) -> tuple:
+    """billets : [(numero, categorie, cid_qr), ...] ; les QR codes sont joints en images inline (cid)."""
+    n = len(billets)
+    sujet = f"Vos billets pour « {evenement} »" if n > 1 else f"Votre billet pour « {evenement} »"
+    intro = [
+        f"Bonjour {prenom}, merci pour votre réservation ! Votre paiement est confirmé.",
+        f"{evenement} : {date_texte}" + (f", {lieu}." if lieu else "."),
+        (f"Voici vos {n} billets" if n > 1 else "Voici votre billet")
+        + " : présentez le QR code à l'entrée, sur votre téléphone ou imprimé. Le billet PDF est aussi en pièce jointe.",
+    ]
+    blocs = "".join(
+        f'<div style="margin:0 0 14px;padding:16px;border-radius:14px;background:#F6F4FC;text-align:center">'
+        f'<img src="cid:{escape(cid)}" width="170" height="170" alt="QR code du billet {escape(numero)}" style="display:block;margin:0 auto 8px;border-radius:8px;background:#fff">'
+        f'<div style="font-size:14px;font-weight:700;color:#1E1A3C">{escape(numero)}</div>'
+        f'<div style="font-size:13px;color:#6E6987">{escape(categorie)}</div></div>'
+        for numero, categorie, cid in billets
+    )
+    html = _gabarit_message("Votre billet est prêt" if n == 1 else "Vos billets sont prêts", intro, ("Voir mes billets", lien))
+    # les QR codes s'insèrent juste avant le bouton
+    html = html.replace('<p style="margin:8px 0 0"><a href=', blocs + '<p style="margin:8px 0 0"><a href=', 1)
+    texte = "\n\n".join(intro + [f"Billet {numero} ({categorie})" for numero, categorie, _ in billets] + [f"Vos billets : {lien}"]) + "\n"
     return sujet, texte, html

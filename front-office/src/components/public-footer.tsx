@@ -15,7 +15,7 @@ const COLONNES = [
     liens: [
       { href: "/participants/login", libelle: "Connexion" },
       { href: "/participants/signup", libelle: "Créer mon compte" },
-      { href: "/participants/mes-reservations", libelle: "Mes réservations" },
+      { href: "/participants/mes-reservations", libelle: "Mes billets" },
     ],
   },
   {

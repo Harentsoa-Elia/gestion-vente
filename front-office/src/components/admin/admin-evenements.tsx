@@ -51,10 +51,10 @@ const FILTRES: { id: Filtre; libelle: string }[] = [
   { id: "tous", libelle: "Tous" },
 ]
 
-const TYPES: { type: PropositionType; titre: string; icone: LucideIcon }[] = [
-  { type: "LIEU", titre: "Lieux", icone: MapPin },
-  { type: "ARTISTE", titre: "Artistes", icone: Mic2 },
-  { type: "CATEGORIE", titre: "Types d'événement", icone: Shapes },
+const TYPES: { type: PropositionType; titre: string; singulier: string; pluriel: string; icone: LucideIcon }[] = [
+  { type: "LIEU", titre: "Lieux", singulier: "lieu", pluriel: "lieux", icone: MapPin },
+  { type: "ARTISTE", titre: "Artistes", singulier: "artiste", pluriel: "artistes", icone: Mic2 },
+  { type: "CATEGORIE", titre: "Types d'événement", singulier: "type d'événement", pluriel: "types d'événement", icone: Shapes },
 ]
 
 const MOTIFS_RAPIDES = [
@@ -363,9 +363,10 @@ function CarteAValider({
         { ok: ev.description.trim().length >= 40, texte: ev.description.trim().length >= 40 ? "Description détaillée" : "Description très courte" },
         { ok: details.tarifs.length > 0, texte: details.tarifs.length > 0 ? "Tarifs définis" : "Aucun tarif" },
         { ok: new Date(ev.date_debut) > new Date(), texte: new Date(ev.date_debut) > new Date() ? "Date à venir" : "Date déjà passée" },
-        ...TYPES.map(({ type, titre }) => {
+        ...TYPES.map(({ type, singulier, pluriel }) => {
           const n = parType(type).length
-          return { ok: n >= 2, texte: n >= 2 ? `${n} ${titre.toLowerCase()} soumis au vote` : `${n} ${titre.toLowerCase()} soumis au vote (2 conseillés)` }
+          const texte = n === 0 ? `Aucun ${singulier} soumis au vote` : `${n} ${n > 1 ? pluriel : singulier} soumis au vote`
+          return { ok: n >= 2, texte: n >= 2 ? texte : `${texte} (2 conseillés)` }
         }),
       ]
     : []
