@@ -288,6 +288,7 @@ class TicketService:
                     concert_description=evenement_new.description,
                 )
             billet.is_used = True
+            billet.date_scan = func.now()
             self.db.add(billet)
             try:
                 await self.db.commit()

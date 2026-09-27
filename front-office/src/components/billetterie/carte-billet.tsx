@@ -129,7 +129,11 @@ export function CarteBillet({
         ) : null}
         <p className="font-mono text-xs font-semibold tracking-wider text-gw-nuit">{billet.numero_billet}</p>
         <p className="max-w-[11rem] text-center text-xs text-gw-texte-doux">
-          {billet.utilise ? "Ce billet a déjà été scanné." : "Présentez ce QR code à l'entrée, sur votre téléphone ou imprimé."}
+          {billet.utilise
+            ? billet.date_scan
+              ? `Scanné à l'entrée le ${new Date(billet.date_scan).toLocaleDateString("fr-FR")} à ${new Date(billet.date_scan).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}.`
+              : "Ce billet a déjà été scanné."
+            : "Présentez ce QR code à l'entrée, sur votre téléphone ou imprimé."}
         </p>
       </div>
     </article>

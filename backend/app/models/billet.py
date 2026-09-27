@@ -12,6 +12,8 @@ class Billet(Base):
     qr_code = Column(String, unique=True, nullable=False)
     is_used = Column(Boolean, default=False, nullable=False)
     date_emission = Column(DateTime(timezone=True), server_default=func.now())
+    # heure du passage à l'entrée (premier scan valide), None tant que le billet n'est pas utilisé
+    date_scan = Column(DateTime(timezone=True), nullable=True)
 
     reservation_id = Column(Integer, ForeignKey("reservations.id"), unique=True, nullable=False)
 

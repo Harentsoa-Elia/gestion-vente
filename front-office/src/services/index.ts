@@ -13,3 +13,4 @@ export * from "./notificationService";
 export * from "./referentielService";
 export * from "./recommandationService";
 export * from "./billetterieService";
+export * from "./controleEntreeService";

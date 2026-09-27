@@ -191,3 +191,14 @@ body {
     outline-offset: -1px;
   }
 }
+
+/* Lecteur de QR code (contrôle des entrées) : la vidéo occupe le cadre, centrée sur fond sombre */
+.lecteur-qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lecteur-qr video {
+  display: block;
+  max-height: 100%;
+}

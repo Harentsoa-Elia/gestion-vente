@@ -36,6 +36,8 @@ export interface BilletParticipant {
   numero_billet: string | null
   qr_code: string | null
   utilise: boolean
+  /** Heure du passage à l'entrée */
+  date_scan?: string | null
 }
 
 export interface PaiementLotConfirme {

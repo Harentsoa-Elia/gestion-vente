@@ -57,6 +57,7 @@ class BilletParticipant(BaseModel):
     numero_billet: Optional[str] = None
     qr_code: Optional[str] = None
     utilise: bool = False
+    date_scan: Optional[datetime] = None  # heure du passage à l'entrée
 
 
 class PaiementConfirme(BaseModel):

@@ -207,6 +207,7 @@ class BilletterieService:
                     "numero_billet": b.numero_billet if b else None,
                     "qr_code": b.qr_code if b else None,
                     "utilise": bool(b.is_used) if b else False,
+                    "date_scan": b.date_scan if b else None,
                 }
             )
         return resultat
