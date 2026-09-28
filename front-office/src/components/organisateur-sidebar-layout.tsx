@@ -205,6 +205,17 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
     setMounted(true)
   }, [])
 
+  // Une seule session « équipe » par navigateur : si on se connecte avec un autre compte (ou si on
+  // se déconnecte) dans un autre onglet, on recharge la page pour afficher le bon espace
+  // au lieu de laisser à l'écran des pages d'un compte qui n'est plus connecté.
+  useEffect(() => {
+    const changement = (e: StorageEvent) => {
+      if (e.key === "access_token" || e.key === null) window.location.reload()
+    }
+    window.addEventListener("storage", changement)
+    return () => window.removeEventListener("storage", changement)
+  }, [])
+
   useEffect(() => {
     if (!tiroirOuvert) return
     const echap = (e: KeyboardEvent) => e.key === "Escape" && setTiroirOuvert(false)

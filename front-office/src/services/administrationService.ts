@@ -8,6 +8,8 @@ async function appel<T>(chemin: string, options: RequestInit = {}): Promise<T> {
   const data = await parseJsonSafe(res)
   if (!res.ok) {
     const d = data?.detail
+    if (res.status === 403)
+      throw new Error("Vous n'êtes plus connecté en administrateur (connexion avec un autre compte ?). Rechargez la page et reconnectez-vous.")
     throw new Error(typeof d === "string" ? d : Array.isArray(d) ? "Vérifiez les champs du formulaire." : "La demande n'a pas abouti.")
   }
   return data as T
