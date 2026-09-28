@@ -223,14 +223,17 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
                 <span className="text-[10px] text-gw-texte-doux dark:text-white/60">remplissage</span>
               </div>
             </div>
-            <div className="min-w-0 space-y-2 text-xs">
+            {/* légende de l'anneau (information, pas des boutons) : même encre pour les deux lignes */}
+            <div className="min-w-0 space-y-2 text-xs text-gw-texte dark:text-white/75">
               <p className="flex items-center gap-2 whitespace-nowrap">
-                <span className="h-2.5 w-2.5 rounded-full bg-[linear-gradient(135deg,#6C5CE7,#E8479A)]" aria-hidden />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[linear-gradient(135deg,#6C5CE7,#E8479A)]" aria-hidden />
                 Places vendues
+                <span className="ml-auto pl-3 font-semibold tabular-nums text-gw-nuit dark:text-white">{Math.round(data.taux_remplissage_moyen)} %</span>
               </p>
-              <p className="flex items-center gap-2 whitespace-nowrap text-gw-texte-doux dark:text-white/60">
-                <span className="h-2.5 w-2.5 rounded-full bg-gw-lavande dark:bg-white/20" aria-hidden />
+              <p className="flex items-center gap-2 whitespace-nowrap">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-gw-lavande dark:bg-white/20" aria-hidden />
                 Places libres
+                <span className="ml-auto pl-3 font-semibold tabular-nums text-gw-nuit dark:text-white">{100 - Math.round(data.taux_remplissage_moyen)} %</span>
               </p>
               <Link
                 href="/organisateur/reservations"
