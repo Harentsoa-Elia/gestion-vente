@@ -200,27 +200,3 @@ body {
   height: auto !important;
 }
 
-/* Statistiques : couleurs des graphiques (palette vérifiée daltonisme et contraste,
-   sur la carte blanche et sur la carte sombre de l'espace organisateur) */
-.gw-stats {
-  --stat-1: #6c5ce7; /* violet */
-  --stat-2: #e8479a; /* rose */
-  --stat-3: #008300; /* vert */
-  --stat-neutre: #b3afc4; /* non précisé */
-  --stat-clair: #b9b0f5; /* vendus pas encore entrés (étape claire du violet) */
-  --stat-piste: #ece8f7; /* fond des jauges */
-  --stat-grille: #ece8f7;
-  --stat-axe: #8b86a3;
-  --stat-surface: #ffffff;
-}
-.dark .gw-stats {
-  --stat-1: #9085e9;
-  --stat-2: #e8479a;
-  --stat-3: #1a9e2a;
-  --stat-neutre: #6b6590;
-  --stat-clair: #4d4499;
-  --stat-piste: #332c5a;
-  --stat-grille: #332c5a;
-  --stat-axe: #8b86a3;
-  --stat-surface: #221d40;
-}
