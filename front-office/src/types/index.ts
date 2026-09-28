@@ -14,3 +14,4 @@ export * from "./referentiel";
 export * from "./recommandation";
 export * from "./billetterie";
 export * from "./controle-entree";
+export * from "./statistiques";

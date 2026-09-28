@@ -50,7 +50,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/controle-entrees", label: "Contrôle des entrées", icon: ScanLine, disponible: true },
   { href: "/organisateur/participants", label: "Participants", icon: Users, disponible: true },
   { href: "/organisateur/paiements", label: "Paiements", icon: Wallet, disponible: true },
-  { href: "/organisateur/statistiques", label: "Statistiques", icon: BarChart3, disponible: false },
+  { href: "/organisateur/statistiques", label: "Statistiques", icon: BarChart3, disponible: true },
   { href: "/organisateur/intelligence-decisionnelle", label: "Recommandations", icon: Sparkles, disponible: true },
 ]
 
