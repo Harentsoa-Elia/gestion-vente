@@ -21,6 +21,10 @@ class PropositionBase(BaseModel):
     lieu_id: Optional[int] = Field(None, description="ID du lieu propose")
     categorie_id: Optional[int] = Field(None, description="ID de la categorie proposee")
 
+
+class PropositionCreate(PropositionBase):
+    # Contrôle à la création seulement : une ancienne proposition sans lien (créée avant
+    # le référentiel) doit rester lisible, sinon toute la liste de l'événement échoue (500).
     @model_validator(mode="after")
     def verifier_coherence_type(self):
         if self.type == PropositionType.ARTISTE and self.artiste_id is None:
@@ -30,10 +34,6 @@ class PropositionBase(BaseModel):
         if self.type == PropositionType.CATEGORIE and self.categorie_id is None:
             raise ValueError("categorie_id requis quand type est CATEGORIE")
         return self
-
-
-class PropositionCreate(PropositionBase):
-    pass
 
 
 class PropositionResponse(PropositionBase):
