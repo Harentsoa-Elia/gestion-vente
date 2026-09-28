@@ -43,6 +43,8 @@ const REGIONS_PAR_VILLE: Record<string, string> = {
   fianarantsoa: "Haute Matsiatra",
   ambalavao: "Haute Matsiatra",
   ambohimahasoa: "Haute Matsiatra",
+  sahambavy: "Haute Matsiatra",
+  "alakamisy ambohimaha": "Haute Matsiatra",
   toliara: "Atsimo-Andrefana",
   tolagnaro: "Anosy",
   morondava: "Menabe",

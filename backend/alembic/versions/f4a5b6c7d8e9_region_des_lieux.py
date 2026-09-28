@@ -42,11 +42,11 @@ REGIONS_PAR_VILLE = {
 }
 
 # (nom, adresse, ville, capacité connue ou None)
+# (la liste complète, fournie par l'entreprise, est dans g5b6c7d8e9f0_lieux_fianarantsoa.py)
 LIEUX_HAUTE_MATSIATRA = [
-    ("Royal Espace Fianarantsoa", "Bateravola", "Fianarantsoa", 700),
-    ("Hôtel Zomatel Fianarantsoa", None, "Fianarantsoa", None),
-    ("La Chaud'hier", "Rue Pasteur Groult", "Fianarantsoa", None),
-    ("Discothèque du Soafia", "Entrée de la ville, route d'Antananarivo", "Fianarantsoa", None),
+    ("L'Espace Royal Bateravola", "Bateravola", "Fianarantsoa", 700),
+    ("Zomatel Hotel-Restaurant", None, "Fianarantsoa", None),
+    ("La Chaudière", "Rue Pasteur Groult", "Fianarantsoa", None),
 ]
 
 
