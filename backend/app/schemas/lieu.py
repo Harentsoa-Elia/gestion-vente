@@ -6,6 +6,7 @@ class LieuBase(BaseModel):
     nom: str = Field(..., min_length=1, description="Nom du lieu")
     adresse: Optional[str] = Field(None, description="Adresse du lieu")
     ville: Optional[str] = Field(None, description="Ville du lieu")
+    region: Optional[str] = Field(None, description="Région de Madagascar (ex. Haute Matsiatra)")
     capacite: Optional[int] = Field(None, gt=0, description="Capacite du lieu")
 
 

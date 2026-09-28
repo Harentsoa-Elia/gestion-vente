@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useId, useState } from "react"
 import { Plus } from "lucide-react"
 import { toast } from "sonner"
 import type { Categorie, Evenement, Lieu } from "@/types"
 import type { EvenementSaisie } from "@/services/evenementService"
 import { createLieu } from "@/services/referentielService"
+import { REGION_ENTREPRISE, REGIONS, estRegionEntreprise, regionDeLaVille, villeEtRegion } from "@/lib/regions"
 import { Bouton, Champ, Modale, classeChamp, isoVersSaisie, saisieVersIso } from "./ui"
 
 /*
@@ -105,11 +106,22 @@ export function FormulaireEvenement({
             <div className="flex gap-2">
               <select id={id} value={lieuId} onChange={(e) => setLieuId(e.target.value)} className={classeChamp}>
                 <option value="">À définir</option>
-                {lieux.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.ville ? `${l.nom} (${l.ville})` : l.nom}
-                  </option>
-                ))}
+                {[
+                  { libelle: `${REGION_ENTREPRISE} (votre région)`, liste: lieux.filter(estRegionEntreprise) },
+                  { libelle: "Autres régions", liste: lieux.filter((l) => !estRegionEntreprise(l)) },
+                ]
+                  .filter((g) => g.liste.length > 0)
+                  .map((g) => (
+                    <optgroup key={g.libelle} label={g.libelle}>
+                      {[...g.liste]
+                        .sort((a, b) => a.nom.localeCompare(b.nom, "fr"))
+                        .map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {l.ville ? `${l.nom} (${villeEtRegion(l)})` : l.nom}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
               </select>
               <button
                 type="button"
@@ -185,7 +197,7 @@ export function FormulaireEvenement({
   )
 }
 
-/** Création rapide d'un lieu (référentiel partagé : nom, ville, capacité). */
+/** Création rapide d'un lieu (référentiel partagé : nom, ville, région, capacité). */
 export function ModaleNouveauLieu({
   ouverte,
   onFermer,
@@ -200,8 +212,11 @@ export function ModaleNouveauLieu({
 }) {
   const [nom, setNom] = useState("")
   const [ville, setVille] = useState("")
+  // région de l'entreprise par défaut ; préremplie d'après la ville quand elle est connue
+  const [region, setRegion] = useState(REGION_ENTREPRISE)
   const [capacite, setCapacite] = useState("")
   const [envoi, setEnvoi] = useState(false)
+  const idRegions = useId()
 
   useEffect(() => {
     if (ouverte && nomInitial) setNom(nomInitial)
@@ -214,12 +229,14 @@ export function ModaleNouveauLieu({
       const lieu = await createLieu({
         nom: nom.trim(),
         ville: ville.trim() || null,
+        region: region.trim() || null,
         adresse: null,
         capacite: capacite ? Number(capacite) : null,
       })
       toast.success(`Lieu « ${lieu.nom} » créé.`)
       setNom("")
       setVille("")
+      setRegion(REGION_ENTREPRISE)
       setCapacite("")
       onCree(lieu)
     } catch (e) {
@@ -237,7 +254,31 @@ export function ModaleNouveauLieu({
           {(id) => <input id={id} value={nom} onChange={(e) => setNom(e.target.value)} className={classeChamp} placeholder="Ex. Salle des fêtes" />}
         </Champ>
         <Champ libelle="Ville">
-          {(id) => <input id={id} value={ville} onChange={(e) => setVille(e.target.value)} className={classeChamp} placeholder="Ex. Antananarivo" />}
+          {(id) => (
+            <input
+              id={id}
+              value={ville}
+              onChange={(e) => {
+                setVille(e.target.value)
+                const r = regionDeLaVille(e.target.value)
+                if (r) setRegion(r)
+              }}
+              className={classeChamp}
+              placeholder="Ex. Fianarantsoa"
+            />
+          )}
+        </Champ>
+        <Champ libelle="Région" aide="Choisissez dans la liste ou tapez le nom de la région.">
+          {(id) => (
+            <>
+              <input id={id} list={idRegions} value={region} onChange={(e) => setRegion(e.target.value)} className={classeChamp} placeholder="Ex. Haute Matsiatra" />
+              <datalist id={idRegions}>
+                {REGIONS.map((r) => (
+                  <option key={r} value={r} />
+                ))}
+              </datalist>
+            </>
+          )}
         </Champ>
         <Champ libelle="Capacité" aide="Sert à estimer la participation dans les recommandations.">
           {(id) => (

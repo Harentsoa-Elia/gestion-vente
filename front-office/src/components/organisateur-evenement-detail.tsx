@@ -47,6 +47,7 @@ import { cn } from "@/utils"
 import { BadgeStatut, Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui"
 import { FormulaireEvenement, ModaleNouveauLieu } from "@/components/organisateur/formulaire-evenement"
 import { SelecteurRecherche } from "@/components/organisateur/selecteur-recherche"
+import { estRegionEntreprise, villeEtRegion } from "@/lib/regions"
 import { VignetteImage, ZoneImage } from "@/components/organisateur/zone-image"
 
 /*
@@ -69,7 +70,7 @@ const TYPES: {
   aide: string
   recherche: string
 }[] = [
-  { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?", recherche: "Rechercher un lieu ou une ville…" },
+  { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?", recherche: "Rechercher un lieu, une ville ou une région…" },
   { type: "ARTISTE", titre: "Artistes", icone: Mic2, cle: "artiste_id", aide: "Qui programmer ?", recherche: "Rechercher un artiste ou un genre…" },
   { type: "CATEGORIE", titre: "Types d'événement", icone: Shapes, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement…" },
 ]
@@ -457,7 +458,9 @@ function OngletPropositions({
     LIEU: lieux.map((l) => ({
       id: l.id,
       nom: l.nom,
-      detail: [l.ville, l.capacite ? `${entier.format(l.capacite)} places` : null].filter(Boolean).join(", "),
+      // ville, région (recherche possible par région, ex. « haute matsiatra »), capacité
+      detail: [villeEtRegion(l), l.capacite ? `${entier.format(l.capacite)} places` : null].filter(Boolean).join(" · "),
+      priorite: estRegionEntreprise(l) ? 1 : 0,
     })),
     ARTISTE: artistes.map((a) => ({ id: a.id, nom: a.nom, detail: a.genre_artistique ?? undefined })),
     CATEGORIE: categories.map((c) => ({ id: c.id, nom: c.nom })),

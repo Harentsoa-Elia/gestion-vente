@@ -277,7 +277,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
                 </span>
                 <span>
                   <span className="block font-semibold text-gw-nuit">{lieu?.nom}</span>
-                  <span className="text-sm text-gw-texte-doux">{[lieu?.adresse, lieu?.ville].filter(Boolean).join(", ")}</span>
+                  <span className="text-sm text-gw-texte-doux">{[lieu?.adresse, lieu?.ville, lieu?.region].filter(Boolean).join(", ")}</span>
                 </span>
               </li>
             )}

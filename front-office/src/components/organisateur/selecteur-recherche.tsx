@@ -16,6 +16,8 @@ export interface OptionRecherche {
   id: number
   nom: string
   detail?: string
+  /** Options proposées en premier (ex. lieux de la région de l'entreprise) : plus grand d'abord */
+  priorite?: number
 }
 
 const MAX_AFFICHEES = 60
@@ -57,7 +59,7 @@ export function SelecteurRecherche({
 
   const terme = normaliser(texte.trim())
   const correspondantes = useMemo(() => {
-    const triees = [...options].sort((a, b) => a.nom.localeCompare(b.nom, "fr"))
+    const triees = [...options].sort((a, b) => (b.priorite ?? 0) - (a.priorite ?? 0) || a.nom.localeCompare(b.nom, "fr"))
     if (!terme) return triees
     // d'abord les noms qui commencent par le texte, puis ceux qui le contiennent
     const debut: OptionRecherche[] = []

@@ -33,7 +33,7 @@ async function creer<T>(chemin: string, corps: unknown, erreur: string): Promise
   return data;
 }
 
-export const createLieu = (saisie: { nom: string; ville: string | null; adresse: string | null; capacite: number | null }) =>
+export const createLieu = (saisie: { nom: string; ville: string | null; region?: string | null; adresse: string | null; capacite: number | null }) =>
   creer<Lieu>("/lieux", saisie, "Le lieu n'a pas été créé.");
 
 export const createArtiste = (saisie: { nom: string; genre_artistique: string | null; description: string | null }) =>
