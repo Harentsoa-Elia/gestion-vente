@@ -7,6 +7,7 @@ import type { Statistiques as Stats } from "@/types"
 import { cn } from "@/utils"
 import { fetchStatistiques } from "@/services/statistiquesService"
 import { classeChamp } from "@/components/organisateur/ui"
+import { StyleGraphiques } from "@/lib/couleurs-graphiques"
 
 /*
  * Statistiques de l'organisateur (cahier des charges, « Dashboard organisateur ») :
@@ -15,32 +16,10 @@ import { classeChamp } from "@/components/organisateur/ui"
  *  - entrées : scannés / pas encore entrés / places restantes ;
  *  - public : répartition femmes / hommes et tranches d'âge des acheteurs ;
  *  - ventes par tarif, remplissage par événement, événements les plus populaires.
- * Couleurs : variables --stat-* définies ci-dessous, dans la page même (palette vérifiée
- * daltonisme et contraste, sur la carte blanche et sur la carte sombre de l'espace organisateur).
+ * Couleurs : variables --stat-* de lib/couleurs-graphiques.ts.
  */
 
-const COULEURS = `
-.gw-stats {
-  --stat-1: #6c5ce7;
-  --stat-2: #e8479a;
-  --stat-3: #008300;
-  --stat-neutre: #b3afc4;
-  --stat-clair: #b9b0f5;
-  --stat-piste: #ece8f7;
-  --stat-grille: #ece8f7;
-  --stat-axe: #6e6987;
-}
-.dark .gw-stats {
-  --stat-1: #9085e9;
-  --stat-2: #e8479a;
-  --stat-3: #1a9e2a;
-  --stat-neutre: #8a84ad;
-  --stat-clair: #5d52b8;
-  --stat-piste: #3a3366;
-  --stat-grille: #3a3366;
-  --stat-axe: #a8a3c4;
-}
-`
+
 
 const entier = new Intl.NumberFormat("fr-FR")
 const ariary = (n: number) => `${entier.format(Math.round(n))} Ar`
@@ -178,7 +157,7 @@ export function Statistiques() {
 
   return (
     <div className={cn("gw-stats space-y-6 px-4 py-6 lg:px-8 lg:py-8", chargement && "opacity-70 transition-opacity")}>
-      <style>{COULEURS}</style>
+      <StyleGraphiques />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-titre text-2xl font-semibold">Statistiques</h1>
@@ -375,7 +354,14 @@ export function Statistiques() {
               ) : (
                 <ul className="space-y-3">
                   {stats.tranches_age.map((t) => (
-                    <LigneBarre key={t.libelle} libelle={t.libelle} valeur={t.nombre} max={maxAge} texte={entier.format(t.nombre)} />
+                    <LigneBarre
+                      key={t.libelle}
+                      libelle={t.libelle}
+                      valeur={t.nombre}
+                      max={maxAge}
+                      texte={entier.format(t.nombre)}
+                      couleur={t.libelle === "Âge non précisé" ? "var(--stat-neutre)" : undefined}
+                    />
                   ))}
                 </ul>
               )}

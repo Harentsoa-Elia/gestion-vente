@@ -20,7 +20,7 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
   const isPublic = isPublicRoute(pathname)
   // Les pages /organisateur/* fournissent leur propre navigation complete
   // (barre laterale), donc on n'affiche jamais le AppHeader du haut dessus.
-  const isSidebarSection = pathname.startsWith("/organisateur") || pathname.startsWith("/admin/evenements")
+  const isSidebarSection = pathname.startsWith("/organisateur") || pathname === "/admin" || pathname.startsWith("/admin/")
 
   return (
     <html lang="fr">

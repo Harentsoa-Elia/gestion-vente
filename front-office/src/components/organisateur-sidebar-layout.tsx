@@ -8,9 +8,9 @@ import {
   CalendarRange,
   ExternalLink,
   LayoutDashboard,
+  Library,
   LogOut,
   Menu,
-  ScrollText,
   ShieldCheck,
   Moon,
   ScanLine,
@@ -54,12 +54,12 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/intelligence-decisionnelle", label: "Recommandations", icon: Sparkles, disponible: true },
 ]
 
-/** Espace administrateur : la validation est en tête ; les autres pages gardent pour l'instant leur ancien style. */
+/** Espace administrateur : supervision, validation des événements, comptes, référentiel. */
 const NAV_ADMIN: NavItem[] = [
+  { href: "/admin", label: "Vue d'ensemble", icon: LayoutDashboard, disponible: true },
   { href: "/admin/evenements", label: "Événements à valider", icon: ShieldCheck, disponible: true },
-  { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard, disponible: true },
-  { href: "/admin/users", label: "Utilisateurs", icon: Users, disponible: true },
-  { href: "/admin/logs", label: "Journal d'activité", icon: ScrollText, disponible: true },
+  { href: "/admin/utilisateurs", label: "Utilisateurs", icon: Users, disponible: true },
+  { href: "/admin/referentiel", label: "Référentiel", icon: Library, disponible: true },
 ]
 
 export type EspaceStaff = "organisateur" | "admin"
@@ -107,7 +107,7 @@ function BarreLaterale({
       <nav aria-label={espace === "admin" ? "Administration" : "Espace organisateur"} className="mt-6 flex-1 space-y-1 pl-5">
         {(espace === "admin" ? NAV_ADMIN : NAV_ITEMS).map(({ href, label, icon: Icone, disponible }) => {
           // la fiche d'un événement (/organisateur/evenements/12) garde « Mes événements » actif
-          const actif = pathname === href || pathname.startsWith(`${href}/`)
+          const actif = pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`))
           if (!disponible) {
             return (
               <div

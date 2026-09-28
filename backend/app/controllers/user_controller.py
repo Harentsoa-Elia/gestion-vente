@@ -57,6 +57,8 @@ async def user_login(user: UserLoginSchema = Body(...), db: AsyncSession = Depen
     
     if db_user:
         if verify_password(user.password, db_user.password):
+            if db_user.actif is False:
+                raise HTTPException(status_code=423, detail="Ce compte est suspendu. Contactez l'administrateur de guichetweb.")
             return sign_jwt(db_user.email, db_user.id, db_user.concert_id, db_user.role)
         else:
             raise HTTPException(status_code=403, detail="Wrong login details!")

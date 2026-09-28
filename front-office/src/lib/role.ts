@@ -39,7 +39,7 @@ export function roleDepuisJeton(charge: ChargeJeton | null): RoleStaff | null {
 
 /** Page d'accueil de chaque rôle après la connexion. */
 export function accueilSelonRole(role: RoleStaff | null): string {
-  return role === "admin" ? "/admin/evenements" : "/organisateur/dashboard"
+  return role === "admin" ? "/admin" : "/organisateur/dashboard"
 }
 
 /**

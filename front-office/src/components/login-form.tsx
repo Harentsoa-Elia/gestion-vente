@@ -59,6 +59,8 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       try {
         data = await appeler("/login", { email, password }, MESSAGE_IDENTIFIANTS)
       } catch (err) {
+        // compte suspendu par l'administrateur : on affiche la raison telle quelle
+        if (err instanceof Error && /suspendu/i.test(err.message)) throw err
         // pas un compte de l'équipe : c'est peut-être un compte participant
         if (isLogin && !(err instanceof TypeError)) {
           const jetonParticipant = await connexionParticipant(email, password)

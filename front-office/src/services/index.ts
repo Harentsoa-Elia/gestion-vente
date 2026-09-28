@@ -15,3 +15,4 @@ export * from "./recommandationService";
 export * from "./billetterieService";
 export * from "./controleEntreeService";
 export * from "./statistiquesService";
+export * from "./administrationService";

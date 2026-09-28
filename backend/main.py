@@ -23,6 +23,7 @@ from app.controllers import (
     billetterie_controller,
     controle_entree_controller,
     statistiques_controller,
+    administration_controller,
 )
 from app.utils.media import MEDIA_DIR
 
@@ -58,6 +59,7 @@ app.include_router(dashboard_controller.router, prefix="/api/v1")
 app.include_router(billetterie_controller.router, prefix="/api/v1")
 app.include_router(controle_entree_controller.router, prefix="/api/v1")
 app.include_router(statistiques_controller.router, prefix="/api/v1")
+app.include_router(administration_controller.router, prefix="/api/v1")
 app.include_router(reservation_controller.router, prefix="/api/v1")
 app.include_router(participant_controller.router, prefix="/api/v1")
 app.include_router(categorie_billet_controller.router, prefix="/api/v1")

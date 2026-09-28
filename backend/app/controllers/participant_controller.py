@@ -46,6 +46,8 @@ async def login_participant(
     participant = await service.get_by_email(data.email)
     if not participant or not verify_password(data.mot_de_passe, participant.mot_de_passe):
         raise HTTPException(status_code=403, detail="Email ou mot de passe incorrect")
+    if participant.statut == "suspendu":
+        raise HTTPException(status_code=423, detail="Ce compte est suspendu. Contactez l'administrateur de guichetweb.")
     return sign_jwt_participant(participant.email, participant.id)
 
 
