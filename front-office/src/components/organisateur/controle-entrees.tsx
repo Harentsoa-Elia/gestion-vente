@@ -448,8 +448,9 @@ export function ControleEntrees() {
             <Camera className="h-5 w-5 text-gw-violet dark:text-gw-lavande" aria-hidden /> Scanner
           </h2>
 
-          <div className="relative mt-4 aspect-square w-full overflow-hidden rounded-2xl bg-gw-nuit">
-            <div id={ID_LECTEUR} className="lecteur-qr h-full w-full" />
+          {/* la vidéo fixe elle-même sa hauteur (mise en page d'origine de html5-qrcode, la plus sûre sur iPhone) */}
+          <div className="relative mt-4 min-h-72 w-full overflow-hidden rounded-2xl bg-gw-nuit">
+            <div id={ID_LECTEUR} className="lecteur-qr w-full" />
             {camera === "active" && verdict && <BandeauVerdict verdict={verdict} entres={entres} vendus={vendus} />}
             {camera !== "active" && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center text-white">

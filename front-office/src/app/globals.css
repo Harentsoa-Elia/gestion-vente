@@ -192,13 +192,10 @@ body {
   }
 }
 
-/* Lecteur de QR code (contrôle des entrées) : la vidéo occupe le cadre, centrée sur fond sombre */
-.lecteur-qr {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Lecteur de QR code (contrôle des entrées) : pas de mise en page imposée à la vidéo,
+   Safari sur iPhone n'affiche plus l'image si on la place dans un conteneur flex de hauteur fixe. */
 .lecteur-qr video {
   display: block;
-  max-height: 100%;
+  width: 100% !important;
+  height: auto !important;
 }
