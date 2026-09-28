@@ -140,6 +140,8 @@ interface Confirmation {
   texte: string
   libelle: string
   danger?: boolean
+  /** Fenêtre d'information seulement (pas de bouton d'action) */
+  sansAction?: boolean
   action: () => Promise<{ message: string }>
 }
 
@@ -347,18 +349,31 @@ export function AdminUtilisateurs() {
                         </button>
                         <button
                           type="button"
-                          disabled={soiMeme || u.evenements > 0}
-                          title={u.evenements > 0 ? "Un compte qui a des événements ne peut pas être supprimé : suspendez-le." : "Supprimer le compte"}
+                          disabled={soiMeme}
+                          title={u.evenements > 0 ? "Suppression impossible : ce compte a des événements" : "Supprimer le compte"}
                           aria-label={`Supprimer le compte de ${u.fullname}`}
-                          className={cn(action, "text-gw-texte-doux hover:bg-red-50 hover:text-red-700 dark:text-white/55 dark:hover:bg-red-400/10")}
+                          className={cn(action, "text-gw-texte-doux hover:bg-red-50 hover:text-red-700 dark:text-white/55 dark:hover:bg-red-400/10", u.evenements > 0 && "opacity-50")}
                           onClick={() =>
-                            setConfirmation({
-                              titre: `Supprimer le compte de ${u.fullname} ?`,
-                              texte: "Cette action est définitive.",
-                              libelle: "Supprimer",
-                              danger: true,
-                              action: () => supprimerCompteEquipe(u.id),
-                            })
+                            setConfirmation(
+                              u.evenements > 0
+                                ? {
+                                    titre: "Suppression impossible",
+                                    texte: `${u.fullname} a ${u.evenements} événement${u.evenements > 1 ? "s" : ""} : supprimer son compte effacerait l'historique des ventes. ${
+                                      u.actif ? "Suspendez-le plutôt : il ne pourra plus se connecter, et ses événements et ses ventes sont conservés." : "Son compte est déjà suspendu."
+                                    }`,
+                                    libelle: "Suspendre le compte",
+                                    danger: true,
+                                    sansAction: !u.actif,
+                                    action: () => modifierCompteEquipe(u.id, { actif: false }),
+                                  }
+                                : {
+                                    titre: `Supprimer le compte de ${u.fullname} ?`,
+                                    texte: "Cette action est définitive.",
+                                    libelle: "Supprimer",
+                                    danger: true,
+                                    action: () => supprimerCompteEquipe(u.id),
+                                  },
+                            )
                           }
                         >
                           <Trash2 className="h-3.5 w-3.5" aria-hidden />
@@ -465,11 +480,13 @@ export function AdminUtilisateurs() {
         <p className="text-sm text-gw-texte dark:text-white/75">{confirmation?.texte}</p>
         <div className="mt-6 flex justify-end gap-2">
           <Bouton variante="discret" onClick={() => setConfirmation(null)}>
-            Annuler
+            {confirmation?.sansAction ? "Fermer" : "Annuler"}
           </Bouton>
-          <Bouton variante={confirmation?.danger ? "danger" : "principal"} chargement={envoi} onClick={confirmer}>
-            {confirmation?.libelle}
-          </Bouton>
+          {!confirmation?.sansAction && (
+            <Bouton variante={confirmation?.danger ? "danger" : "principal"} chargement={envoi} onClick={confirmer}>
+              {confirmation?.libelle}
+            </Bouton>
+          )}
         </div>
       </Modale>
     </div>

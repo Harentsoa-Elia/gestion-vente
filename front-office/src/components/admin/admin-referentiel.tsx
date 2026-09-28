@@ -284,10 +284,12 @@ export function AdminReferentiel() {
               <button
                 type="button"
                 onClick={() => setASupprimer(e)}
-                disabled={e.utilisations > 0}
                 aria-label={`Supprimer ${e.nom}`}
-                title={e.utilisations > 0 ? "Utilisé par des événements ou des propositions : suppression impossible" : "Supprimer"}
-                className="rounded-full p-2 text-gw-texte-doux hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30 dark:text-white/55 dark:hover:bg-red-400/10"
+                title={e.utilisations > 0 ? "Suppression impossible : élément utilisé" : "Supprimer"}
+                className={cn(
+                  "rounded-full p-2 text-gw-texte-doux hover:bg-red-50 hover:text-red-700 dark:text-white/55 dark:hover:bg-red-400/10",
+                  e.utilisations > 0 && "opacity-40",
+                )}
               >
                 <Trash2 className="h-4 w-4" aria-hidden />
               </button>
@@ -308,15 +310,25 @@ export function AdminReferentiel() {
         }}
       />
 
-      <Modale ouverte={!!aSupprimer} titre={`Supprimer « ${aSupprimer?.nom ?? ""} » ?`} onFermer={() => setASupprimer(null)}>
-        <p className="text-sm text-gw-texte dark:text-white/75">Il ne sera plus proposé aux organisateurs. Cette action est définitive.</p>
+      <Modale
+        ouverte={!!aSupprimer}
+        titre={aSupprimer?.utilisations ? "Suppression impossible" : `Supprimer « ${aSupprimer?.nom ?? ""} » ?`}
+        onFermer={() => setASupprimer(null)}
+      >
+        <p className="text-sm text-gw-texte dark:text-white/75">
+          {aSupprimer?.utilisations
+            ? `« ${aSupprimer.nom} » est utilisé ${aSupprimer.utilisations} fois par des événements ou des propositions : le supprimer les casserait. Vous pouvez en revanche le modifier (crayon).`
+            : "Il ne sera plus proposé aux organisateurs. Cette action est définitive."}
+        </p>
         <div className="mt-6 flex justify-end gap-2">
           <Bouton variante="discret" onClick={() => setASupprimer(null)}>
-            Annuler
+            {aSupprimer?.utilisations ? "Fermer" : "Annuler"}
           </Bouton>
-          <Bouton variante="danger" chargement={envoi} onClick={supprimer}>
-            Supprimer
-          </Bouton>
+          {!aSupprimer?.utilisations && (
+            <Bouton variante="danger" chargement={envoi} onClick={supprimer}>
+              Supprimer
+            </Bouton>
+          )}
         </div>
       </Modale>
     </div>
