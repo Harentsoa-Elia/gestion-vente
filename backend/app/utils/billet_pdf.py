@@ -4,7 +4,7 @@ Le QR code contient la valeur enregistrée dans billets.qr_code : c'est elle que
 le contrôle à l'entrée (POST /tickets/scan), qui refuse un billet déjà utilisé.
 """
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from typing import List, Optional
 from zoneinfo import ZoneInfo
@@ -12,7 +12,11 @@ from zoneinfo import ZoneInfo
 import qrcode
 from fpdf import FPDF
 
-FUSEAU = ZoneInfo("Indian/Antananarivo")
+try:
+    FUSEAU = ZoneInfo("Indian/Antananarivo")
+except Exception:
+    # Windows sans le paquet tzdata : Madagascar est à UTC+3 toute l'année (pas d'heure d'été)
+    FUSEAU = timezone(timedelta(hours=3), "EAT")
 MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
 JOURS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
 
