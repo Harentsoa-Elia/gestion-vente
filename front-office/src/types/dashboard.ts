@@ -21,6 +21,7 @@ export interface VenteParJour {
 
 export interface CategoriePopulaire {
   categorie: string
+  evenement?: string
   nombre: number
 }
 
@@ -31,4 +32,5 @@ export interface DashboardOrganisateur {
   recettes_totales: number
   ventes_par_jour: VenteParJour[]
   categories_populaires: CategoriePopulaire[]
+  reservations_confirmees?: number
 }

@@ -28,6 +28,7 @@ class VenteParJourItem(BaseModel):
 
 class CategoriePopulaireItem(BaseModel):
     categorie: str
+    evenement: str = ""
     nombre: int
 
 
@@ -38,3 +39,4 @@ class DashboardOrganisateurResponse(BaseModel):
     recettes_totales: float
     ventes_par_jour: List[VenteParJourItem]
     categories_populaires: List[CategoriePopulaireItem]
+    reservations_confirmees: int = 0

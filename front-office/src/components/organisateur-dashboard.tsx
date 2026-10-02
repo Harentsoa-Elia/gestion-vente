@@ -2,14 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, ChevronRight, Sparkles, TrendingUp } from "lucide-react"
+import { ArrowRight, ChevronRight, Sparkles, Ticket, TrendingUp } from "lucide-react"
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
-  Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -166,7 +163,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
   const maintenant = Date.now()
   const aVenir = evenements.filter((e) => new Date(e.date_debut).getTime() >= maintenant)
   const totalVentes = ventes.reduce((s, v) => s + v.ventes, 0)
-  const totalCategories = categories.reduce((s, c) => s + c.nombre, 0)
+  const totalCategories = data.reservations_confirmees || categories.reduce((s, c) => s + c.nombre, 0)
   const partTete = totalCategories > 0 ? Math.round((categories[0].nombre / totalCategories) * 100) : 0
 
   const axe = darkMode ? "rgba(255,255,255,0.55)" : "#6E6987"
@@ -328,42 +325,36 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
 
           {/* réservations par catégorie */}
           <section className="gw-carte p-5 md:col-span-2">
-            <TitreCarte>Réservations par catégorie</TitreCarte>
+            <TitreCarte>Billets vendus par tarif</TitreCarte>
             {categories.length === 0 ? (
               <Vide>Pas encore de réservations à afficher.</Vide>
             ) : (
               <div className="mt-4 grid items-center gap-6 sm:grid-cols-[minmax(0,1fr)_160px]">
-                <div className="h-52">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={categories} margin={{ top: 4, right: 0, left: -18, bottom: 0 }} barCategoryGap="28%">
-                      <defs>
-                        <linearGradient id="barre-tete" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0" stopColor="#E8479A" />
-                          <stop offset="1" stopColor="#6C5CE7" />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="categorie" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: axe }} interval={0} />
-                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: axe }} />
-                      <Tooltip
-                        cursor={false}
-                        formatter={(v) => [`${entier.format(Number(v))} réservations`, ""]}
-                        separator=""
-                        contentStyle={{
-                          borderRadius: 12,
-                          border: "none",
-                          background: darkMode ? "#1E1A3C" : "#FFFFFF",
-                          color: darkMode ? "#FFFFFF" : "#1E1A3C",
-                          boxShadow: "0 10px 30px -10px rgba(30,26,60,0.35)",
-                        }}
-                      />
-                      <Bar dataKey="nombre" radius={[10, 10, 10, 10]} background={{ fill: piste, radius: 10 }}>
-                        {categories.map((c, i) => (
-                          <Cell key={c.categorie} fill={i === 0 ? "url(#barre-tete)" : darkMode ? "#8B7CF5" : "#B5A8F5"} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                <ul className="grid gap-3">
+                  {categories.map((c, i) => (
+                    <li key={`${c.evenement}-${c.categorie}`}>
+                      <div className="flex items-baseline justify-between gap-3 text-sm">
+                        <span className="min-w-0 truncate">
+                          <span className="font-semibold">{c.categorie}</span>
+                          {c.evenement && (
+                            <span className="text-gw-texte-doux dark:text-white/60"> · {c.evenement}</span>
+                          )}
+                        </span>
+                        <span className="shrink-0 font-semibold tabular-nums">{entier.format(c.nombre)}</span>
+                      </div>
+                      <div className="mt-1.5 h-2.5 rounded-full" style={{ background: piste }}>
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${Math.max(3, (c.nombre / categories[0].nombre) * 100)}%`,
+                            background:
+                              i === 0 ? "linear-gradient(90deg,#6C5CE7,#E8479A)" : darkMode ? "#8B7CF5" : "#B5A8F5",
+                          }}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
                 <div className="flex gap-6 sm:flex-col">
                   <div className="flex items-center gap-3">
                     <div className="relative shrink-0">
@@ -375,17 +366,16 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
                         <TrendingUp className="h-3.5 w-3.5 shrink-0 text-gw-rose" aria-hidden />
                         {categories[0].categorie}
                       </p>
-                      <p className="text-xs text-gw-texte-doux dark:text-white/60">en tête</p>
+                      <p className="text-xs text-gw-texte-doux dark:text-white/60">des billets vendus</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="relative shrink-0">
-                      <Anneau pourcentage={100 - partTete} id="anneau-autres" taille={52} epaisseur={6} />
-                      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold">{100 - partTete}%</span>
+                    <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-gw-lavande/60 dark:bg-white/10">
+                      <Ticket className="h-5 w-5 text-gw-violet dark:text-white/80" aria-hidden />
                     </div>
                     <div>
                       <p className="text-sm font-semibold">{entier.format(totalCategories)}</p>
-                      <p className="text-xs text-gw-texte-doux dark:text-white/60">réservations au total</p>
+                      <p className="text-xs text-gw-texte-doux dark:text-white/60">billets vendus au total</p>
                     </div>
                   </div>
                 </div>

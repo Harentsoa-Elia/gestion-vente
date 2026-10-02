@@ -108,6 +108,7 @@ class DashboardService:
                 "recettes_totales": 0.0,
                 "ventes_par_jour": [],
                 "categories_populaires": [],
+                "reservations_confirmees": 0,
             }
 
         result_billets = await self.db.execute(
@@ -148,20 +149,29 @@ class DashboardService:
             {"date": str(row[0]), "nombre": row[1]} for row in result_ventes.all()
         ]
 
+        # Billets confirmés par tarif : un tarif appartient à un événement (« Entrée » du concert
+        # n'est pas « Entrée » du stand-up), on regroupe donc par événement ET par tarif.
         result_categories = await self.db.execute(
-            select(CategorieBillet.nom, func.count(Reservation.id))
+            select(CategorieBillet.nom, Evenement.titre, func.count(Reservation.id))
             .join(Reservation, Reservation.categorie_billet_id == CategorieBillet.id)
+            .join(Evenement, Evenement.id == Reservation.evenement_id)
             .filter(
                 Reservation.evenement_id.in_(evenement_ids),
                 Reservation.statut == "confirmee",
             )
-            .group_by(CategorieBillet.nom)
+            .group_by(CategorieBillet.id, CategorieBillet.nom, Evenement.titre)
             .order_by(func.count(Reservation.id).desc())
-            .limit(5)
+            .limit(6)
         )
         categories_populaires = [
-            {"categorie": row[0], "nombre": row[1]} for row in result_categories.all()
+            {"categorie": row[0], "evenement": row[1], "nombre": row[2]} for row in result_categories.all()
         ]
+        reservations_confirmees = (await self.db.execute(
+            select(func.count(Reservation.id)).filter(
+                Reservation.evenement_id.in_(evenement_ids),
+                Reservation.statut == "confirmee",
+            )
+        )).scalar() or 0
 
         return {
             "evenements_publies": evenements_publies,
@@ -170,6 +180,7 @@ class DashboardService:
             "recettes_totales": recettes_totales,
             "ventes_par_jour": ventes_par_jour,
             "categories_populaires": categories_populaires,
+            "reservations_confirmees": reservations_confirmees,
         }
 
     async def get_dashboard_evenement(self, evenement_id: int) -> Dict:
