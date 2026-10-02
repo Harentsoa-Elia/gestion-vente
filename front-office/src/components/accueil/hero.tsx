@@ -77,7 +77,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
 
   return (
     <section aria-labelledby="hero-titre" className="relative">
-      {/* fond : photos en fondu enchaîné (le fond « scène » reste visible pendant le chargement) */}
+      {/* fond : photos en fondu enchaîné (le fond 'scène' reste visible pendant le chargement) */}
       <div className="scene relative overflow-hidden" style={{ "--accent": "var(--color-gw-rose)" } as CSSProperties}>
         <FondDiaporama {...diaporama} />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#16122E]/90 via-[#16122E]/55 to-[#16122E]/10" />
@@ -176,7 +176,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
                 id="recherche-q"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Artiste, titre de l'événement…"
+                placeholder="Artiste, titre de l'événement..."
                 className={styleSaisie}
               />
             </Champ>

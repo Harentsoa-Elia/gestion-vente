@@ -98,7 +98,7 @@ export function VueEnsemble() {
   if (!d && chargement) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
       </div>
     )
   }

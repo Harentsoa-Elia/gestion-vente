@@ -1,5 +1,5 @@
 """
-Rôles des comptes de la table users (acteurs « Organisateur » et « Administrateur »
+Rôles des comptes de la table users (acteurs 'Organisateur' et 'Administrateur'
 du diagramme de cas d'utilisation). Les participants ont leur propre table et leur
 propre jeton (account_type = "participant") ; le visiteur n'a pas de compte.
 Le rôle est porté par la colonne users.role et recopié dans le jeton.

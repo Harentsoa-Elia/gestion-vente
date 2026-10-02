@@ -2,7 +2,7 @@
  * Couleurs des graphiques (statistiques de l'organisateur, vue d'ensemble de l'administrateur).
  * Palette vérifiée pour le daltonisme et le contraste, sur la carte blanche et sur la carte
  * sombre (#221d40) de l'espace organisateur. Définie ici plutôt que dans globals.css pour être
- * toujours chargée avec la page : entourer le contenu de la classe « gw-stats ».
+ * toujours chargée avec la page : entourer le contenu de la classe 'gw-stats'.
  */
 const COULEURS = `
 .gw-stats {

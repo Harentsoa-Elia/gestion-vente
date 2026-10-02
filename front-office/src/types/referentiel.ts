@@ -3,7 +3,7 @@ export interface Lieu {
   nom: string
   adresse: string | null
   ville: string | null
-  /** Région de Madagascar, ex. « Haute Matsiatra » */
+  /** Région de Madagascar, ex. 'Haute Matsiatra' */
   region?: string | null
   capacite: number | null
 }

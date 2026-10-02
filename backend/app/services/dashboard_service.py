@@ -132,8 +132,8 @@ class DashboardService:
             {"date": str(row[0]), "nombre": row[1]} for row in result_ventes.all()
         ]
 
-        # Billets confirmés par tarif : un tarif appartient à un événement (« Entrée » du concert
-        # n'est pas « Entrée » du stand-up), on regroupe donc par événement ET par tarif.
+        # Billets confirmés par tarif : un tarif appartient à un événement ('Entrée' du concert
+        # n'est pas 'Entrée' du stand-up), on regroupe donc par événement ET par tarif.
         result_categories = await self.db.execute(
             select(CategorieBillet.nom, Evenement.titre, func.count(Reservation.id))
             .join(Reservation, Reservation.categorie_billet_id == CategorieBillet.id)

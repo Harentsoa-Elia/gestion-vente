@@ -13,7 +13,7 @@ import { BoutonAuth, CadreAuth, ChampAuth, LienPied, MessageErreur } from "@/com
 
 /*
  * Connexion de l'équipe (organisateurs et administrateurs), page /login.
- * Onglets « Connexion » / « Inscription » : même page, le formulaire change.
+ * Onglets 'Connexion' / 'Inscription' : même page, le formulaire change.
  * La redirection après connexion est décidée par la page (selon le rôle).
  */
 
@@ -30,7 +30,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  // retour de « mot de passe oublié » : l'adresse est préremplie (/login?email=…)
+  // retour de 'mot de passe oublié' : l'adresse est préremplie (/login?email=...)
   useEffect(() => {
     const adresse = new URLSearchParams(window.location.search).get("email")
     if (adresse) setEmail(adresse)
@@ -148,7 +148,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
+          placeholder="--------"
           autoComplete={isLogin ? "current-password" : "new-password"}
           minLength={isLogin ? undefined : 6}
           required
@@ -168,7 +168,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
         <div className="flex justify-center pt-1">
           <BoutonAuth type="submit" chargement={loading} className="w-full sm:w-auto sm:min-w-[200px]">
-            {isLogin ? (loading ? "Connexion…" : "Se connecter") : loading ? "Création…" : "Créer mon compte"}
+            {isLogin ? (loading ? "Connexion..." : "Se connecter") : loading ? "Création..." : "Créer mon compte"}
           </BoutonAuth>
         </div>
       </form>

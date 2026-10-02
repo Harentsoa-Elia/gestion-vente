@@ -97,4 +97,4 @@ async def supprimer_element(table: str, element_id: int, auth_data: dict = Depen
         nom = await AdministrationService(db).supprimer_element(table, element_id)
     except ErreurAdministration as e:
         raise erreur(e)
-    return {"message": f"« {nom} » supprimé."}
+    return {"message": f"'{nom}' supprimé."}

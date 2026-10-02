@@ -1,6 +1,6 @@
 """Données de démonstration pour la soutenance.
 
-Crée un organisateur « Fianar Events » avec des événements à Fianarantsoa (passés, à venir,
+Crée un organisateur 'Fianar Events' avec des événements à Fianarantsoa (passés, à venir,
 en attente de validation, brouillon), des participants au public varié (genre, âge), des ventes
 étalées sur plusieurs semaines, des entrées scannées pour les événements passés, et des
 propositions soumises au vote avec les réactions et commentaires du public.
@@ -19,7 +19,7 @@ ajouter dans backend/.env une ligne, sans la publier sur GitHub :
 Chaque adresse devient (ou reste) un compte participant à l'e-mail confirmé, avec un billet
 à venir et un billet déjà utilisé sur des événements de démonstration. Un compte qui existait
 déjà garde son mot de passe ; un compte créé par le script a le mot de passe demo1234.
-« --supprimer » retire ces billets de démonstration mais jamais ces comptes personnels.
+'--supprimer' retire ces billets de démonstration mais jamais ces comptes personnels.
 """
 import argparse
 import asyncio
@@ -72,7 +72,7 @@ NOMS = ["Rakotomalala", "Randriamampionona", "Rasoanaivo", "Andrianarisoa", "Raz
         "Rakotondrabe", "Andriamanana", "Rasolofoniaina", "Ratsimbazafy", "Razanakolona", "Randrianarivelo", "Rafanomezantsoa",
         "Rajaonarison", "Ravelojaona", "Andrianjafy", "Ramanantsoa", "Rakotoarisoa", "Rabearivelo"]
 COMMENTAIRES = [
-    "Trop hâte !", "On sera là avec toute la bande 🎉", "Tsara be ity !", "Mankasitraka ny mpikarakara",
+    "Trop hâte !", "On sera là avec toute la bande ", "Tsara be ity !", "Mankasitraka ny mpikarakara",
     "Excellent choix, ça va être une belle soirée", "Enfin un grand événement à Fianar !", "Je vote pour ça sans hésiter",
     "Parfait pour l'ambiance", "Mahafinaritra !", "Ce serait génial", "Venez nombreux !", "Bravo pour l'organisation",
 ]
@@ -369,7 +369,7 @@ async def creer(db) -> None:
 
     await db.commit()
 
-    # --- recommandations calculées, comme avec le bouton « Calculer » de l'organisateur
+    # --- recommandations calculées, comme avec le bouton 'Calculer' de l'organisateur
     nb_reco = 0
     for titre in {t for t, *_ in PROPOSITIONS}:
         try:

@@ -16,7 +16,7 @@ const normaliser = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
 /**
- * Page /evenements : onglets « À venir » et « Passés », comme les onglets d'Eventbrite.
+ * Page /evenements : onglets 'À venir' et 'Passés', comme les onglets d'Eventbrite.
  * Les filtres vivent dans l'URL (?onglet, q, lieu, categorie, periode) : la recherche du hero
  * y mène directement, et une recherche peut être partagée par lien.
  */
@@ -100,7 +100,7 @@ export function CatalogueEvenements() {
                 type="search"
                 value={saisie}
                 onChange={(e) => setSaisie(e.target.value)}
-                placeholder="Artiste, titre, lieu…"
+                placeholder="Artiste, titre, lieu..."
                 aria-label="Rechercher un événement"
                 className="h-11 w-full rounded-full bg-white pr-4 pl-11 text-sm text-gw-nuit placeholder:text-gw-texte-pale focus:outline-2 focus:outline-gw-rose"
               />

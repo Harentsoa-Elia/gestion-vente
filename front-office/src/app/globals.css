@@ -143,7 +143,7 @@ body {
 /* ---------- Espace organisateur ---------- */
 
 /* Couleur du contenu principal : l'onglet actif de la barre latérale prend
-   la même couleur pour « se fondre » dans la page (voir .gw-onglet-actif). */
+   la même couleur pour 'se fondre' dans la page (voir .gw-onglet-actif). */
 .gw-orga {
   --gw-contenu: var(--color-gw-fond);
 }
@@ -152,7 +152,7 @@ body {
   --gw-contenu: var(--color-gw-nuit-profond);
 }
 
-/* Onglet actif façon « onglet de classeur » : deux quarts de cercle creusés
+/* Onglet actif façon 'onglet de classeur' : deux quarts de cercle creusés
    au-dessus et au-dessous raccordent l'onglet au contenu principal. */
 .gw-onglet-actif::before,
 .gw-onglet-actif::after {

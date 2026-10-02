@@ -26,7 +26,7 @@ import { Bouton, classeChamp } from "@/components/organisateur/ui"
 /*
  * Contrôle des billets à l'entrée.
  *  - choix de l'événement contrôlé ;
- *  - lecture du QR code à la caméra (téléphone ou webcam), par une photo, ou saisie du numéro BLT-… ;
+ *  - lecture du QR code à la caméra (téléphone ou webcam), par une photo, ou saisie du numéro BLT-... ;
  *  - verdict en grand (vert : entrée autorisée ; rouge : déjà utilisé ou inconnu ; orange : autre événement),
  *    avec un bip et une vibration ;
  *  - compteur des entrées et derniers passages.
@@ -92,7 +92,7 @@ function PanneauVerdict({ verdict, enCours }: { verdict: Verdict | null; enCours
         ) : (
           <ScanLine className="h-10 w-10 text-gw-violet dark:text-gw-lavande" aria-hidden />
         )}
-        <p className="font-titre text-xl font-semibold">{enCours ? "Vérification…" : "Prêt à scanner"}</p>
+        <p className="font-titre text-xl font-semibold">{enCours ? "Vérification..." : "Prêt à scanner"}</p>
         <p className="max-w-xs text-sm text-gw-texte-doux dark:text-white/60">
           Présentez le QR code du billet devant la caméra, ou saisissez son numéro.
         </p>
@@ -151,7 +151,7 @@ function BandeauVerdict({ verdict, entres, vendus }: { verdict: Verdict; entres:
       <div className="min-w-0 flex-1">
         <p className="font-titre truncate text-lg leading-tight font-bold">{style.titre}</p>
         <p className="truncate text-sm text-white/90">
-          {verdict.billet ? `${verdict.billet.participant} · ${verdict.billet.categorie}` : verdict.message}
+          {verdict.billet ? `${verdict.billet.participant}  ${verdict.billet.categorie}` : verdict.message}
         </p>
       </div>
       <p className="shrink-0 text-right text-xs text-white/80 tabular-nums">
@@ -217,7 +217,7 @@ export function ControleEntrees() {
       if (!propre || id == null || occupe.current) return
       const maintenant = Date.now()
       if (dernier.current.code === propre && maintenant - dernier.current.t < DELAI_MEME_CODE) {
-        // toujours devant la caméra : on prolonge, sans revérifier (sinon « Déjà utilisé » remplacerait le vert)
+        // toujours devant la caméra : on prolonge, sans revérifier (sinon 'Déjà utilisé' remplacerait le vert)
         dernier.current.t = maintenant
         return
       }
@@ -353,7 +353,7 @@ export function ControleEntrees() {
   if (chargement) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
       </div>
     )
   }
@@ -397,7 +397,7 @@ export function ControleEntrees() {
           <select value={evenementId ?? ""} onChange={(e) => setEvenementId(Number(e.target.value))} className={classeChamp}>
             {evenements.map((e) => (
               <option key={e.id} value={e.id}>
-                {e.titre} · {dateCourte(e.date_debut)}
+                {e.titre}  {dateCourte(e.date_debut)}
               </option>
             ))}
           </select>
@@ -437,7 +437,7 @@ export function ControleEntrees() {
           <div className="h-full rounded-full bg-[linear-gradient(90deg,#6C5CE7,#E8479A)] transition-all" style={{ width: `${pourcentage}%` }} />
         </div>
         <p className="mt-2 text-xs text-gw-texte-doux dark:text-white/55">
-          {pourcentage} % des billets vendus scannés{evenement?.lieu ? ` · ${evenement.lieu}` : ""}
+          {pourcentage} % des billets vendus scannés{evenement?.lieu ? `  ${evenement.lieu}` : ""}
         </p>
       </section>
 
@@ -457,7 +457,7 @@ export function ControleEntrees() {
                 {camera === "demarrage" ? (
                   <>
                     <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
-                    <p className="text-sm text-white/80">Ouverture de la caméra… autorisez l&apos;accès si le navigateur le demande.</p>
+                    <p className="text-sm text-white/80">Ouverture de la caméra... autorisez l&apos;accès si le navigateur le demande.</p>
                   </>
                 ) : !contexteSur ? (
                   <>
@@ -556,7 +556,7 @@ export function ControleEntrees() {
               )}
             </div>
             {!etat ? (
-              <p className="mt-4 text-sm text-gw-texte-doux dark:text-white/60">Chargement…</p>
+              <p className="mt-4 text-sm text-gw-texte-doux dark:text-white/60">Chargement...</p>
             ) : etat.derniers.length === 0 ? (
               <p className="mt-4 text-sm text-gw-texte-doux dark:text-white/60">Personne n&apos;est encore entré.</p>
             ) : (
@@ -567,10 +567,10 @@ export function ControleEntrees() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold">{b.participant}</span>
                       <span className="block truncate font-mono text-xs text-gw-texte-doux dark:text-white/55">
-                        {b.categorie} · {b.numero}
+                        {b.categorie}  {b.numero}
                       </span>
                     </span>
-                    <span className="shrink-0 text-sm tabular-nums text-gw-texte-doux dark:text-white/60">{heure(b.date_scan) || "—"}</span>
+                    <span className="shrink-0 text-sm tabular-nums text-gw-texte-doux dark:text-white/60">{heure(b.date_scan) || "-"}</span>
                   </li>
                 ))}
               </ul>

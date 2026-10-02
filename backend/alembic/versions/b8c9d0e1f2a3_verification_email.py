@@ -4,7 +4,7 @@ Revision ID: b8c9d0e1f2a3
 Revises: a7b8c9d0e1f2
 Create Date: 2026-09-25 16:00:00.000000
 
-- participants.email_verifie : les comptes existants sont « non confirmés » ;
+- participants.email_verifie : les comptes existants sont 'non confirmés' ;
   leur propriétaire confirme son adresse avec un code avant sa prochaine réservation.
 - codes_email : codes à 6 chiffres (confirmation d'adresse, mot de passe oublié),
   seule leur empreinte est enregistrée.

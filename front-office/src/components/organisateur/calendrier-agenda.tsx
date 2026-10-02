@@ -7,9 +7,9 @@ import type { Evenement } from "@/types"
 import { cn } from "@/utils"
 
 /*
- * « Mon agenda » : calendrier du mois (jours avec événement marqués d'un point rose)
+ * 'Mon agenda' : calendrier du mois (jours avec événement marqués d'un point rose)
  * et, en dessous, les événements du jour choisi sur une ligne de temps,
- * à la manière du bloc « My tasks » du modèle.
+ * à la manière du bloc 'My tasks' du modèle.
  */
 
 const JOURS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"]

@@ -14,7 +14,7 @@ export function urlMedia(chemin: string | null | undefined): string | null {
   if (!chemin) return null
   if (/^(https?:)?\/\//.test(chemin) || chemin.startsWith("data:") || chemin.startsWith("blob:")) return chemin
   if (chemin.startsWith("/media/")) return `${ORIGINE_API}${chemin}`
-  return chemin // image du site (public/…)
+  return chemin // image du site (public/...)
 }
 
 /*
@@ -24,7 +24,7 @@ export function urlMedia(chemin: string | null | undefined): string | null {
 
 /** Images de test choisies d'après le titre de l'événement. */
 const IMAGES_PAR_NOM: { motif: RegExp; image: string }[] = [
-  // affiche « Revy Mahaleo sy ny taranany » déjà présente dans le projet
+  // affiche 'Revy Mahaleo sy ny taranany' déjà présente dans le projet
   { motif: /mahaleo/i, image: "/images/Picture.jpg" },
 ]
 
@@ -40,7 +40,7 @@ export const IMAGES_TEST_EVENEMENTS = [
 export const IMAGES_TEST_PROPOSITIONS: Record<PropositionType, string[]> = {
   ARTISTE: ["/images/test/artiste.jpg"],
   LIEU: ["/images/test/lieu.jpg"],
-  // « Concert live » et les autres types d'événement : en attendant une image dédiée
+  // 'Concert live' et les autres types d'événement : en attendant une image dédiée
   CATEGORIE: ["/images/accueil/foule-violette.jpg", "/images/accueil/confettis-roses.jpg"],
 }
 
@@ -60,14 +60,14 @@ export function imageTestEvenement(evenement: { id: number; titre: string }): st
 
 /**
  * Images de test choisies d'après le libellé de la proposition.
- * image: null = pas de photo : la carte garde son fond « scène » dessiné.
+ * image: null = pas de photo : la carte garde son fond 'scène' dessiné.
  */
 const IMAGES_PROPOSITIONS_PAR_NOM: { motif: RegExp; image: string | null }[] = [
   { motif: /coliseum/i, image: "/images/test/lieu-coliseum.jpg" },
   { motif: /rossy/i, image: null },
 ]
 
-/** Image de test d'une proposition, ou null pour garder le fond « scène » sans photo. */
+/** Image de test d'une proposition, ou null pour garder le fond 'scène' sans photo. */
 export function imageTestProposition(proposition: { id: number; type: PropositionType; libelle: string }): string | null {
   const regle = IMAGES_PROPOSITIONS_PAR_NOM.find((r) => r.motif.test(proposition.libelle))
   if (regle) return regle.image

@@ -23,7 +23,7 @@ import { Anneau } from "@/components/organisateur/anneau"
 import { cn } from "@/utils"
 
 /*
- * Tableau de bord de l'organisateur, sur le modèle « uTask » :
+ * Tableau de bord de l'organisateur, sur le modèle 'uTask' :
  * bandeau de bienvenue, trois chiffres clés, anneau de remplissage, courbe des ventes,
  * événements populaires, réservations par catégorie, puis profil et agenda à droite.
  * Couleurs guichetweb ; thème clair ou sombre selon la barre latérale (prop darkMode).
@@ -337,7 +337,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
                         <span className="min-w-0 truncate">
                           <span className="font-semibold">{c.categorie}</span>
                           {c.evenement && (
-                            <span className="text-gw-texte-doux dark:text-white/60"> · {c.evenement}</span>
+                            <span className="text-gw-texte-doux dark:text-white/60">  {c.evenement}</span>
                           )}
                         </span>
                         <span className="shrink-0 font-semibold tabular-nums">{entier.format(c.nombre)}</span>

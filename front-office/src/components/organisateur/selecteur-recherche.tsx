@@ -8,7 +8,7 @@ import { classeChamp } from "./ui"
 /*
  * Champ de recherche avec suggestions (combobox accessible).
  * Un clic sur une suggestion (ou Entrée) la choisit immédiatement : pas de bouton
- * « Ajouter » à part. Si le texte saisi ne correspond à aucune option, une dernière
+ * 'Ajouter' à part. Si le texte saisi ne correspond à aucune option, une dernière
  * ligne propose de créer l'élément (onCreer).
  */
 
@@ -22,8 +22,8 @@ export interface OptionRecherche {
 
 const MAX_AFFICHEES = 60
 
-/** Minuscules sans accents : « Samoëla » est trouvé en tapant « samoela ». */
-const normaliser = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+/** Minuscules sans accents : 'Samoëla' est trouvé en tapant 'samoela'. */
+const normaliser = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
 export function SelecteurRecherche({
   options,
@@ -36,13 +36,13 @@ export function SelecteurRecherche({
   vide,
 }: {
   options: OptionRecherche[]
-  /** Nom accessible du champ, ex. « Ajouter un artiste » */
+  /** Nom accessible du champ, ex. 'Ajouter un artiste' */
   libelle: string
   placeholder: string
   onChoisir: (option: OptionRecherche) => void
   /** Création d'un élément absent de la liste, à partir du texte saisi */
   onCreer?: (texte: string) => void
-  /** Ex. (t) => `Créer l'artiste « ${t} »` */
+  /** Ex. (t) => `Créer l'artiste '${t}'` */
   libelleCreer?: (texte: string) => string
   /** Ajout en cours : le champ est désactivé et affiche un indicateur */
   occupe?: boolean
@@ -201,7 +201,7 @@ export function SelecteurRecherche({
                 )}
               >
                 <Plus className="h-4 w-4 shrink-0" aria-hidden />
-                {libelleCreer ? libelleCreer(texte.trim()) : `Créer « ${texte.trim()} »`}
+                {libelleCreer ? libelleCreer(texte.trim()) : `Créer '${texte.trim()}'`}
               </li>
             )}
 

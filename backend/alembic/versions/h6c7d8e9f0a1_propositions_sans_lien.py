@@ -4,7 +4,7 @@ Revision ID: h6c7d8e9f0a1
 Revises: g5b6c7d8e9f0
 Create Date: 2026-09-28 12:45:00.000000
 
-Des propositions créées avant le référentiel (ex. « Mahaleo ») n'ont pas d'artiste_id,
+Des propositions créées avant le référentiel (ex. 'Mahaleo') n'ont pas d'artiste_id,
 de lieu_id ou de categorie_id. On les relie à l'élément du même nom (sans tenir compte
 de la casse) quand il existe ; sinon elles restent telles quelles (affichées avec leur libellé).
 """

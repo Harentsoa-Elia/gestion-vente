@@ -65,7 +65,7 @@ export function dansPeriode(e: Evenement, periode: Periode, maintenant = new Dat
   return debut < b[1].getTime() && fin >= b[0].getTime()
 }
 
-/** Petit repère affiché sur la carte, façon Eventbrite ("Aujourd'hui", "Demain"…). */
+/** Petit repère affiché sur la carte, façon Eventbrite ("Aujourd'hui", "Demain"...). */
 export function repereTemporel(e: Evenement, maintenant = new Date()): string | null {
   if (estPasse(e, maintenant)) return null
   const debut = new Date(e.date_debut)

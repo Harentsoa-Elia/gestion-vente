@@ -5,8 +5,8 @@ import { cn } from "@/utils"
 
 /*
  * Photos du hero de l'accueil.
- * - En fond : la photo courante, en fondu enchaîné, avec un lent zoom (effet « survol »).
- * À droite (grands écrans), le carrousel « À l'affiche » montre les vrais événements à venir.
+ * - En fond : la photo courante, en fondu enchaîné, avec un lent zoom (effet 'survol').
+ * À droite (grands écrans), le carrousel 'À l'affiche' montre les vrais événements à venir.
  * Le défilement s'arrête quand l'onglet n'est pas visible et n'a jamais lieu si l'utilisateur
  * a demandé à réduire les animations.
  *

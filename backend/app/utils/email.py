@@ -39,7 +39,7 @@ def _config() -> dict:
         "from_name": os.getenv("SMTP_FROM_NAME", "guichetweb"),
         # Nom annoncé au serveur (EHLO). Par défaut Python prend le nom réseau de l'ordinateur,
         # que certaines box donnent sous une forme refusée par Gmail
-        # (ex. « DESKTOP-XXX.flybox.home,airbox.home » -> erreur 501 5.5.4).
+        # (ex. 'DESKTOP-XXX.flybox.home,airbox.home' -> erreur 501 5.5.4).
         "local_hostname": os.getenv("SMTP_LOCAL_HOSTNAME", "localhost").strip() or "localhost",
     }
 
@@ -208,18 +208,18 @@ def _gabarit_message(titre: str, paragraphes: list, bouton: Optional[tuple] = No
 
 def email_decision_evenement(prenom: str, titre_evenement: str, valide: bool, motif: Optional[str], lien: str) -> tuple:
     if valide:
-        sujet = f"« {titre_evenement} » est validé et visible sur guichetweb"
+        sujet = f"'{titre_evenement}' est validé et visible sur guichetweb"
         titre = "Votre événement est validé"
         paragraphes = [
-            f"Bonjour {prenom}, bonne nouvelle : l'administrateur a validé « {titre_evenement} ».",
+            f"Bonjour {prenom}, bonne nouvelle : l'administrateur a validé '{titre_evenement}'.",
             "Il apparaît maintenant sur le site public, et le public peut réserver ses billets.",
         ]
         encadre = None
     else:
-        sujet = f"« {titre_evenement} » n'a pas été validé"
+        sujet = f"'{titre_evenement}' n'a pas été validé"
         titre = "Votre événement n'a pas été validé"
         paragraphes = [
-            f"Bonjour {prenom}, l'administrateur n'a pas validé « {titre_evenement} » pour l'instant.",
+            f"Bonjour {prenom}, l'administrateur n'a pas validé '{titre_evenement}' pour l'instant.",
             "Corrigez-le depuis votre espace organisateur, puis soumettez-le à nouveau.",
         ]
         encadre = motif
@@ -231,7 +231,7 @@ def email_decision_evenement(prenom: str, titre_evenement: str, valide: bool, mo
 def email_billets(prenom: str, evenement: str, date_texte: str, lieu: Optional[str], billets: list, lien: str) -> tuple:
     """billets : [(numero, categorie, cid_qr), ...] ; les QR codes sont joints en images inline (cid)."""
     n = len(billets)
-    sujet = f"Vos billets pour « {evenement} »" if n > 1 else f"Votre billet pour « {evenement} »"
+    sujet = f"Vos billets pour '{evenement}'" if n > 1 else f"Votre billet pour '{evenement}'"
     intro = [
         f"Bonjour {prenom}, merci pour votre réservation ! Votre paiement est confirmé.",
         f"{evenement} : {date_texte}" + (f", {lieu}." if lieu else "."),

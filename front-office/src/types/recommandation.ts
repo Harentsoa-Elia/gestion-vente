@@ -4,7 +4,7 @@ export interface Recommandation {
   evenement_id: number
   /** Moyenne des parts de score des propositions gagnantes, en % (0 à 100). */
   niveau_interet_estime: number | null
-  /** Capacité du lieu gagnant × niveau d'intérêt. */
+  /** Capacité du lieu gagnant x niveau d'intérêt. */
   participation_estimee: number | null
   artiste_id: number | null
   lieu_id: number | null

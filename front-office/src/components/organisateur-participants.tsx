@@ -48,7 +48,7 @@ export function OrganisateurParticipants() {
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          placeholder="Rechercher un participant…"
+          placeholder="Rechercher un participant..."
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
           className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"

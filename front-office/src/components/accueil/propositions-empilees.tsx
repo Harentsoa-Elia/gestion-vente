@@ -14,7 +14,7 @@ import { BoiteReactions } from "./boite-reactions"
 
 /*
  * Propositions ouvertes au vote, présentées comme la section
- * « Vous aussi, engagez-vous simplement » de HelloAsso : de grandes cartes
+ * 'Vous aussi, engagez-vous simplement' de HelloAsso : de grandes cartes
  * en deux parties (aplat de couleur + visuel) qui s'empilent au défilement.
  * Chaque carte porte les réactions et les commentaires du public, façon Facebook (voir boite-reactions.tsx).
  */
@@ -41,7 +41,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
   const texte = ton.clair ? "text-white" : "text-gw-nuit"
   const texteDoux = ton.clair ? "text-white/75" : "text-gw-nuit/70"
   // visuel : celui de l'organisateur, sinon la photo de l'artiste, sinon une image de test ;
-  // une image introuvable (lien cassé) passe à la suivante, et sans image on garde le fond « scène »
+  // une image introuvable (lien cassé) passe à la suivante, et sans image on garde le fond 'scène'
   const candidates = [urlMedia(proposition.image_url), urlMedia(proposition.artiste?.image_url), imageTestProposition(proposition)].filter(
     (x): x is string => !!x,
   )
@@ -204,8 +204,8 @@ export function PropositionsEmpilees({
           />
           <DecorationVote />
           <p className="mx-auto mt-4 max-w-sm text-center text-sm text-gw-texte-doux">
-            Chaque réaction ajoute des points à la proposition. Un «&nbsp;J&apos;adore&nbsp;» compte trois fois
-            plus qu&apos;un «&nbsp;J&apos;aime&nbsp;».
+            Chaque réaction ajoute des points à la proposition. Un '&nbsp;J&apos;adore&nbsp;' compte trois fois
+            plus qu&apos;un '&nbsp;J&apos;aime&nbsp;'.
           </p>
         </div>
 

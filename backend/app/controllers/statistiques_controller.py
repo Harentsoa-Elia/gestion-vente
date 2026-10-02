@@ -1,4 +1,4 @@
-"""Statistiques de l'espace organisateur (page « Statistiques »)."""
+"""Statistiques de l'espace organisateur (page 'Statistiques')."""
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query

@@ -1,4 +1,4 @@
-/** Anneau de progression en dégradé violet → rose (tableau de bord, recommandations). */
+/** Anneau de progression en dégradé violet -> rose (tableau de bord, recommandations). */
 export function Anneau({ pourcentage, taille = 132, epaisseur = 14, id }: { pourcentage: number; taille?: number; epaisseur?: number; id: string }) {
   const r = (taille - epaisseur) / 2
   const c = 2 * Math.PI * r

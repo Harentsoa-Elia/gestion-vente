@@ -3,6 +3,6 @@ export interface AuthUser {
   id: number
   fullname: string
   email?: string
-  /** « admin » ou « organisateur » */
+  /** 'admin' ou 'organisateur' */
   role: "admin" | "organisateur"
 }

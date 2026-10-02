@@ -16,7 +16,7 @@ import { BoiteReactions } from "@/components/accueil/boite-reactions"
 
 /*
  * Page publique d'un événement : affiche, informations pratiques, tarifs avec les places
- * restantes et bouton « Réserver » ; plus bas, les propositions ouvertes au vote du public.
+ * restantes et bouton 'Réserver' ; plus bas, les propositions ouvertes au vote du public.
  */
 
 type EtatBilletterie =
@@ -133,7 +133,7 @@ function CarteProposition({ proposition, part }: { proposition: PropositionAvecS
       </div>
       <div className="p-4">
         <p className="mb-3 text-sm text-white/75">
-          <span className="font-semibold text-white">{score.toLocaleString("fr-FR")} points</span> · réagissez pour la soutenir
+          <span className="font-semibold text-white">{score.toLocaleString("fr-FR")} points</span>  réagissez pour la soutenir
         </p>
         <BoiteReactions propositionId={proposition.id} libelle={proposition.libelle} onScore={(d) => setScore((v) => v + d)} />
       </div>

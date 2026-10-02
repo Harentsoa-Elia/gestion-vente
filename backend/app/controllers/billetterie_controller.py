@@ -1,5 +1,5 @@
 """Billetterie côté participant : réserver plusieurs billets, payer (simulation Mobile Money),
-recevoir les billets par e-mail (PDF + QR codes) et les retrouver dans « Mes billets »."""
+recevoir les billets par e-mail (PDF + QR codes) et les retrouver dans 'Mes billets'."""
 from typing import List
 
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response

@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 
 class CodeScanne(BaseModel):
-    code: str = Field(..., min_length=1, max_length=500, description="Contenu du QR code, ou numéro du billet saisi à la main (BLT-…)")
+    code: str = Field(..., min_length=1, max_length=500, description="Contenu du QR code, ou numéro du billet saisi à la main (BLT-...)")
 
 
 class BilletScanne(BaseModel):

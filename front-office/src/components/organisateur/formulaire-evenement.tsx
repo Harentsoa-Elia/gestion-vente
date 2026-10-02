@@ -12,8 +12,8 @@ import { cn } from "@/utils"
 import { Bouton, Champ, Modale, classeChamp, isoVersSaisie, saisieVersIso } from "./ui"
 
 /*
- * Formulaire d'un événement, utilisé pour la création (modale de « Mes événements »)
- * et la modification (onglet « Informations » de la fiche).
+ * Formulaire d'un événement, utilisé pour la création (modale de 'Mes événements')
+ * et la modification (onglet 'Informations' de la fiche).
  * Le lieu et la catégorie sont facultatifs tant que l'événement est en préparation :
  * ils seront souvent choisis grâce aux votes du public.
  */
@@ -91,13 +91,13 @@ function ChoixAffiche({ fichier, onChange }: { fichier: File | null; onChange: (
             </span>
             <span>
               <span className="block text-sm font-semibold text-gw-nuit dark:text-white">Glissez l&apos;affiche ici ou cliquez pour la choisir</span>
-              <span className="text-xs text-gw-texte-doux dark:text-white/55">JPEG, PNG ou WebP · 8 Mo maximum · format paysage conseillé</span>
+              <span className="text-xs text-gw-texte-doux dark:text-white/55">JPEG, PNG ou WebP  8 Mo maximum  format paysage conseillé</span>
             </span>
           </span>
         )}
       </button>
       <p className={cn("mt-1 text-xs", erreur ? "text-gw-rose-action" : "text-gw-texte-doux dark:text-white/55")}>
-        {erreur ?? "Elle illustre l'événement sur l'accueil, le catalogue et sa page publique. Modifiable ensuite dans « Informations »."}
+        {erreur ?? "Elle illustre l'événement sur l'accueil, le catalogue et sa page publique. Modifiable ensuite dans 'Informations'."}
       </p>
     </div>
   )
@@ -325,7 +325,7 @@ export function ModaleNouveauLieu({
         adresse: null,
         capacite: capacite ? Number(capacite) : null,
       })
-      toast.success(`Lieu « ${lieu.nom} » créé.`)
+      toast.success(`Lieu '${lieu.nom}' créé.`)
       setNom("")
       setVille("")
       setRegion(REGION_ENTREPRISE)

@@ -18,7 +18,7 @@ const REGLES: [RegExp, LucideIcon][] = [
   [/concert|musique|music|live/i, Music],
   [/cabaret|karaok|chant|slam/i, Mic2],
   [/th[eé][aâ]tre|spectacle|humour|danse|com[eé]die/i, Drama],
-  // avant la règle « art » : « Arts martiaux » est un sport
+  // avant la règle 'art' : 'Arts martiaux' est un sport
   [/sport|foot|match|basket|tournoi|course|boxe|martia|combat|rugby/i, Trophy],
   [/soir[eé]e|f[eê]te|festival|night|bal/i, PartyPopper],
   [/conf[eé]rence|atelier|formation|salon|forum/i, Presentation],

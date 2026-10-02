@@ -4,14 +4,14 @@ Revision ID: d9e0f1a2b3c4
 Revises: b7c8d9e0f1a2
 Create Date: 2026-09-24 14:00:00.000000
 
-Les acteurs « Organisateur » et « Administrateur » du diagramme de cas d'utilisation
+Les acteurs 'Organisateur' et 'Administrateur' du diagramme de cas d'utilisation
 partagent la table users ; ce champ les distingue. Les participants ont leur table.
 
 Règles de reprise des comptes existants :
-- concert_id = 0 (ancien « superadmin ») -> admin
+- concert_id = 0 (ancien 'superadmin') -> admin
 - tous les autres comptes             -> organisateur
 
-La migration est écrite pour fonctionner aussi si une colonne « role » a déjà été
+La migration est écrite pour fonctionner aussi si une colonne 'role' a déjà été
 ajoutée à la main ou par une migration d'essai : la colonne est alors convertie.
 """
 from typing import Sequence, Union

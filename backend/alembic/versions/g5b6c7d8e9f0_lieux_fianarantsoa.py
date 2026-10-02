@@ -5,7 +5,7 @@ Revises: f4a5b6c7d8e9
 Create Date: 2026-09-28 12:30:00.000000
 
 - Renomme les lieux ajoutés par f4a5b6c7d8e9 avec les noms utilisés sur place.
-- Retire « Discothèque du Soafia » (seulement si aucun événement, proposition ou
+- Retire 'Discothèque du Soafia' (seulement si aucun événement, proposition ou
   recommandation ne l'utilise).
 - Ajoute les lieux de la liste ; idempotent (un nom déjà présent, sans tenir compte
   de la casse, n'est pas réinséré).
@@ -44,7 +44,7 @@ LIEUX = [
     ("L'Espace Royal Bateravola", "Bateravola", "Fianarantsoa"),
     ("Alliance Française de Fianarantsoa", None, "Fianarantsoa"),
     ("Zomatel Hotel-Restaurant", None, "Fianarantsoa"),
-    ("Villa Sylvestre – Tsara Guest House", None, "Fianarantsoa"),
+    ("Villa Sylvestre - Tsara Guest House", None, "Fianarantsoa"),
     ("Hôtel Mahamanina", None, "Fianarantsoa"),
     ("Nick's Food & Drink", None, "Fianarantsoa"),
     ("La Table du Rova", None, "Fianarantsoa"),

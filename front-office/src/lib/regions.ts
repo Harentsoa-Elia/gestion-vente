@@ -59,7 +59,7 @@ export function regionDeLaVille(ville: string): string | undefined {
   return REGIONS_PAR_VILLE[ville.trim().toLowerCase()]
 }
 
-/** « Fianarantsoa, Haute Matsiatra » (ville et région sans répétition) */
+/** 'Fianarantsoa, Haute Matsiatra' (ville et région sans répétition) */
 export function villeEtRegion(lieu: Pick<Lieu, "ville" | "region">): string {
   return [lieu.ville, lieu.region].filter(Boolean).join(", ")
 }

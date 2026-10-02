@@ -4,7 +4,7 @@ Revision ID: i7d8e9f0a1b2
 Revises: h6c7d8e9f0a1
 Create Date: 2026-09-28 13:30:00.000000
 
-Les participants ont déjà une colonne statut (« actif » / « suspendu »).
+Les participants ont déjà une colonne statut ('actif' / 'suspendu').
 """
 from typing import Sequence, Union
 

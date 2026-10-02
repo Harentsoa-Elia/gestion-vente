@@ -18,7 +18,7 @@ export async function fetchUserData(): Promise<AuthUser> {
  * Déconnexion : le jeton est révoqué côté serveur, puis TOUJOURS retiré du navigateur,
  * même si le serveur répond une erreur (jeton déjà révoqué ou expiré, serveur arrêté).
  * Sans ce retrait, un jeton révoqué restait dans localStorage : l'interface se croyait
- * connectée et chaque nouvelle déconnexion échouait avec « Token has been revoked ».
+ * connectée et chaque nouvelle déconnexion échouait avec 'Token has been revoked'.
  */
 export async function logout(): Promise<void> {
   try {

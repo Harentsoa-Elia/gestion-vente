@@ -11,7 +11,7 @@ import { ariary, dateEvenement, pluriel } from "@/lib/billetterie"
 import { CarteBillet } from "@/components/billetterie/carte-billet"
 
 /*
- * « Mes billets » : réservations à payer (gardées 15 minutes), puis billets payés regroupés
+ * 'Mes billets' : réservations à payer (gardées 15 minutes), puis billets payés regroupés
  * par événement, avec leurs QR codes, le PDF et le renvoi par e-mail.
  */
 
@@ -26,7 +26,7 @@ interface Groupe {
   billets: BilletParticipant[]
 }
 
-/** Un événement est « passé » six heures après son début (la date de fin n'est pas renvoyée ici). */
+/** Un événement est 'passé' six heures après son début (la date de fin n'est pas renvoyée ici). */
 const estPasse = (b: BilletParticipant) => new Date(b.evenement_date).getTime() < Date.now() - 6 * 3600_000
 
 function grouper(billets: BilletParticipant[], cle: (b: BilletParticipant) => string): Groupe[] {
@@ -68,7 +68,7 @@ function EnAttente({ groupe, onAnnule }: { groupe: Groupe; onAnnule: () => void 
       <div className="min-w-0 flex-1">
         <p className="font-titre truncate text-lg font-bold text-gw-nuit">{groupe.titre}</p>
         <p className="text-sm text-gw-texte">
-          {groupe.billets.length} × {groupe.billets[0].categorie_nom} · <strong className="font-semibold">{ariary(total)}</strong>
+          {groupe.billets.length} x {groupe.billets[0].categorie_nom}  <strong className="font-semibold">{ariary(total)}</strong>
         </p>
         <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-amber-800">
           <Clock className="h-3.5 w-3.5" aria-hidden />
@@ -77,7 +77,7 @@ function EnAttente({ groupe, onAnnule }: { groupe: Groupe; onAnnule: () => void 
       </div>
       <div className="flex shrink-0 items-center gap-3">
         <button type="button" onClick={annuler} disabled={annulation} className="text-sm font-semibold text-gw-texte-doux hover:text-gw-rose-action disabled:opacity-50">
-          {annulation ? "Annulation…" : "Annuler"}
+          {annulation ? "Annulation..." : "Annuler"}
         </button>
         <Link
           href={`/evenements/${groupe.evenementId}/reserver?reservations=${ids.join(",")}`}
@@ -124,7 +124,7 @@ export function MesReservationsList() {
   if (chargement) {
     return (
       <p className="flex items-center gap-2 py-16 text-gw-texte-doux">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de vos billets…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de vos billets...
       </p>
     )
   }

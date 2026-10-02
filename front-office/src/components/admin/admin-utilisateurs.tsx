@@ -26,7 +26,7 @@ import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui
 type Onglet = "equipe" | "participants"
 const entier = new Intl.NumberFormat("fr-FR")
 const ariary = (n: number) => `${entier.format(Math.round(n))} Ar`
-const normaliser = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+const normaliser = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
 function age(naissance: string | null) {
   if (!naissance) return null
@@ -37,7 +37,7 @@ function age(naissance: string | null) {
 
 function genreCourt(g: string | null) {
   const x = (g ?? "").toLowerCase()
-  return x.startsWith("f") ? "Femme" : x.startsWith("m") || x.startsWith("h") ? "Homme" : x ? "Autre" : "—"
+  return x.startsWith("f") ? "Femme" : x.startsWith("m") || x.startsWith("h") ? "Homme" : x ? "Autre" : "-"
 }
 
 function BadgeStatut({ actif }: { actif: boolean }) {
@@ -99,7 +99,7 @@ function ModaleNouveauCompte({ ouverte, onFermer, onCree }: { ouverte: boolean; 
         <Champ libelle="Adresse e-mail" requis>
           {(id) => <input id={id} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={classeChamp} placeholder="nom@exemple.mg" />}
         </Champ>
-        <Champ libelle="Mot de passe provisoire" requis aide="La personne pourra le changer avec « Mot de passe oublié ».">
+        <Champ libelle="Mot de passe provisoire" requis aide="La personne pourra le changer avec 'Mot de passe oublié'.">
           {(id) => (
             <div className="flex gap-2">
               <input id={id} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={cn(classeChamp, "font-mono")} />
@@ -250,13 +250,13 @@ export function AdminUtilisateurs() {
         <label className="relative w-full sm:w-72">
           <span className="sr-only">Rechercher</span>
           <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gw-texte-pale" aria-hidden />
-          <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Nom, e-mail…" className={cn(classeChamp, "pl-9")} />
+          <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Nom, e-mail..." className={cn(classeChamp, "pl-9")} />
         </label>
       </div>
 
       {chargement ? (
         <p className="flex items-center gap-2 py-10 text-gw-texte-doux dark:text-white/60">
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
         </p>
       ) : onglet === "equipe" ? (
         <div className="gw-carte overflow-x-auto">
@@ -299,7 +299,7 @@ export function AdminUtilisateurs() {
                       {u.evenements > 0 && (
                         <span className="block text-xs text-gw-texte-doux dark:text-white/55">
                           {u.evenements_valides} publié{u.evenements_valides > 1 ? "s" : ""}
-                          {u.evenements_en_attente ? ` · ${u.evenements_en_attente} à valider` : ""}
+                          {u.evenements_en_attente ? `  ${u.evenements_en_attente} à valider` : ""}
                         </span>
                       )}
                     </td>
@@ -394,7 +394,7 @@ export function AdminUtilisateurs() {
               <tr className="border-b border-gw-bordure dark:border-white/10">
                 <th className="px-5 py-3 font-medium">Participant</th>
                 <th className="px-3 py-3 font-medium">E-mail</th>
-                <th className="px-3 py-3 font-medium">Genre · âge</th>
+                <th className="px-3 py-3 font-medium">Genre  âge</th>
                 <th className="px-3 py-3 font-medium">Inscrit le</th>
                 <th className="px-3 py-3 text-right font-medium">Billets</th>
                 <th className="px-3 py-3 font-medium">Statut</th>
@@ -428,9 +428,9 @@ export function AdminUtilisateurs() {
                     </td>
                     <td className="px-3 py-3 text-gw-texte dark:text-white/80">
                       {genreCourt(p.genre)}
-                      {a != null ? ` · ${a} ans` : ""}
+                      {a != null ? `  ${a} ans` : ""}
                     </td>
-                    <td className="px-3 py-3 text-gw-texte-doux dark:text-white/60">{p.date_creation ? new Date(p.date_creation).toLocaleDateString("fr-FR") : "—"}</td>
+                    <td className="px-3 py-3 text-gw-texte-doux dark:text-white/60">{p.date_creation ? new Date(p.date_creation).toLocaleDateString("fr-FR") : "-"}</td>
                     <td className="px-3 py-3 text-right tabular-nums">
                       {p.billets}
                       {p.total_depense > 0 && <span className="block text-xs text-gw-texte-doux dark:text-white/55">{ariary(p.total_depense)}</span>}

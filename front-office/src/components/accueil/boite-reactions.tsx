@@ -16,7 +16,7 @@ import { participantCourantId } from "@/lib/participant-courant"
 
 /*
  * Réactions et commentaires d'une proposition, sur le modèle de Facebook :
- *  - un clic sur « J'aime » ajoute un J'aime ; un nouveau clic le retire ;
+ *  - un clic sur 'J'aime' ajoute un J'aime ; un nouveau clic le retire ;
  *  - un survol prolongé (souris) ou un appui long (écran tactile) fait apparaître
  *    les réactions au-dessus du bouton : J'aime, J'adore, Waouh, Favori ;
  *  - au clavier : Flèche haut ouvre le choix, Échap le referme ;
@@ -110,7 +110,7 @@ export function BoiteReactions({
   const minuteurs = useRef<{ ouvrir?: number; fermer?: number; appui?: number }>({})
   const appuiLong = useRef(false)
 
-  // Chargement des réactions et commentaires, puis de « ma » réaction
+  // Chargement des réactions et commentaires, puis de 'ma' réaction
   useEffect(() => {
     const idMoi = participantCourantId()
     setMoi(idMoi)
@@ -354,7 +354,7 @@ export function BoiteReactions({
                   >
                     <Pastille type={type} taille={38} />
                   </span>
-                  {/* nom de la réaction au survol, comme Facebook (groupe nommé : la carte parente est aussi un « group ») */}
+                  {/* nom de la réaction au survol, comme Facebook (groupe nommé : la carte parente est aussi un 'group') */}
                   <span className="pointer-events-none absolute -top-8 rounded-full bg-black/80 px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-white opacity-0 transition-opacity group-hover/reaction:opacity-100 group-focus-visible/reaction:opacity-100">
                     {nom}
                   </span>
@@ -455,7 +455,7 @@ export function BoiteReactions({
             value={commentaire}
             onChange={(e) => setCommentaire(e.target.value)}
             maxLength={500}
-            placeholder="Écrivez un commentaire…"
+            placeholder="Écrivez un commentaire..."
             aria-label={`Commenter ${libelle}`}
             className="h-9 w-full rounded-full bg-[#F0F2F5] pr-10 pl-4 text-sm placeholder:text-[#65676B] focus:outline-2 focus:outline-[#1466D8]"
           />

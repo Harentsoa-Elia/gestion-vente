@@ -38,7 +38,7 @@ class InfosBillet:
 
 
 def date_francaise(d: datetime) -> str:
-    """« samedi 21 novembre 2026 à 21h00 », à l'heure de Madagascar."""
+    """'samedi 21 novembre 2026 à 21h00', à l'heure de Madagascar."""
     if d.tzinfo is not None:
         d = d.astimezone(FUSEAU)
     return f"{JOURS[d.weekday()]} {d.day} {MOIS[d.month - 1]} {d.year} à {d.hour:02d}h{d.minute:02d}"
@@ -60,7 +60,7 @@ def qr_png(valeur: str, taille_module: int = 10) -> bytes:
 
 def _latin1(texte: str) -> str:
     """Les polices intégrées du PDF ne couvrent que le latin-1 : on remplace le reste."""
-    remplacements = {"’": "'", "‘": "'", "“": '"', "”": '"', "–": "-", "—": "-", "…": "...", " ": " ", " ": " ", "œ": "oe", "Œ": "OE"}
+    remplacements = {"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"', "\u2013": "-", "\u2014": "-", "\u2026": "...", "\u202f": " ", "\u00a0": " ", "\u0153": "oe", "\u0152": "OE"}
     for a, b in remplacements.items():
         texte = texte.replace(a, b)
     return texte.encode("latin-1", "replace").decode("latin-1")
@@ -96,7 +96,7 @@ def generer_pdf_billets(billets: List[InfosBillet]) -> bytes:
         pdf.cell(80, 10, "guichetweb")
         pdf.set_font("Helvetica", "", 9)
         pdf.set_xy(l - 98, 15)
-        pdf.cell(80, 10, _latin1(f"Billet {i} sur {len(billets)}  ·  {b.numero}".replace("·", "-")), align="R")
+        pdf.cell(80, 10, _latin1(f"Billet {i} sur {len(billets)}  -  {b.numero}"), align="R")
 
         # informations (colonne gauche)
         x, largeur = 18, 112

@@ -9,7 +9,7 @@ import { imageTestEvenement, urlMedia } from "@/lib/media"
 import { cn } from "@/utils"
 
 /*
- * « À l'affiche » : carrousel en éventail des événements à venir, dans le hero de l'accueil
+ * 'À l'affiche' : carrousel en éventail des événements à venir, dans le hero de l'accueil
  * (à droite sur grand écran, sous les boutons sur mobile).
  * L'affiche du centre est mise en avant (voile violet-rose, prix, description, bouton Réserver) ;
  * les voisines, plus petites et assombries, se cliquent pour passer au centre.

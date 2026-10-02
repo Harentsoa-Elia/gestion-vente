@@ -2,7 +2,7 @@ const API_DIRECTE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/ap
 
 /**
  * Sur l'ordinateur (localhost), le navigateur appelle l'API directement.
- * Depuis une autre adresse (téléphone, tunnel https), « localhost » ne désigne plus
+ * Depuis une autre adresse (téléphone, tunnel https), 'localhost' ne désigne plus
  * l'ordinateur : on passe par le relais /api/v1 du site (voir next.config.ts).
  */
 function adresseApi() {

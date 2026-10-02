@@ -9,7 +9,7 @@ class Lieu(Base):
     nom = Column(String, nullable=False)
     adresse = Column(String, nullable=True)
     ville = Column(String, nullable=True)
-    region = Column(String, nullable=True)  # région de Madagascar, ex. « Haute Matsiatra »
+    region = Column(String, nullable=True)  # région de Madagascar, ex. 'Haute Matsiatra'
     capacite = Column(Integer, nullable=True)
 
     evenements = relationship("Evenement", back_populates="lieu")

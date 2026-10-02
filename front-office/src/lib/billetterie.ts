@@ -23,7 +23,7 @@ export const operateur = (mode: string | null | undefined) => OPERATEURS.find((o
 
 export const QUANTITE_MAX = 10
 
-/** « +261 34 12 345 67 » -> « 0341234567 » */
+/** '+261 34 12 345 67' -> '0341234567' */
 export function normaliserTelephone(valeur: string) {
   let chiffres = valeur.replace(/\D/g, "")
   if (chiffres.startsWith("261")) chiffres = "0" + chiffres.slice(3)
@@ -47,13 +47,13 @@ export function erreurTelephone(mode: ModePaiement, valeur: string): string | nu
   return null
 }
 
-/** 15000 -> « 15 000 Ar », 0 -> « Gratuit » */
+/** 15000 -> '15 000 Ar', 0 -> 'Gratuit' */
 export function ariary(montant: number) {
   if (montant === 0) return "Gratuit"
   return `${Math.round(montant).toLocaleString("fr-FR")} Ar`
 }
 
-/** « Samedi 14 mars 2027 à 19 h 00 » */
+/** 'Samedi 14 mars 2027 à 19 h 00' */
 export function dateEvenement(iso: string) {
   const d = new Date(iso)
   const jour = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })

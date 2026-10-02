@@ -1,5 +1,5 @@
 /**
- * Rôle du compte staff connecté (table users) : « admin » ou « organisateur ».
+ * Rôle du compte staff connecté (table users) : 'admin' ou 'organisateur'.
  * Les participants ont leur propre jeton (participant_access_token) et le visiteur
  * n'a pas de compte : voir le diagramme de cas d'utilisation (4 acteurs).
  *

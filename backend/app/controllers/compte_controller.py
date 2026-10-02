@@ -8,7 +8,7 @@ Participants :
 Équipe (organisateurs, administrateurs) :
 - POST /mot-de-passe/oublie, POST /mot-de-passe/reinitialiser.
 
-« Mot de passe oublié » répond toujours la même chose, que le compte existe ou non,
+'Mot de passe oublié' répond toujours la même chose, que le compte existe ou non,
 pour ne pas révéler quelles adresses sont inscrites.
 """
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException

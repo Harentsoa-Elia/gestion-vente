@@ -51,7 +51,7 @@ export function VerificationEmail({
       setAttente(DELAI_RENVOI)
     } catch (e) {
       const message = e instanceof Error ? e.message : "Le code n'a pas pu être envoyé."
-      // « Patientez 42 s… » : on reprend le compte à rebours du serveur
+      // 'Patientez 42 s...' : on reprend le compte à rebours du serveur
       const secondes = Number(message.match(/(\d+)\s*s\b/)?.[1])
       if (secondes) setAttente(secondes)
       else setErreur(message)

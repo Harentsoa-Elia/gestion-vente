@@ -2,7 +2,7 @@ import { API_BASE_URL, parseJsonSafe } from "./apiConfig";
 import { getParticipantAuthHeaders } from "./participantService";
 
 /*
- * Confirmation de l'adresse e-mail (participants) et « mot de passe oublié »
+ * Confirmation de l'adresse e-mail (participants) et 'mot de passe oublié'
  * (participants et équipe). Voir backend/app/controllers/compte_controller.py.
  */
 

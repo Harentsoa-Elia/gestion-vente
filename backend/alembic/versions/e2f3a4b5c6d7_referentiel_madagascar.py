@@ -4,7 +4,7 @@ Revision ID: e2f3a4b5c6d7
 Revises: d9e0f1a2b3c4
 Create Date: 2026-09-24 22:30:00.000000
 
-Données proposées aux organisateurs dans « Mes événements » (recherche des
+Données proposées aux organisateurs dans 'Mes événements' (recherche des
 propositions). Uniquement des noms vérifiés dans des sources publiques ; les
 organisateurs peuvent ajouter les artistes et les lieux manquants depuis l'interface.
 
@@ -28,7 +28,7 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-# (nom, genre) — genre laissé vide quand il n'est pas établi
+# (nom, genre) - genre laissé vide quand il n'est pas établi
 ARTISTES = [
     # salegy, musique du Nord
     ("Jaojoby", "Salegy"),
@@ -189,6 +189,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     # Volontairement sans effet : un nom inséré ici peut aussi avoir été saisi par un
-    # utilisateur avant la migration (ex. « Mahaleo »), et rien ne permet de distinguer
+    # utilisateur avant la migration (ex. 'Mahaleo'), et rien ne permet de distinguer
     # les deux. Supprimer ces lignes risquerait d'effacer des données réelles.
     pass

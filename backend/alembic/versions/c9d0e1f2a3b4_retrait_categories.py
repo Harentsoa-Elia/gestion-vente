@@ -4,8 +4,8 @@ Revision ID: c9d0e1f2a3b4
 Revises: b8c9d0e1f2a3
 Create Date: 2026-09-26 11:40:00.000000
 
-Retire « Rugby », « Course / Marathon », « Culte / Gospel » et « Événement pour enfants »
-(ajoutées par e2f3a4b5c6d7). « Arts martiaux / Boxe » reste.
+Retire 'Rugby', 'Course / Marathon', 'Culte / Gospel' et 'Événement pour enfants'
+(ajoutées par e2f3a4b5c6d7). 'Arts martiaux / Boxe' reste.
 Une catégorie déjà utilisée (événement, proposition ou recommandation) est gardée,
 pour ne perdre ni données ni votes : un message l'indique pendant la migration.
 """
@@ -43,7 +43,7 @@ def upgrade() -> None:
         if ligne is None:
             continue
         if bind.execute(sa.text(UTILISATIONS), {"id": ligne.id}).scalar():
-            print(f"  catégorie « {nom} » gardée : elle est déjà utilisée par un événement ou une proposition")
+            print(f"  catégorie '{nom}' gardée : elle est déjà utilisée par un événement ou une proposition")
             continue
         bind.execute(sa.text("DELETE FROM categories WHERE id = :id"), {"id": ligne.id})
 

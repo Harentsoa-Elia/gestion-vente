@@ -48,7 +48,7 @@ import { CarteBillet } from "@/components/billetterie/carte-billet"
  *  2. Paiement : Mobile Money SIMULÉ (MVola, Orange Money, Airtel Money) : aucun opérateur
  *     n'est contacté, le numéro est seulement contrôlé ;
  *  3. Billets : QR codes à l'écran, PDF, et envoi par e-mail.
- * « ?reservations=12,13 » reprend le paiement d'un lot déjà réservé (depuis « Mes billets »).
+ * '?reservations=12,13' reprend le paiement d'un lot déjà réservé (depuis 'Mes billets').
  */
 
 type Etape = "billets" | "paiement" | "confirmation"
@@ -67,7 +67,7 @@ const ETAPES: { cle: Etape; libelle: string }[] = [
   { cle: "confirmation", libelle: "Confirmation" },
 ]
 
-/** Durée de la simulation « validez sur votre téléphone » */
+/** Durée de la simulation 'validez sur votre téléphone' */
 const DUREE_SIMULATION = 2600
 
 function Etapes({ courante }: { courante: Etape }) {
@@ -280,8 +280,8 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
   }
 
   const lignes = useMemo(() => {
-    if (lot) return [{ libelle: `${lot.ids.length} × ${lot.tarif}`, montant: lot.total }]
-    if (tarif) return [{ libelle: `${quantite} × ${tarif.nom}`, montant: tarif.prix * quantite }]
+    if (lot) return [{ libelle: `${lot.ids.length} x ${lot.tarif}`, montant: lot.total }]
+    if (tarif) return [{ libelle: `${quantite} x ${tarif.nom}`, montant: tarif.prix * quantite }]
     return []
   }, [lot, tarif, quantite])
 
@@ -316,7 +316,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
     setErreur("")
     setSimulation(true)
     try {
-      // simulation : le temps de « valider sur le téléphone »
+      // simulation : le temps de 'valider sur le téléphone'
       const [r] = await Promise.all([payerLot(lot.ids, mode, normaliserTelephone(telephone)), new Promise((ok) => setTimeout(ok, DUREE_SIMULATION))])
       setResultat(r)
       allerA("confirmation")
@@ -349,7 +349,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
   if (chargement) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center gap-2 text-gw-texte-doux">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de la billetterie…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de la billetterie...
       </div>
     )
   }
@@ -382,7 +382,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
 
       <div className={cn("mt-8 grid gap-8", etape !== "confirmation" && "lg:grid-cols-[1fr_20rem]")}>
         <div className="min-w-0">
-          {/* ——— 1. Billets ——— */}
+          {/* --- 1. Billets --- */}
           {etape === "billets" && emailVerifie === false && (
             <section className="rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8">
               <p className="mb-6 flex items-start gap-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -484,7 +484,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
             </section>
           )}
 
-          {/* ——— 2. Paiement ——— */}
+          {/* --- 2. Paiement --- */}
           {etape === "paiement" && lot && (
             <section className="relative rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8" aria-labelledby="titre-paiement">
               <h2 id="titre-paiement" className="font-titre text-xl font-bold text-gw-nuit">
@@ -527,7 +527,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                         </span>
                         <span className="min-w-0">
                           <span className="block text-sm font-semibold text-gw-nuit">{o.nom}</span>
-                          <span className="text-xs text-gw-texte-doux">{o.prefixes.join(" · ")}</span>
+                          <span className="text-xs text-gw-texte-doux">{o.prefixes.join("  ")}</span>
                         </span>
                         {choisi && <CheckCircle2 className="ml-auto h-5 w-5 shrink-0 text-gw-violet" aria-hidden />}
                       </label>
@@ -611,7 +611,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                       <span className="font-mono whitespace-nowrap">{formaterTelephone(telephone)}</span>.
                     </p>
                     <p className="mt-4 inline-flex items-center gap-2 text-xs text-gw-texte-doux">
-                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> En attente de confirmation (simulation)…
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> En attente de confirmation (simulation)...
                     </p>
                   </div>
                 </div>
@@ -619,7 +619,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
             </section>
           )}
 
-          {/* ——— 3. Confirmation ——— */}
+          {/* --- 3. Confirmation --- */}
           {etape === "confirmation" && resultat && (
             <section aria-labelledby="titre-confirmation">
               <div className="flex flex-col gap-5 rounded-3xl bg-emerald-50 p-6 ring-1 ring-emerald-200 sm:flex-row sm:items-center sm:p-8">
@@ -631,7 +631,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                     Paiement accepté
                   </h2>
                   <p className="mt-1 text-sm text-emerald-900">
-                    {ariary(resultat.montant_total)} payés avec {operateur(resultat.mode_paiement)?.nom} · référence{" "}
+                    {ariary(resultat.montant_total)} payés avec {operateur(resultat.mode_paiement)?.nom}  référence{" "}
                     <span className="font-mono font-semibold">{resultat.reference}</span>
                   </p>
                   <p className="mt-2 flex items-start gap-2 text-sm text-emerald-900">

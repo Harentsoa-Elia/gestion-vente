@@ -10,7 +10,7 @@ import { BoutonAuth, CadreAuth, ChampAuth, LienPied, MessageErreur } from "./cad
 import { SaisieCode } from "./saisie-code"
 
 /*
- * « Mot de passe oublié » en deux étapes, pour les participants et pour l'équipe :
+ * 'Mot de passe oublié' en deux étapes, pour les participants et pour l'équipe :
  * 1. l'adresse e-mail -> un code à 6 chiffres y est envoyé ;
  * 2. le code et le nouveau mot de passe.
  * Participant : connecté directement ensuite. Équipe : renvoyé vers /login.

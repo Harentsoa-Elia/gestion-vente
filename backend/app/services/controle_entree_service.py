@@ -20,7 +20,7 @@ MOTIF_NUMERO = re.compile(r"^(?:BLT-?)?([0-9A-F]{10})$", re.IGNORECASE)
 
 
 def numero_depuis_code(code: str) -> Optional[str]:
-    """QR code (numéro chiffré) ou numéro tapé à la main -> « BLT-XXXXXXXXXX »."""
+    """QR code (numéro chiffré) ou numéro tapé à la main -> 'BLT-XXXXXXXXXX'."""
     brut = (code or "").strip()
     saisi = MOTIF_NUMERO.match(brut.replace(" ", ""))
     if saisi:
@@ -162,7 +162,7 @@ class ControleEntreeService:
         else:
             infos = await self._billet_scanne(billet_id)
             if infos["evenement_id"] != evenement.id:
-                resultat = reponse("autre_evenement", f"Ce billet est pour « {infos['evenement_titre']} ».", infos, infos["evenement_titre"])
+                resultat = reponse("autre_evenement", f"Ce billet est pour '{infos['evenement_titre']}'.", infos, infos["evenement_titre"])
             else:
                 # une seule requête : deux scans simultanés du même billet ne peuvent pas passer tous les deux
                 passe = (

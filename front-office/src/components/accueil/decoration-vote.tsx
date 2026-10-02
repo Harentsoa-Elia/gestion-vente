@@ -3,7 +3,7 @@ import { WaouhFace } from "@/components/ui/WaouhFace"
 import { cn } from "@/utils"
 
 /*
- * Décoration de la colonne de texte de « Donnez votre avis ».
+ * Décoration de la colonne de texte de 'Donnez votre avis'.
  * Une photo d'amis qui réagissent sur leur téléphone, inclinée, entourée des quatre réactions publiques qui flottent.
  * Chaque bulle affiche le poids de la réaction dans le score
  * (mêmes valeurs que backend/app/utils/scoring.py) : la décoration
@@ -55,7 +55,7 @@ export function DecorationVote() {
               {Icone ? <Icone className="h-7 w-7 text-white" strokeWidth={2} /> : <WaouhFace size={40} />}
             </div>
             <span className="font-titre absolute -right-2 -bottom-1 rounded-full bg-white px-2 py-0.5 text-sm font-bold text-gw-nuit shadow-sm">
-              ×{poids}
+              x{poids}
             </span>
           </div>
         </div>

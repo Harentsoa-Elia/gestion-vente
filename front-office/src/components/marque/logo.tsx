@@ -34,7 +34,7 @@ export function Logo({ ton = "sombre", className }: LogoProps) {
       <span aria-hidden className="inline-flex items-baseline">
         gu
         <span className="relative">
-          ı
+          i
           <span className="absolute left-1/2 top-[0.02em] h-[0.2em] w-[0.2em] -translate-x-1/2 rotate-12 rounded-[0.05em] bg-gw-rose" />
         </span>
         chetweb

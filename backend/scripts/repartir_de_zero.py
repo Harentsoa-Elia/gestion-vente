@@ -10,7 +10,7 @@ SUPPRIME :
     réservations, paiements, billets et notifications ;
   - tous les autres comptes : organisateurs et participants de test, données de démonstration.
 
-Action définitive : faire une sauvegarde de la base avant (pgAdmin, clic droit sur la base, Backup…).
+Action définitive : faire une sauvegarde de la base avant (pgAdmin, clic droit sur la base, Backup...).
 
 Utilisation (dans backend, venv activé) :
     python -m scripts.repartir_de_zero        affiche ce qui sera supprimé et demande de taper OUI
@@ -57,7 +57,7 @@ async def principal(confirme: bool) -> None:
             print("  (aucun compte personnel : ajoutez DEMO_COMPTES_PERSONNELS dans .env pour garder vos adresses)")
         print("\nSERA SUPPRIMÉ :")
         print(f"  - {nb_evenements} événements (avec tarifs, propositions, réactions, réservations) et {nb_billets} billets")
-        print(f"  - {len(users_suppr)} comptes organisateur : " + ", ".join(u.email for u in users_suppr[:8]) + (" …" if len(users_suppr) > 8 else ""))
+        print(f"  - {len(users_suppr)} comptes organisateur : " + ", ".join(u.email for u in users_suppr[:8]) + (" ..." if len(users_suppr) > 8 else ""))
         print(f"  - {len(parts) - len(parts_gardes)} comptes participant")
         print("  Le référentiel (lieux, artistes, types d'événement) et les comptes administrateurs sont conservés.")
 

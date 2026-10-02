@@ -40,7 +40,7 @@ class LotReserve(BaseModel):
 
 
 class BilletParticipant(BaseModel):
-    """Une réservation du participant, avec son billet s'il est payé (page « Mes billets »)."""
+    """Une réservation du participant, avec son billet s'il est payé (page 'Mes billets')."""
     reservation_id: int
     statut: str  # en_attente | confirmee
     date_reservation: datetime

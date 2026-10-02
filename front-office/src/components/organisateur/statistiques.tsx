@@ -10,7 +10,7 @@ import { classeChamp } from "@/components/organisateur/ui"
 import { StyleGraphiques } from "@/lib/couleurs-graphiques"
 
 /*
- * Statistiques de l'organisateur (cahier des charges, « Dashboard organisateur ») :
+ * Statistiques de l'organisateur (cahier des charges, 'Dashboard organisateur') :
  *  - indicateurs : billets vendus, total des ventes, remplissage, entrées, acheteurs ;
  *  - ventes par jour (billets ou montant, un seul axe à la fois) ;
  *  - entrées : scannés / pas encore entrés / places restantes ;
@@ -132,7 +132,7 @@ export function Statistiques() {
   if (!stats && chargement) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement des statistiques…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement des statistiques...
       </div>
     )
   }
@@ -198,7 +198,7 @@ export function Statistiques() {
             <Tuile
               icone={BarChart3}
               libelle="Taux de remplissage"
-              valeur={i.taux_remplissage != null ? `${entier.format(i.taux_remplissage)} %` : "—"}
+              valeur={i.taux_remplissage != null ? `${entier.format(i.taux_remplissage)} %` : "-"}
               detail={i.places_restantes != null ? `${entier.format(i.places_restantes)} places restantes sur ${entier.format(i.capacite ?? 0)}` : "Capacité non renseignée"}
             />
             <Tuile
@@ -409,7 +409,7 @@ export function Statistiques() {
                           {e.titre}
                         </button>
                         <span className="shrink-0 text-xs text-gw-texte-doux tabular-nums dark:text-white/60">
-                          {e.capacite ? `${entier.format(e.vendus)} / ${entier.format(e.capacite)} · ` : `${entier.format(e.vendus)} vendus · `}
+                          {e.capacite ? `${entier.format(e.vendus)} / ${entier.format(e.capacite)}  ` : `${entier.format(e.vendus)} vendus  `}
                           <strong className="text-gw-nuit dark:text-white">{e.taux_remplissage != null ? `${entier.format(e.taux_remplissage)} %` : "capacité ?"}</strong>
                         </span>
                       </div>

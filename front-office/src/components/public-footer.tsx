@@ -55,7 +55,7 @@ export function PublicFooter() {
       </div>
       <div className="border-t border-white/10">
         <p className="mx-auto max-w-7xl px-4 py-5 text-xs text-white/50 sm:px-6">
-          © {new Date().getFullYear()} {NOM_PLATEFORME}. Tous droits réservés.
+          (c) {new Date().getFullYear()} {NOM_PLATEFORME}. Tous droits réservés.
         </p>
       </div>
     </footer>

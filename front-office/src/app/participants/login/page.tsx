@@ -14,7 +14,7 @@ function ParticipantLoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get("redirect") || "/"
-  // l'onglet « Inscription » garde la page de retour (ex. réservation en cours)
+  // l'onglet 'Inscription' garde la page de retour (ex. réservation en cours)
   const suite = searchParams.get("redirect") ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
 
   const [email, setEmail] = useState(searchParams.get("email") ?? "")
@@ -100,7 +100,7 @@ function ParticipantLoginForm() {
           type="password"
           value={motDePasse}
           onChange={(e) => setMotDePasse(e.target.value)}
-          placeholder="••••••••"
+          placeholder="--------"
           autoComplete="current-password"
           required
         />
@@ -117,7 +117,7 @@ function ParticipantLoginForm() {
 
         <div className="flex justify-center pt-1">
           <BoutonAuth type="submit" chargement={loading} className="w-full sm:w-auto sm:min-w-[200px]">
-            {loading ? "Connexion…" : "Se connecter"}
+            {loading ? "Connexion..." : "Se connecter"}
           </BoutonAuth>
         </div>
       </form>

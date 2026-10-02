@@ -20,9 +20,9 @@ export function CarteBillet({
   compact = false,
 }: {
   billet: BilletParticipant
-  /** « Billet 2 sur 3 » dans un lot */
+  /** 'Billet 2 sur 3' dans un lot */
   numeroDansLot?: { index: number; total: number }
-  /** QR plus petit (liste « Mes billets ») */
+  /** QR plus petit (liste 'Mes billets') */
   compact?: boolean
 }) {
   const [occupe, setOccupe] = useState<"pdf" | "email" | null>(null)
@@ -102,7 +102,7 @@ export function CarteBillet({
           </div>
           <div>
             <dt className="text-xs text-white/60">Payé avec</dt>
-            <dd className="font-semibold">{op ? op.nom : "—"}</dd>
+            <dd className="font-semibold">{op ? op.nom : "-"}</dd>
           </div>
         </dl>
 

@@ -39,7 +39,7 @@ def maintenant() -> datetime:
 
 
 def normaliser_telephone(telephone: str) -> str:
-    """« +261 34 12 345 67 », « 034 12 345 67 »… -> « 0341234567 »."""
+    """'+261 34 12 345 67', '034 12 345 67'... -> '0341234567'."""
     chiffres = re.sub(r"\D", "", telephone or "")
     if chiffres.startswith("261"):
         chiffres = "0" + chiffres[3:]
@@ -98,10 +98,10 @@ class BilletterieService:
         if categorie.quantite_disponible is not None:
             restantes = categorie.quantite_disponible - await self.places_prises(categorie_id)
             if restantes <= 0:
-                raise ErreurBilletterie(f"Plus de places « {categorie.nom} » disponibles.")
+                raise ErreurBilletterie(f"Plus de places '{categorie.nom}' disponibles.")
             if quantite > restantes:
                 reste = "qu'une place" if restantes == 1 else f"que {restantes} places"
-                raise ErreurBilletterie(f"Il ne reste {reste} « {categorie.nom} ».")
+                raise ErreurBilletterie(f"Il ne reste {reste} '{categorie.nom}'.")
 
         reservations = [
             Reservation(evenement_id=evenement_id, categorie_billet_id=categorie_id, participant_id=participant_id, statut="en_attente")
@@ -152,7 +152,7 @@ class BilletterieService:
         self.db.add(
             Notification(
                 organisateur_id=evenement.organisateur_id,
-                message=f"{n} billet{'s' if n > 1 else ''} « {categorie.nom} » vendu{'s' if n > 1 else ''} pour '{evenement.titre}' ({categorie.prix * n:.0f} Ar).",
+                message=f"{n} billet{'s' if n > 1 else ''} '{categorie.nom}' vendu{'s' if n > 1 else ''} pour '{evenement.titre}' ({categorie.prix * n:.0f} Ar).",
                 lu=False,
                 reservation_id=premiere.id,
             )

@@ -14,9 +14,9 @@ class CodeEmail(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, nullable=False, index=True)
-    # « participant » ou « equipe » (organisateurs et administrateurs, table users)
+    # 'participant' ou 'equipe' (organisateurs et administrateurs, table users)
     compte = Column(String(20), nullable=False)
-    # « verification » ou « reinitialisation »
+    # 'verification' ou 'reinitialisation'
     usage = Column(String(20), nullable=False)
     empreinte = Column(String(64), nullable=False)
     tentatives = Column(Integer, nullable=False, default=0, server_default="0")

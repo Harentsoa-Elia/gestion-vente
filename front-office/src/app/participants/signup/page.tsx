@@ -11,8 +11,8 @@ import type { Genre } from "@/types"
 
 /*
  * Inscription d'un participant en deux étapes :
- * 1. « Vous » : prénom, nom, date de naissance, genre ;
- * 2. « Votre compte » : e-mail et mot de passe.
+ * 1. 'Vous' : prénom, nom, date de naissance, genre ;
+ * 2. 'Votre compte' : e-mail et mot de passe.
  * Barre de pied Retour / Continuer, comme sur le modèle.
  */
 
@@ -222,7 +222,7 @@ function ParticipantSignupForm() {
               <ArrowRight className="h-4 w-4" aria-hidden />
             </>
           ) : loading ? (
-            "Inscription…"
+            "Inscription..."
           ) : (
             "Créer mon compte"
           )}

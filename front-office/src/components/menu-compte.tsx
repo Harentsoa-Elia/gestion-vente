@@ -8,7 +8,7 @@ import { cn } from "@/utils"
 
 /*
  * Menu du participant connecté, dans l'en-tête public : un clic sur son nom ouvre
- * « Mes réservations », la confirmation de l'adresse e-mail (si besoin) et « Déconnexion ».
+ * 'Mes réservations', la confirmation de l'adresse e-mail (si besoin) et 'Déconnexion'.
  * Se ferme avec Échap, par un clic ailleurs ou en changeant de page.
  */
 

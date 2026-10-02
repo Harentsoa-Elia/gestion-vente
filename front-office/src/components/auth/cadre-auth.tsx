@@ -12,16 +12,16 @@ import { cn } from "@/utils"
  * Une carte en deux panneaux :
  * - à gauche, la photo de concert aux couleurs guichetweb, des formes diagonales roses,
  *   le logo et des onglets verticaux ; l'onglet actif est blanc et se prolonge dans le
- *   panneau de droite par deux coins arrondis « creusés » ;
+ *   panneau de droite par deux coins arrondis 'creusés' ;
  * - à droite, le formulaire, avec une barre de pied (liens ou boutons Retour / Continuer).
  * Sur téléphone, le panneau photo devient un bandeau en haut et les onglets passent à l'horizontale.
  */
 
 export interface OngletAuth {
   libelle: string
-  /** Lien vers une autre page… */
+  /** Lien vers une autre page... */
   href?: string
-  /** …ou action locale (ex. basculer connexion / inscription sans changer de page) */
+  /** ...ou action locale (ex. basculer connexion / inscription sans changer de page) */
   onClick?: () => void
   actif?: boolean
 }
@@ -38,7 +38,7 @@ export function CadreAuth({
 }: {
   onglets: OngletAuth[]
   icone: LucideIcon
-  /** Petit texte au-dessus du titre, ex. « Espace organisateur » */
+  /** Petit texte au-dessus du titre, ex. 'Espace organisateur' */
   surtitre?: string
   titre: string
   sousTitre?: ReactNode
@@ -103,7 +103,7 @@ function PanneauVisuel({ onglets }: { onglets: OngletAuth[] }) {
         aria-hidden
         className="absolute inset-0 -z-20 h-full w-full object-cover object-[60%_50%]"
       />
-      {/* teinte guichetweb : nuit → violet → rose */}
+      {/* teinte guichetweb : nuit -> violet -> rose */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-[linear-gradient(160deg,rgba(30,26,60,0.92)_0%,rgba(108,92,231,0.78)_55%,rgba(201,42,122,0.72)_100%)]"
