@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { CalendarPlus, ChevronRight, Eye, MapPin, Sparkles, Ticket } from "lucide-react"
 import { toast } from "sonner"
 import { fetchUserData } from "@/services/auth.service"
-import { createEvenement, fetchAllEvenements } from "@/services/evenementService"
+import { createEvenement, envoyerImageEvenement, fetchAllEvenements } from "@/services/evenementService"
 import { fetchPropositionsAvecScores } from "@/services/propositionService"
 import { fetchCategories, fetchLieux } from "@/services/referentielService"
 import type { Categorie, Evenement, Lieu, StatutValidation } from "@/types"
@@ -189,8 +189,16 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
           onLieuCree={(l) => setLieux((ls) => [...ls, l])}
           libelleBouton="Créer l'événement"
           onAnnuler={() => setCreation(false)}
-          onEnregistrer={async (saisie) => {
+          avecAffiche
+          onEnregistrer={async (saisie, affiche) => {
             const cree = await createEvenement(saisie)
+            if (affiche) {
+              try {
+                await envoyerImageEvenement(cree.id, affiche)
+              } catch {
+                toast.error("L'événement est créé, mais l'affiche n'a pas pu être envoyée : ajoutez-la dans l'onglet « Informations ».")
+              }
+            }
             toast.success("Événement créé en brouillon. Ajoutez maintenant vos propositions.")
             router.push(`/organisateur/evenements/${cree.id}`)
           }}

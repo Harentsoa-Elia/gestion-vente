@@ -96,6 +96,23 @@ EVENEMENTS = [
      84, 19, 5, "Résidence Matsiatra", "Gala", "brouillon", 200, [], 0.0),
 ]
 
+# affiches : photos neutres du projet (front-office/public/images), sans nom ni date d'un vrai événement.
+# Le brouillon n'en a pas : on peut montrer l'ajout d'une affiche pendant la démonstration.
+AFFICHES = {
+    "Fianar Jazz Night": "/images/organisateur/bandeau-concert.jpg",
+    "Festival Hira Gasy de Fianarantsoa": "/images/accueil/danseurs.jpg",
+    "Salegy Night à Bateravola": "/images/accueil/confettis-roses.jpg",
+    "Acoustique au Rova": "/images/accueil/foule-violette.jpg",
+    "Festival des Musiques de la Haute Matsiatra": "/images/accueil/confettis-bleus.jpg",
+    "Rire à Fianar : stand-up malagasy": "/images/accueil/scene-dj.jpg",
+}
+# visuels des propositions de lieux (les autres gardent l'image prévue par le site)
+VISUELS_PROPOSITIONS = {
+    "Stade de Fianarantsoa": "/images/test/lieu.jpg",
+    "Le Coliseum d'Ambatomena": "/images/test/lieu-coliseum.jpg",
+    "L'Espace Royal Bateravola": "/images/accueil/foule-violette.jpg",
+}
+
 # propositions soumises au vote : (titre de l'événement, type, libellés, poids d'engagement de chaque option)
 PROPOSITIONS = [
     ("Festival des Musiques de la Haute Matsiatra", PropositionType.LIEU, ["Stade de Fianarantsoa", "L'Espace Royal Bateravola", "Le Coliseum d'Ambatomena"], [0.9, 0.55, 0.3]),
@@ -256,6 +273,7 @@ async def creer(db) -> None:
             lieu_id=lieu.id if lieu else None,
             categorie_id=categorie.id,
             organisateur_id=orga.id,
+            image_url=AFFICHES.get(titre),
         )
         db.add(e)
         await db.flush()
@@ -329,7 +347,8 @@ async def creer(db) -> None:
                 lien["artiste_id"] = (await trouver_ou_creer(db, Artiste, libelle)).id
             else:
                 lien["categorie_id"] = (await trouver_ou_creer(db, Categorie, libelle)).id
-            prop = Proposition(type=type_, libelle=libelle, evenement_id=e.id, date_proposition=e.date_creation + timedelta(days=1), **lien)
+            prop = Proposition(type=type_, libelle=libelle, evenement_id=e.id, date_proposition=e.date_creation + timedelta(days=1),
+                               image_url=VISUELS_PROPOSITIONS.get(libelle) if type_ == PropositionType.LIEU else None, **lien)
             db.add(prop)
             await db.flush()
             for p in participants:

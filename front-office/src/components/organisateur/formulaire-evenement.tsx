@@ -1,12 +1,14 @@
 "use client"
 
-import { useEffect, useId, useState } from "react"
-import { Plus } from "lucide-react"
+import { useEffect, useId, useRef, useState, type DragEvent } from "react"
+import { ImagePlus, Plus, RefreshCw, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import type { Categorie, Evenement, Lieu } from "@/types"
 import type { EvenementSaisie } from "@/services/evenementService"
 import { createLieu } from "@/services/referentielService"
 import { REGION_ENTREPRISE, REGIONS, estRegionEntreprise, regionDeLaVille, villeEtRegion } from "@/lib/regions"
+import { TYPES_IMAGE_ACCEPTES, verifierFichierImage } from "@/lib/media"
+import { cn } from "@/utils"
 import { Bouton, Champ, Modale, classeChamp, isoVersSaisie, saisieVersIso } from "./ui"
 
 /*
@@ -16,6 +18,91 @@ import { Bouton, Champ, Modale, classeChamp, isoVersSaisie, saisieVersIso } from
  * ils seront souvent choisis grâce aux votes du public.
  */
 
+/**
+ * Choix de l'affiche dans la fenêtre de création : aperçu immédiat, glisser-déposer ou clic.
+ * Le fichier est envoyé juste après la création de l'événement (voir organisateur-evenements.tsx).
+ */
+function ChoixAffiche({ fichier, onChange }: { fichier: File | null; onChange: (f: File | null) => void }) {
+  const champ = useRef<HTMLInputElement>(null)
+  const [apercu, setApercu] = useState<string | null>(null)
+  const [survol, setSurvol] = useState(false)
+  const [erreur, setErreur] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!fichier) return setApercu(null)
+    const url = URL.createObjectURL(fichier)
+    setApercu(url)
+    return () => URL.revokeObjectURL(url)
+  }, [fichier])
+
+  const choisir = (f: File | undefined) => {
+    if (!f) return
+    const e = verifierFichierImage(f)
+    setErreur(e)
+    if (!e) onChange(f)
+    if (champ.current) champ.current.value = ""
+  }
+
+  return (
+    <div>
+      <div className="mb-1.5 flex items-end justify-between gap-3">
+        <span className="block text-sm font-medium">
+          Affiche <span className="font-normal text-gw-texte-doux dark:text-white/55">(facultatif, conseillé)</span>
+        </span>
+        {fichier && (
+          <span className="flex gap-1">
+            <button type="button" onClick={() => champ.current?.click()} className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-gw-violet hover:bg-gw-fond dark:text-gw-lavande dark:hover:bg-white/10">
+              <RefreshCw className="h-3.5 w-3.5" aria-hidden /> Changer
+            </button>
+            <button type="button" onClick={() => onChange(null)} className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-gw-texte-doux hover:bg-gw-fond hover:text-red-600 dark:text-white/60 dark:hover:bg-white/10">
+              <Trash2 className="h-3.5 w-3.5" aria-hidden /> Retirer
+            </button>
+          </span>
+        )}
+      </div>
+      <input ref={champ} type="file" accept={TYPES_IMAGE_ACCEPTES.join(",")} className="sr-only" tabIndex={-1} onChange={(e) => choisir(e.target.files?.[0])} />
+      <button
+        type="button"
+        onClick={() => champ.current?.click()}
+        onDragOver={(e: DragEvent) => {
+          e.preventDefault()
+          setSurvol(true)
+        }}
+        onDragLeave={() => setSurvol(false)}
+        onDrop={(e: DragEvent) => {
+          e.preventDefault()
+          setSurvol(false)
+          choisir(e.dataTransfer.files?.[0])
+        }}
+        aria-label={fichier ? "Changer l'affiche" : "Ajouter une affiche"}
+        className={cn(
+          "group relative block aspect-[3/1] w-full overflow-hidden rounded-2xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet",
+          apercu ? "bg-gw-nuit" : "border-2 border-dashed border-gw-lavande bg-gw-fond hover:border-gw-violet dark:border-white/20 dark:bg-white/5",
+          survol && "border-gw-violet ring-4 ring-gw-violet/20",
+        )}
+      >
+        {apercu ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={apercu} alt="Aperçu de l'affiche" className="h-full w-full object-cover" />
+        ) : (
+          <span className="flex h-full items-center justify-center gap-3 px-4 text-left">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-white">
+              <ImagePlus className="h-5 w-5" aria-hidden />
+            </span>
+            <span>
+              <span className="block text-sm font-semibold text-gw-nuit dark:text-white">Glissez l&apos;affiche ici ou cliquez pour la choisir</span>
+              <span className="text-xs text-gw-texte-doux dark:text-white/55">JPEG, PNG ou WebP · 8 Mo maximum · format paysage conseillé</span>
+            </span>
+          </span>
+        )}
+      </button>
+      <p className={cn("mt-1 text-xs", erreur ? "text-gw-rose-action" : "text-gw-texte-doux dark:text-white/55")}>
+        {erreur ?? "Elle illustre l'événement sur l'accueil, le catalogue et sa page publique. Modifiable ensuite dans « Informations »."}
+      </p>
+    </div>
+  )
+}
+
 export function FormulaireEvenement({
   initial,
   lieux,
@@ -24,14 +111,17 @@ export function FormulaireEvenement({
   onEnregistrer,
   libelleBouton,
   onAnnuler,
+  avecAffiche = false,
 }: {
   initial?: Evenement
   lieux: Lieu[]
   categories: Categorie[]
   onLieuCree: (lieu: Lieu) => void
-  onEnregistrer: (saisie: EvenementSaisie) => Promise<void>
+  onEnregistrer: (saisie: EvenementSaisie, affiche: File | null) => Promise<void>
   libelleBouton: string
   onAnnuler?: () => void
+  /** Création : propose de choisir l'affiche, transmise à onEnregistrer */
+  avecAffiche?: boolean
 }) {
   const [titre, setTitre] = useState(initial?.titre ?? "")
   const [description, setDescription] = useState(initial?.description ?? "")
@@ -43,6 +133,7 @@ export function FormulaireEvenement({
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState<string | null>(null)
   const [nouveauLieu, setNouveauLieu] = useState(false)
+  const [affiche, setAffiche] = useState<File | null>(null)
 
   const soumettre = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,7 +152,7 @@ export function FormulaireEvenement({
         capacite: capacite ? Number(capacite) : null,
         lieu_id: lieuId ? Number(lieuId) : null,
         categorie_id: categorieId ? Number(categorieId) : null,
-      })
+      }, avecAffiche ? affiche : null)
     } catch (err) {
       setErreur(err instanceof Error ? err.message : "L'enregistrement a échoué.")
     } finally {
@@ -74,6 +165,7 @@ export function FormulaireEvenement({
   return (
     <>
     <form onSubmit={soumettre} className="space-y-4">
+      {avecAffiche && <ChoixAffiche fichier={affiche} onChange={setAffiche} />}
       <Champ libelle="Titre" requis>
         {(id) => (
           <input id={id} required value={titre} onChange={(e) => setTitre(e.target.value)} className={classeChamp} placeholder="Ex. Mahaleo sy ny taranany" />
