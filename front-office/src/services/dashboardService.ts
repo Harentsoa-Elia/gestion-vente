@@ -1,21 +1,5 @@
 import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
-import type { DashboardEvenement, EvenementPopulaire, DashboardOrganisateur } from "../types";
-
-export async function fetchDashboardEvenement(
-  evenementId: number
-): Promise<DashboardEvenement> {
-  const res = await fetch(
-    `${API_BASE_URL}/evenements/${evenementId}/dashboard`,
-    { headers: getAuthHeaders() }
-  );
-  const data = await parseJsonSafe(res);
-  if (!res.ok) {
-    throw new Error(
-      data?.detail || `Failed to fetch dashboard: ${res.statusText}`
-    );
-  }
-  return data;
-}
+import type { EvenementPopulaire, DashboardOrganisateur } from "../types";
 
 export async function fetchEvenementsPopulaires(): Promise<EvenementPopulaire[]> {
   const res = await fetch(

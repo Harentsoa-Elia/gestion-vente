@@ -1,5 +1,5 @@
 import { API_BASE_URL, parseJsonSafe } from "./apiConfig";
-import type { Participant, ParticipantSignupPayload, ParticipantLoginPayload, ParticipantAuthResponse } from "../types";
+import type { Participant, ParticipantSignupPayload, ParticipantAuthResponse } from "../types";
 
 const PARTICIPANT_TOKEN_KEY = "participant_access_token";
 
@@ -32,19 +32,6 @@ export async function signupParticipant(payload: ParticipantSignupPayload): Prom
   const data = await parseJsonSafe(res);
   if (!res.ok) {
     throw new Error(data?.detail || `Failed to signup: ${res.statusText}`);
-  }
-  return data;
-}
-
-export async function loginParticipant(payload: ParticipantLoginPayload): Promise<ParticipantAuthResponse> {
-  const res = await fetch(`${API_BASE_URL}/participants/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  const data = await parseJsonSafe(res);
-  if (!res.ok) {
-    throw new Error(data?.detail || `Failed to login: ${res.statusText}`);
   }
   return data;
 }

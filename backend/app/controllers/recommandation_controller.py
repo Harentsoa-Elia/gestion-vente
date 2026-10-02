@@ -6,13 +6,13 @@ from app.services.recommandation_service import RecommandationService
 from app.services.evenement_service import EvenementService
 from app.auth.auth_bearer import JWTBearer
 from app.database import get_db
+from app.auth.roles import est_admin
 
 router = APIRouter(tags=["recommandations"])
 
 
 async def check_access(auth_data: dict, evenement_service: EvenementService, evenement_id: int):
-    user_concert_id = auth_data.get("concert_id")
-    if user_concert_id == 0:
+    if est_admin(auth_data):
         return True
     evenement = await evenement_service.get_evenement(evenement_id)
     if not evenement:

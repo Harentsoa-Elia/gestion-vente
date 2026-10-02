@@ -1,33 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-
-class ReservationBase(BaseModel):
-    evenement_id: int = Field(..., description="ID de l'evenement concerne")
-    categorie_billet_id: int = Field(..., description="ID de la categorie de billet choisie (VIP, Simple, etc.)")
-
-
-class ReservationCreate(ReservationBase):
-    pass
-
-
-class ReservationResponse(ReservationBase):
-    id: int = Field(..., description="Unique ID de la reservation")
-    statut: str
-    participant_id: int
-    date_reservation: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class PaiementConfirmeResponse(BaseModel):
-    reservation_id: int
-    statut_reservation: str
-    montant_paye: float
-    numero_billet: str
-    qr_code: str
 
 class ParticipantSummary(BaseModel):
     id: int

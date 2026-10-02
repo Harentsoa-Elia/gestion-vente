@@ -4,7 +4,7 @@ from typing import List, Optional, Dict
 
 from app.models.proposition import Proposition
 from app.models.evenement import Evenement
-from app.models.interaction_publique import InteractionPublique, InteractionType
+from app.models.interaction_publique import InteractionPublique
 from app.models.lieu import Lieu
 from app.models.artiste import Artiste
 from app.models.categorie import Categorie

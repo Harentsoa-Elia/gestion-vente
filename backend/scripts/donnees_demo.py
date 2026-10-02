@@ -28,7 +28,7 @@ import os
 import random
 import uuid
 from datetime import date, datetime, timedelta, timezone
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from passlib.context import CryptContext
 from sqlalchemy import delete, func, or_, select
@@ -120,6 +120,11 @@ PROPOSITIONS = [
     ("Festival des Musiques de la Haute Matsiatra", PropositionType.CATEGORIE, ["Concert", "Festival", "Spectacle traditionnel"], [0.5, 0.7, 0.4]),
     ("Salegy Night à Bateravola", PropositionType.ARTISTE, ["Jaojoby", "Tence Mena", "Wawa"], [0.8, 0.55, 0.45]),
     ("Acoustique au Rova", PropositionType.ARTISTE, ["Erick Manana", "Rajery", "Justin Vali"], [0.6, 0.7, 0.35]),
+    # en attente de validation : il a déjà une proposition de chaque type (règle de soumission),
+    # et pourra être resoumis s'il est rejeté pendant la démonstration
+    ("Rire à Fianar : stand-up malagasy", PropositionType.LIEU, ["Zomatel Hotel-Restaurant", "Alliance Française de Fianarantsoa"], [0.5, 0.4]),
+    ("Rire à Fianar : stand-up malagasy", PropositionType.ARTISTE, ["Les Tontons du Rire", "Kolektif Mampihomehy"], [0.45, 0.35]),
+    ("Rire à Fianar : stand-up malagasy", PropositionType.CATEGORIE, ["Humour / Stand-up"], [0.4]),
 ]
 
 REACTIONS = [(InteractionType.LIKE, 0.45), (InteractionType.JADORE, 0.25), (InteractionType.WAOUH, 0.15), (InteractionType.FAVORI, 0.15)]
@@ -224,7 +229,7 @@ async def creer(db) -> None:
     rnd = random.Random(2026)
     hache = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(MOT_DE_PASSE)
 
-    orga = User(fullname="Fianar Events", email=EMAIL_ORGANISATEUR, password=hache, role="organisateur", concert_id=None, actif=True)
+    orga = User(fullname="Fianar Events", email=EMAIL_ORGANISATEUR, password=hache, role="organisateur", actif=True)
     db.add(orga)
     await db.flush()
 

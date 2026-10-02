@@ -9,6 +9,7 @@ from app.database import get_db
 from app.models.evenement import Evenement
 from app.schemas.statistiques import Statistiques
 from app.services.statistiques_service import StatistiquesService
+from app.auth.roles import est_admin
 
 router = APIRouter(tags=["statistiques"])
 
@@ -23,6 +24,6 @@ async def statistiques(
         evenement = await db.get(Evenement, evenement_id)
         if not evenement:
             raise HTTPException(status_code=404, detail="Événement introuvable.")
-        if auth_data.get("concert_id") != 0 and auth_data.get("user_id") != evenement.organisateur_id:
+        if not est_admin(auth_data) and auth_data.get("user_id") != evenement.organisateur_id:
             raise HTTPException(status_code=403, detail="Cet événement n'est pas le vôtre.")
     return await StatistiquesService(db).calculer(auth_data, evenement_id)

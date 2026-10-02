@@ -6,13 +6,13 @@ from app.schemas.proposition import PropositionCreate, PropositionResponse, Prop
 from app.services.proposition_service import PropositionService
 from app.auth.auth_bearer import JWTBearer, OptionalParticipantBearer
 from app.database import get_db
+from app.auth.roles import est_admin
 
 router = APIRouter(tags=["propositions"])
 
 
 async def check_evenement_access(auth_data: dict, service: PropositionService, evenement_id: int):
-    user_concert_id = auth_data.get("concert_id")
-    if user_concert_id == 0:
+    if est_admin(auth_data):
         return True
     organisateur_id = await service.get_evenement_organisateur(evenement_id)
     if organisateur_id is None:

@@ -14,6 +14,7 @@ from app.models.lieu import Lieu
 from app.models.participant import Participant
 from app.models.reservation import Reservation
 from app.utils.crypto import decrypt_data
+from app.auth.roles import est_admin
 
 MOTIF_NUMERO = re.compile(r"^(?:BLT-?)?([0-9A-F]{10})$", re.IGNORECASE)
 
@@ -32,8 +33,8 @@ def numero_depuis_code(code: str) -> Optional[str]:
 
 
 def peut_controler(auth_data: dict, evenement: Evenement) -> bool:
-    # administrateur (concert_id = 0) ou organisateur de l'événement
-    return auth_data.get("concert_id") == 0 or auth_data.get("user_id") == evenement.organisateur_id
+    # administrateur ou organisateur de l'événement
+    return est_admin(auth_data) or auth_data.get("user_id") == evenement.organisateur_id
 
 
 class ControleEntreeService:
@@ -56,7 +57,7 @@ class ControleEntreeService:
             .outerjoin(Lieu, Evenement.lieu_id == Lieu.id)
             .where(Evenement.statut_validation == "valide")
         )
-        if auth_data.get("concert_id") != 0:
+        if not est_admin(auth_data):
             requete = requete.where(Evenement.organisateur_id == auth_data.get("user_id"))
         lignes = (await self.db.execute(requete)).all()
         maintenant = datetime.now(timezone.utc)

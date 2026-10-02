@@ -27,11 +27,6 @@ export interface ParticipantSignupPayload {
   genre: Genre
 }
 
-export interface ParticipantLoginPayload {
-  email: string
-  mot_de_passe: string
-}
-
 export interface ParticipantAuthResponse {
   access_token: string
 }

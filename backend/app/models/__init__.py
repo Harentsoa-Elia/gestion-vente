@@ -1,8 +1,5 @@
 # app/models/__init__.py
-from .concert import Concert
-from .ticket import Ticket
 from .user import User
-from .scan_history import ScanHistory
 from .evenement import Evenement
 from .artiste import Artiste
 from .lieu import Lieu
@@ -19,10 +16,7 @@ from .notification import Notification
 from .code_email import CodeEmail
 
 __all__ = [
-    'Concert',
-    'Ticket',
     'User',
-    'ScanHistory',
     'Evenement',
     'Artiste',
     'Lieu',

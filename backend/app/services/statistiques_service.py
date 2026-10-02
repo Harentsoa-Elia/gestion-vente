@@ -6,7 +6,7 @@ Les ventes sont regroupées par jour à l'heure de Madagascar.
 from datetime import date, datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
-from sqlalchemy import and_, case, distinct, func, or_, select
+from sqlalchemy import case, distinct, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.billet import Billet
@@ -20,6 +20,7 @@ from app.models.reservation import Reservation
 from app.services.billetterie_service import DUREE_RESERVATION
 from app.utils.fuseau import FUSEAU_MADAGASCAR
 from app.utils.scoring import POIDS_INTERACTION
+from app.auth.roles import est_admin
 
 TRANCHES = [(0, 17, "Moins de 18 ans"), (18, 24, "18-24 ans"), (25, 34, "25-34 ans"), (35, 44, "35-44 ans"), (45, 200, "45 ans et plus")]
 MAX_JOURS = 90  # au-delà, la courbe des ventes ne garde que les 90 derniers jours
@@ -51,7 +52,7 @@ class StatistiquesService:
             .where(or_(Evenement.statut_validation == "valide", Evenement.id.in_(select(Reservation.evenement_id))))
             .order_by(Evenement.date_debut.desc())
         )
-        if auth_data.get("concert_id") != 0:
+        if not est_admin(auth_data):
             requete = requete.where(Evenement.organisateur_id == auth_data.get("user_id"))
         return list((await self.db.execute(requete)).scalars().all())
 

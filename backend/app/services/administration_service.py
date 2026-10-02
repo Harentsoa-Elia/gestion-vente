@@ -1,11 +1,11 @@
 """Administration : supervision de la plateforme, comptes, référentiel."""
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.roles import ROLE_ADMIN, concert_id_pour_role
+from app.auth.roles import ROLE_ADMIN
 from app.models.artiste import Artiste
 from app.models.billet import Billet
 from app.models.categorie import Categorie
@@ -206,7 +206,7 @@ class AdministrationService:
     async def creer_organisateur(self, fullname: str, email: str, mot_de_passe_hache: str, role: str) -> User:
         if (await self.db.execute(select(User.id).where(func.lower(User.email) == email.lower()))).scalar():
             raise ErreurAdministration("Un compte utilise déjà cette adresse e-mail.")
-        u = User(fullname=fullname.strip(), email=email.strip(), password=mot_de_passe_hache, role=role, concert_id=concert_id_pour_role(role, None), actif=True)
+        u = User(fullname=fullname.strip(), email=email.strip(), password=mot_de_passe_hache, role=role, actif=True)
         self.db.add(u)
         await self.db.commit()
         return u
@@ -219,7 +219,6 @@ class AdministrationService:
             raise ErreurAdministration("Vous ne pouvez pas retirer vos propres droits d'administrateur ni suspendre votre compte.")
         if role is not None:
             u.role = role
-            u.concert_id = concert_id_pour_role(role, u.concert_id)
         if actif is not None:
             u.actif = actif
         await self.db.commit()

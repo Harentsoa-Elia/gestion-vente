@@ -7,7 +7,7 @@ comme dans le reste de l'application (tableaux de bord, contrôle à l'entrée).
 import re
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession

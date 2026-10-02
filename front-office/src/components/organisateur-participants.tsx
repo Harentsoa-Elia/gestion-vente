@@ -40,7 +40,7 @@ export function OrganisateurParticipants() {
       <div>
         <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">Participants</h1>
         <p className="text-muted-foreground dark:text-gray-400">
-          Les personnes ayant reserve pour vos evenements
+          Les personnes ayant réservé pour vos événements
         </p>
       </div>
 
@@ -48,7 +48,7 @@ export function OrganisateurParticipants() {
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
-          placeholder="Rechercher un participant..."
+          placeholder="Rechercher un participant…"
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
           className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"
@@ -72,10 +72,10 @@ export function OrganisateurParticipants() {
                 <thead>
                   <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                     <th className="pb-2 pr-4 font-medium">Participant</th>
-                    <th className="pb-2 pr-4 font-medium">Telephone</th>
-                    <th className="pb-2 pr-4 font-medium">Reservations</th>
-                    <th className="pb-2 pr-4 font-medium">Total depense</th>
-                    <th className="pb-2 font-medium">Derniere reservation</th>
+                    <th className="pb-2 pr-4 font-medium">Téléphone</th>
+                    <th className="pb-2 pr-4 font-medium">Réservations</th>
+                    <th className="pb-2 pr-4 font-medium">Total dépensé</th>
+                    <th className="pb-2 font-medium">Dernière réservation</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -28,8 +28,8 @@ class JWTBearer(HTTPBearer):
             "token": token,
             "user_id": payload.get("user_id"),
             "email": payload.get("email"),
-            "concert_id": payload.get("concert_id"),
             "role": payload.get("role"),
+            "account_type": "staff",
         }
 
     async def clean_blacklist():
@@ -84,7 +84,7 @@ class FlexibleBearer(HTTPBearer):
             "token": token,
             "account_type": payload.get("account_type"),
             "user_id": payload.get("user_id"),
-            "concert_id": payload.get("concert_id"),
+            "role": payload.get("role"),
             "participant_id": payload.get("participant_id"),
             "email": payload.get("email"),
         }    

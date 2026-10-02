@@ -1,7 +1,7 @@
 """Billets électroniques : QR code (PNG) et billet PDF aux couleurs guichetweb.
 
 Le QR code contient la valeur enregistrée dans billets.qr_code : c'est elle que lit
-le contrôle à l'entrée (POST /tickets/scan), qui refuse un billet déjà utilisé.
+le contrôle à l'entrée (POST /organisateur/evenements/{id}/scanner), qui refuse un billet déjà utilisé.
 """
 from dataclasses import dataclass
 from datetime import datetime

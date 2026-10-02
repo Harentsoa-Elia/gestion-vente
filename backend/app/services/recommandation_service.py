@@ -1,11 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime, timezone
 
 from app.models.recommandation import Recommandation
 from app.models.proposition import Proposition, PropositionType
-from app.models.interaction_publique import InteractionPublique, InteractionType
+from app.models.interaction_publique import InteractionPublique
 from app.models.lieu import Lieu
 from app.utils.scoring import POIDS_INTERACTION
 

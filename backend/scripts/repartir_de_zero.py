@@ -5,7 +5,6 @@ GARDE :
   - les comptes listés dans DEMO_COMPTES_PERSONNELS (backend/.env), organisateur et/ou participant,
     avec leur mot de passe ;
   - le référentiel : lieux, artistes, types d'événement ;
-  - l'ancien module concerts (tables concerts, tickets), qui n'est plus utilisé.
 SUPPRIME :
   - tous les événements, avec leurs tarifs, propositions, réactions, recommandations,
     réservations, paiements, billets et notifications ;

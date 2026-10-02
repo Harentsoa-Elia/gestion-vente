@@ -6,6 +6,7 @@ from app.schemas.interaction_publique import InteractionPubliqueCreate, Interact
 from app.services.interaction_publique_service import InteractionPubliqueService
 from app.auth.auth_bearer import OptionalParticipantBearer, FlexibleBearer
 from app.database import get_db
+from app.auth.roles import est_admin
 
 router = APIRouter(tags=["interactions"])
 
@@ -56,7 +57,7 @@ async def delete_interaction(
         raise HTTPException(status_code=404, detail="Interaction not found.")
 
     is_owner = auth_data.get("account_type") == "participant" and interaction.participant_id == auth_data.get("participant_id")
-    is_staff_admin = auth_data.get("account_type") == "staff" and auth_data.get("concert_id") == 0
+    is_staff_admin = est_admin(auth_data)
     if not is_owner and not is_staff_admin:
         raise HTTPException(status_code=403, detail="Access denied for this interaction.")
 

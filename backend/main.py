@@ -1,11 +1,8 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from app.controllers import (
-    concert_controller,
-    ticket_controller,
     user_controller,
-    backup_controller,
     artiste_controller,
     lieu_controller,
     categorie_controller,
@@ -28,7 +25,6 @@ from app.controllers import (
 from app.utils.media import MEDIA_DIR
 
 from app.database import engine, Base
-from app.auth.auth_bearer import JWTBearer  # Import JWTBearer
 
 
 #app = FastAPI(docs_url=None, redoc_url=None)
@@ -45,9 +41,6 @@ app.add_middleware(
 
 # Include routers
 app.include_router(user_controller.router, prefix="/api/v1")
-app.include_router(concert_controller.router, prefix="/api/v1")
-app.include_router(ticket_controller.router, prefix="/api/v1")
-app.include_router(backup_controller.router, prefix="/api/v1")
 app.include_router(artiste_controller.router, prefix="/api/v1")
 app.include_router(lieu_controller.router, prefix="/api/v1")
 app.include_router(categorie_controller.router, prefix="/api/v1")
@@ -74,7 +67,7 @@ app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 @app.get("/", tags=["system"])
 
 def read_root():
-    return {"message": "Concert Project API"}
+    return {"message": "API guichetweb"}
 
 @app.on_event("startup")
 async def startup_event():

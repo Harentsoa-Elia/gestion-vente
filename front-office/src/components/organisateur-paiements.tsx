@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { fetchMesPaiements } from "@/services/reservationService"
 import type { PaiementOrganisateur } from "@/types"
+import { operateur } from "@/lib/billetterie"
 
 function formatDate(iso: string | null) {
   if (!iso) return "-"
@@ -26,7 +27,7 @@ const STATUT_STYLES: Record<string, string> = {
 }
 
 const STATUT_LABELS: Record<string, string> = {
-  paye: "Paye",
+  paye: "Payé",
   en_attente: "En attente",
 }
 
@@ -54,13 +55,13 @@ export function OrganisateurPaiements() {
       <div>
         <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">Paiements</h1>
         <p className="text-muted-foreground dark:text-gray-400">
-          Historique des paiements pour vos evenements
+          Historique des paiements pour vos événements
         </p>
       </div>
 
       <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700 max-w-xs">
         <CardContent className="p-5">
-          <p className="text-sm text-muted-foreground dark:text-gray-400">Total encaisse</p>
+          <p className="text-sm text-muted-foreground dark:text-gray-400">Total encaissé</p>
           <p className="text-2xl font-bold text-[#0F172A] dark:text-white">{formatAr(totalEncaisse)}</p>
         </CardContent>
       </Card>
@@ -82,9 +83,9 @@ export function OrganisateurPaiements() {
                 <thead>
                   <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                     <th className="pb-2 pr-4 font-medium">Participant</th>
-                    <th className="pb-2 pr-4 font-medium">Evenement</th>
+                    <th className="pb-2 pr-4 font-medium">Événement</th>
                     <th className="pb-2 pr-4 font-medium">Montant</th>
-                    <th className="pb-2 pr-4 font-medium">Mode</th>
+                    <th className="pb-2 pr-4 font-medium">Opérateur</th>
                     <th className="pb-2 pr-4 font-medium">Date</th>
                     <th className="pb-2 font-medium">Statut</th>
                   </tr>
@@ -101,8 +102,8 @@ export function OrganisateurPaiements() {
                       <td className="py-3 pr-4 font-medium text-[#0F172A] dark:text-white">
                         {formatAr(p.montant)}
                       </td>
-                      <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400 capitalize">
-                        {p.mode_paiement}
+                      <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400">
+                        {operateur(p.mode_paiement)?.nom ?? p.mode_paiement ?? "-"}
                       </td>
                       <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400">
                         {formatDate(p.date_paiement)}

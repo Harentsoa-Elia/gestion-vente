@@ -6,6 +6,7 @@ from app.schemas.evenement import DecisionRejet, EvenementCreate, EvenementUpdat
 from app.services.evenement_service import EvenementService
 from app.auth.auth_bearer import JWTBearer
 from app.database import get_db
+from app.auth.roles import est_admin
 from app.models.user import User
 from app.utils.email import email_decision_evenement, envoyer_email_sans_erreur, lien_site
 
@@ -13,11 +14,9 @@ router = APIRouter(tags=["evenements"])
 
 
 def check_access(auth_data: dict, evenement_organisateur_id: int):
-    user_concert_id = auth_data.get("concert_id")
-    user_id = auth_data.get("user_id")
-    if user_concert_id == 0:
+    if est_admin(auth_data):
         return True
-    if user_id != evenement_organisateur_id:
+    if auth_data.get("user_id") != evenement_organisateur_id:
         raise HTTPException(status_code=403, detail="Access denied for this evenement.")
     return True
 
@@ -37,8 +36,8 @@ async def prevenir_organisateur(db: AsyncSession, taches: BackgroundTasks, evene
 
 
 def check_admin(auth_data: dict):
-    if auth_data.get("concert_id") != 0:
-        raise HTTPException(status_code=403, detail="Reserve a l'administrateur.")
+    if not est_admin(auth_data):
+        raise HTTPException(status_code=403, detail="Réservé à l'administrateur.")
     return True
 
 

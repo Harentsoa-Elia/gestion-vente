@@ -28,7 +28,7 @@ const STATUT_STYLES: Record<string, string> = {
 }
 
 const STATUT_LABELS: Record<string, string> = {
-  confirmee: "Confirmee",
+  confirmee: "Confirmée",
   en_attente: "En attente",
 }
 
@@ -79,13 +79,13 @@ export function OrganisateurReservations() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">Reservations</h1>
-        <p className="text-muted-foreground dark:text-gray-400">Consultez les reservations de vos evenements</p>
+        <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">Réservations</h1>
+        <p className="text-muted-foreground dark:text-gray-400">Consultez les réservations de vos événements</p>
       </div>
 
       {evenements.length === 0 ? (
         <p className="text-sm text-muted-foreground dark:text-gray-400">
-          Vous n'avez pas encore cree d'evenement.
+          Vous n'avez pas encore créé d'événement.
         </p>
       ) : (
         <>
@@ -106,7 +106,7 @@ export function OrganisateurReservations() {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Rechercher un participant..."
+                placeholder="Rechercher un participant…"
                 value={recherche}
                 onChange={(e) => setRecherche(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"
@@ -117,17 +117,17 @@ export function OrganisateurReservations() {
           <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700">
             <CardHeader>
               <CardTitle className="text-base dark:text-white">
-                {reservationsFiltrees.length} reservation{reservationsFiltrees.length > 1 ? "s" : ""}
+                {reservationsFiltrees.length} réservation{reservationsFiltrees.length > 1 ? "s" : ""}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loadingReservations ? (
                 <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
-                  Chargement des reservations...
+                  Chargement des réservations…
                 </p>
               ) : reservationsFiltrees.length === 0 ? (
                 <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
-                  Aucune reservation pour cet evenement.
+                  Aucune réservation pour cet événement.
                 </p>
               ) : (
                 <div className="overflow-x-auto">
@@ -135,7 +135,7 @@ export function OrganisateurReservations() {
                     <thead>
                       <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                         <th className="pb-2 pr-4 font-medium">Participant</th>
-                        <th className="pb-2 pr-4 font-medium">Categorie</th>
+                        <th className="pb-2 pr-4 font-medium">Tarif</th>
                         <th className="pb-2 pr-4 font-medium">Prix</th>
                         <th className="pb-2 pr-4 font-medium">Date</th>
                         <th className="pb-2 font-medium">Statut</th>

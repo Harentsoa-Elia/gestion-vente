@@ -10,7 +10,6 @@ export type RoleStaff = "admin" | "organisateur"
 
 interface ChargeJeton {
   role?: string
-  concert_id?: number | null
   expires?: number
 }
 
@@ -30,11 +29,10 @@ export function jetonValide(charge: ChargeJeton | null): boolean {
   return !!charge && typeof charge.expires === "number" && charge.expires > Date.now() / 1000
 }
 
-/** Rôle du jeton ; les jetons émis avant l'ajout du rôle se basent sur concert_id (0 = admin). */
+/** Rôle inscrit dans le jeton (null si absent ou inconnu). */
 export function roleDepuisJeton(charge: ChargeJeton | null): RoleStaff | null {
   if (!charge) return null
-  if (charge.role === "admin" || charge.role === "organisateur") return charge.role
-  return charge.concert_id === 0 ? "admin" : "organisateur"
+  return charge.role === "admin" || charge.role === "organisateur" ? charge.role : null
 }
 
 /** Page d'accueil de chaque rôle après la connexion. */
@@ -44,11 +42,11 @@ export function accueilSelonRole(role: RoleStaff | null): string {
 
 /**
  * Page autorisée pour ce rôle ? Si non, renvoie l'adresse où rediriger.
- * - l'organisateur n'a pas accès à l'administration ni à l'ancien tableau de bord /dashboard ;
+ * - l'organisateur n'a pas accès à l'administration ;
  * - l'administrateur n'a pas d'espace organisateur (il n'organise pas d'événements).
  */
 export function redirectionSiInterdit(role: RoleStaff | null, chemin: string): string | null {
-  if (role === "organisateur" && (chemin === "/dashboard" || chemin.startsWith("/admin"))) {
+  if (role === "organisateur" && chemin.startsWith("/admin")) {
     return "/organisateur/dashboard"
   }
   if (role === "admin" && chemin.startsWith("/organisateur")) {
