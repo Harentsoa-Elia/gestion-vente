@@ -12,10 +12,19 @@ Utilisation (dans backend, venv activé, base configurée par .env) :
 
 Tout ce qui est créé est rattaché au compte demo.organisateur@guichetweb.mg ou à des participants
 en @demo.guichetweb.mg : la suppression ne touche à rien d'autre. Mot de passe des comptes : demo1234.
+
+Comptes personnels (pour la démonstration en direct : achat, e-mail du billet, scan du QR code) :
+ajouter dans backend/.env une ligne, sans la publier sur GitHub :
+    DEMO_COMPTES_PERSONNELS=adresse1@gmail.com=Prénom Nom,adresse2@gmail.com=Prénom Nom
+Chaque adresse devient (ou reste) un compte participant à l'e-mail confirmé, avec un billet
+à venir et un billet déjà utilisé sur des événements de démonstration. Un compte qui existait
+déjà garde son mot de passe ; un compte créé par le script a le mot de passe demo1234.
+« --supprimer » retire ces billets de démonstration mais jamais ces comptes personnels.
 """
 import argparse
 import asyncio
 import logging
+import os
 import random
 import uuid
 from datetime import date, datetime, timedelta, timezone
@@ -48,6 +57,8 @@ from app.utils.fuseau import FUSEAU_MADAGASCAR
 logging.getLogger("passlib").setLevel(logging.ERROR)
 
 EMAIL_ORGANISATEUR = "demo.organisateur@guichetweb.mg"
+# billets offerts aux comptes personnels : (événement, tarif, déjà scanné à l'entrée)
+BILLETS_PERSONNELS = [("Salegy Night à Bateravola", "Prévente", False), ("Fianar Jazz Night", "Entrée", True)]
 DOMAINE_PARTICIPANTS = "@demo.guichetweb.mg"
 MOT_DE_PASSE = "demo1234"
 NB_PARTICIPANTS = 180
@@ -114,6 +125,51 @@ async def trouver_ou_creer(db, modele, nom: str, **champs):
         db.add(obj)
         await db.flush()
     return obj
+
+
+def comptes_personnels() -> List[tuple]:
+    """DEMO_COMPTES_PERSONNELS=adresse=Prénom Nom,adresse2=Prénom Nom (prénom et nom facultatifs)."""
+    comptes = []
+    for morceau in os.getenv("DEMO_COMPTES_PERSONNELS", "").split(","):
+        if "@" not in morceau:
+            continue
+        email, _, nom_complet = morceau.partition("=")
+        mots = nom_complet.split()
+        prenom = mots[0] if mots else email.split("@")[0].rstrip("0123456789").capitalize()
+        nom = " ".join(mots[1:]) or "Participant"
+        comptes.append((email.strip().lower(), prenom, nom))
+    return comptes
+
+
+async def preparer_comptes_personnels(db, evenements: Dict[str, Evenement], hache: str, rnd: random.Random) -> List[str]:
+    lignes = []
+    for email, prenom, nom in comptes_personnels():
+        p = (await db.execute(select(Participant).where(func.lower(Participant.email) == email))).scalar_one_or_none()
+        if p is None:
+            p = Participant(prenom=prenom, nom=nom, email=email, mot_de_passe=hache, genre=None, statut="actif", email_verifie=True)
+            db.add(p)
+            await db.flush()
+            etat = f"créé (mot de passe {MOT_DE_PASSE})"
+        else:
+            p.email_verifie = True  # l'achat exige une adresse confirmée
+            etat = "existant (mot de passe inchangé)"
+        for titre, nom_tarif, scanne in BILLETS_PERSONNELS:
+            e = evenements.get(titre)
+            tarif = (
+                await db.execute(select(CategorieBillet).where(CategorieBillet.evenement_id == e.id, CategorieBillet.nom == nom_tarif))
+            ).scalar_one_or_none() if e else None
+            if not tarif:
+                continue
+            quand = min(maintenant() - timedelta(days=rnd.randint(2, 6)), e.date_debut - timedelta(days=2))
+            r = Reservation(statut="confirmee", date_reservation=quand, evenement_id=e.id, participant_id=p.id, categorie_billet_id=tarif.id)
+            db.add(r)
+            await db.flush()
+            db.add(Paiement(montant=tarif.prix, statut_paiement="paye", mode_paiement="mvola", date_paiement=quand, reservation_id=r.id))
+            numero = f"BLT-{uuid.uuid4().hex[:10].upper()}"
+            db.add(Billet(numero_billet=numero, qr_code=encrypt_data(numero), is_used=scanne, date_emission=quand,
+                          date_scan=e.date_debut + timedelta(minutes=12) if scanne else None, reservation_id=r.id))
+        lignes.append(f"  compte personnel {email} : {etat}, {len(BILLETS_PERSONNELS)} billets de démonstration")
+    return lignes
 
 
 async def supprimer(db) -> bool:
@@ -258,6 +314,9 @@ async def creer(db) -> None:
             vendus_par_tarif[c.id] += n
         nb_billets += vendus
 
+    # --- comptes personnels (démonstration en direct)
+    lignes_personnelles = await preparer_comptes_personnels(db, evenements, hache, rnd)
+
     # --- propositions et réactions du public
     nb_reactions = 0
     for titre, type_, libelles, poids in PROPOSITIONS:
@@ -300,6 +359,8 @@ async def creer(db) -> None:
     print(f"  organisateur : {EMAIL_ORGANISATEUR} (mot de passe {MOT_DE_PASSE})")
     print(f"  {len(evenements)} événements, {len(participants)} participants, {nb_billets} billets vendus, {nb_reactions} réactions et commentaires")
     print(f"  {nb_reco} recommandations calculées")
+    for ligne in lignes_personnelles:
+        print(ligne)
     print(f"  participants : adresses en {DOMAINE_PARTICIPANTS}, mot de passe {MOT_DE_PASSE}")
 
 
