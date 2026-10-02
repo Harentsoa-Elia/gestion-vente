@@ -18,7 +18,7 @@ export function Accueil() {
 
   return (
     <>
-      <Hero lieux={catalogue.lieux} categories={catalogue.categories} />
+      <Hero lieux={catalogue.lieux} categories={catalogue.categories} catalogue={catalogue} />
       <RangeeCategories categories={catalogue.categories} />
       <EvenementsAVenir catalogue={catalogue} />
       <PropositionsEmpilees propositions={propositions} chargement={catalogue.chargement || chargement} />

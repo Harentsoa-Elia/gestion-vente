@@ -8,13 +8,16 @@ import type { Categorie, Lieu } from "@/types"
 import { cn } from "@/utils"
 import { PERIODES, type Periode } from "@/lib/evenements"
 import { NOM_PLATEFORME } from "@/components/marque/logo"
-import { FondDiaporama, PHOTOS_HERO, PileHero, useDiaporama } from "./diaporama-hero"
+import { FondDiaporama, PHOTOS_HERO, useDiaporama } from "./diaporama-hero"
+import type { Catalogue } from "@/lib/use-catalogue"
+import { CarrouselAffiche } from "./carrousel-affiche"
 
 type Onglet = "a-venir" | "passes"
 
 interface HeroProps {
   lieux: Lieu[]
   categories: Categorie[]
+  catalogue: Catalogue
 }
 
 function Champ({
@@ -46,7 +49,7 @@ function Champ({
 const styleSaisie =
   "mt-0.5 w-full truncate bg-transparent text-sm text-gw-texte placeholder:text-gw-texte-pale focus:outline-none disabled:text-[#B5B1C7]"
 
-export function Hero({ lieux, categories }: HeroProps) {
+export function Hero({ lieux, categories, catalogue }: HeroProps) {
   const router = useRouter()
   const [onglet, setOnglet] = useState<Onglet>("a-venir")
   const [q, setQ] = useState("")
@@ -80,7 +83,6 @@ export function Hero({ lieux, categories }: HeroProps) {
         <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#16122E]/90 via-[#16122E]/55 to-[#16122E]/10" />
 
         <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-40 sm:px-6 sm:pt-20 sm:pb-48 lg:pb-52">
-          <PileHero {...diaporama} />
 
           <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
             <Sparkles className="h-4 w-4 text-[#F59BC7]" aria-hidden />
@@ -121,6 +123,10 @@ export function Hero({ lieux, categories }: HeroProps) {
               </span>
               Donner mon avis
             </Link>
+          </div>
+
+          <div className="xl:absolute xl:top-10 xl:right-6 xl:w-[580px]">
+            <CarrouselAffiche catalogue={catalogue} />
           </div>
         </div>
       </div>
