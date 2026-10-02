@@ -98,7 +98,7 @@ export function Hero({ lieux, categories }: HeroProps) {
             sur {NOM_PLATEFORME}
           </h1>
           <p className="mt-5 max-w-md text-lg leading-relaxed text-white/85">
-            Réservez vos billets en quelques clics, et votez pour les artistes que vous voulez voir.
+            Réservez vos billets en quelques clics, et votez pour les artistes, les lieux et les événements que vous voulez voir.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">

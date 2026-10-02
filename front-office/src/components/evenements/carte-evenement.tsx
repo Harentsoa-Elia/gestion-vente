@@ -21,7 +21,7 @@ interface CarteEvenementProps {
  * Affiche de l'événement : celle de l'organisateur, sinon une image de test (lib/media.ts),
  * sinon (image introuvable) une couverture dessinée : lumières de scène, icône et date.
  */
-function Couverture({ evenement, categorie, passe }: { evenement: Evenement; categorie?: Categorie; passe: boolean }) {
+function Couverture({ evenement, categorie }: { evenement: Evenement; categorie?: Categorie }) {
   const Icone = iconeCategorie(categorie?.nom)
   const d = new Date(evenement.date_debut)
   // teinte dérivée de l'id : deux événements voisins n'ont pas la même couverture
@@ -40,7 +40,6 @@ function Couverture({ evenement, categorie, passe }: { evenement: Evenement; cat
         onError={() => setImageEnErreur(true)}
         className={cn(
           "h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none",
-          passe && "grayscale",
         )}
       />
     )
@@ -48,7 +47,7 @@ function Couverture({ evenement, categorie, passe }: { evenement: Evenement; cat
 
   return (
     <div
-      className={cn("scene relative h-full w-full", passe && "grayscale")}
+      className="scene relative h-full w-full"
       style={{ "--accent": accent } as CSSProperties}
       aria-hidden
     >
@@ -72,7 +71,7 @@ export function CarteEvenement({ evenement, lieu, categorie, variante = "a-venir
   return (
     <article className="group relative flex flex-col">
       <div className="relative aspect-[2/1] overflow-hidden rounded-xl bg-gw-nuit">
-        <Couverture evenement={evenement} categorie={categorie} passe={passe} />
+        <Couverture evenement={evenement} categorie={categorie} />
         {categorie && (
           <span className="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-medium text-gw-nuit">
             {categorie.nom}

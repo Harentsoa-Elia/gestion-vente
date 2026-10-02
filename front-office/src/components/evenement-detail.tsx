@@ -243,7 +243,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
           <div className="mt-4 aspect-[2/1] max-h-[28rem] w-full overflow-hidden rounded-3xl bg-gw-nuit shadow-[0_30px_60px_-30px_rgba(0,0,0,0.7)]">
             {!erreurImage ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={affiche} alt={`Affiche : ${evenement.titre}`} onError={() => setErreurImage(true)} className={cn("h-full w-full object-cover", passe && "grayscale")} />
+              <img src={affiche} alt={`Affiche : ${evenement.titre}`} onError={() => setErreurImage(true)} className="h-full w-full object-cover" />
             ) : (
               <div className="scene h-full w-full" />
             )}
