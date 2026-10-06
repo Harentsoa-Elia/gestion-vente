@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { BarChart3, Flame, Loader2, ScanLine, Ticket, Users, Wallet } from "lucide-react"
+import Link from "next/link"
+import { BarChart3, Flame, Loader2, ScanLine, Ticket, TicketPlus, Users, Wallet } from "lucide-react"
 import type { Statistiques as Stats } from "@/types"
 import { cn } from "@/utils"
 import { fetchStatistiques } from "@/services/statistiquesService"
@@ -10,12 +11,14 @@ import { classeChamp } from "@/components/organisateur/ui"
 import { StyleGraphiques } from "@/lib/couleurs-graphiques"
 
 /*
- * Statistiques de l'organisateur (cahier des charges, 'Dashboard organisateur') :
+ * Statistiques de l'organisateur (cahier des charges, « Dashboard organisateur ») :
  *  - indicateurs : billets vendus, total des ventes, remplissage, entrées, acheteurs ;
  *  - ventes par jour (billets ou montant, un seul axe à la fois) ;
  *  - entrées : scannés / pas encore entrés / places restantes ;
  *  - public : répartition femmes / hommes et tranches d'âge des acheteurs ;
- *  - ventes par tarif, remplissage par événement, événements les plus populaires.
+ *  - ventes par tarif, remplissage par événement, événements les plus populaires ;
+ *  - billets hors ligne (dépôt-vente, guichet, invitations) : inclus dans les indicateurs,
+ *    détaillés dans leur propre carte (vendus, encore chez le revendeur, non scannés, à encaisser).
  * Couleurs : variables --stat-* de lib/couleurs-graphiques.ts.
  */
 
@@ -132,7 +135,7 @@ export function Statistiques() {
   if (!stats && chargement) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement des statistiques...
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement des statistiques…
       </div>
     )
   }
@@ -148,6 +151,9 @@ export function Statistiques() {
   const maxScore = Math.max(...populaires.map((e) => e.score_popularite), 0)
   // entrées : scannés, vendus pas encore entrés, places restantes (si la capacité est connue)
   const restantes = i.places_restantes ?? 0
+  const hl = stats.hors_ligne
+  // billets valables : vendus en ligne et hors ligne, invitations et billets en dépôt compris
+  const valables = i.entres + i.non_scannes
   const baseEntrees = i.entres + i.non_scannes + restantes
   const segments = [
     { libelle: "Entrés (scannés)", nombre: i.entres, couleur: "var(--stat-1)" },
@@ -198,17 +204,71 @@ export function Statistiques() {
             <Tuile
               icone={BarChart3}
               libelle="Taux de remplissage"
-              valeur={i.taux_remplissage != null ? `${entier.format(i.taux_remplissage)} %` : "-"}
+              valeur={i.taux_remplissage != null ? `${entier.format(i.taux_remplissage)} %` : "—"}
               detail={i.places_restantes != null ? `${entier.format(i.places_restantes)} places restantes sur ${entier.format(i.capacite ?? 0)}` : "Capacité non renseignée"}
             />
             <Tuile
               icone={ScanLine}
               libelle="Entrées"
-              valeur={`${entier.format(i.entres)} / ${entier.format(i.billets_vendus)}`}
-              detail={`${pourcent(i.entres, i.billets_vendus)} % des billets scannés`}
+              valeur={`${entier.format(i.entres)} / ${entier.format(valables)}`}
+              detail={`${pourcent(i.entres, valables)} % des billets scannés${hl.emis ? ", hors ligne compris" : ""}`}
             />
             <Tuile icone={Users} libelle="Acheteurs" valeur={entier.format(i.participants)} detail="Personnes ayant payé au moins un billet" />
           </div>
+
+          {hl.emis > 0 && (
+            <Carte
+              titre="Billets hors ligne"
+              sousTitre="Dépôt-vente, guichet et invitations : déjà comptés dans les indicateurs ci-dessus (ventes, remplissage, entrées)"
+              action={
+                <Link href="/organisateur/billets-hors-ligne" className="text-sm font-semibold text-gw-violet dark:text-gw-lavande">
+                  Gérer les lots
+                </Link>
+              }
+            >
+              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+                {[
+                  { l: "Billets émis", v: entier.format(hl.emis), d: "non annulés" },
+                  { l: "Vendus", v: entier.format(hl.vendus), d: "réglés ou déclarés" },
+                  { l: "Pas encore vendus", v: entier.format(hl.en_depot), d: "chez le revendeur ou au guichet" },
+                  { l: "Invitations", v: entier.format(hl.invitations), d: "billets offerts" },
+                  { l: "Non scannés", v: entier.format(hl.non_scannes), d: `${entier.format(hl.entres)} déjà entrés` },
+                  { l: "Ventes hors ligne", v: compact(hl.recettes), d: hl.a_encaisser ? `dont ${ariary(hl.a_encaisser)} à encaisser` : "tout est réglé" },
+                ].map((x) => (
+                  <div key={x.l} className="rounded-2xl bg-gw-fond p-3 dark:bg-white/5">
+                    <dt className="text-xs text-gw-texte-doux dark:text-white/60">{x.l}</dt>
+                    <dd className="font-titre mt-1 text-xl font-bold tabular-nums">{x.v}</dd>
+                    <dd className="text-[11px] text-gw-texte-doux dark:text-white/50">{x.d}</dd>
+                  </div>
+                ))}
+              </dl>
+              <ul className="mt-5 space-y-3">
+                {hl.par_type.map((t) => (
+                  <li key={t.type}>
+                    <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
+                      <span className="flex items-center gap-2 font-semibold">
+                        <TicketPlus className="h-4 w-4 text-gw-violet dark:text-gw-lavande" aria-hidden /> {t.libelle}
+                      </span>
+                      <span className="text-xs text-gw-texte-doux tabular-nums dark:text-white/60">
+                        {t.type === "invitation"
+                          ? `${entier.format(t.emis)} offertes · ${entier.format(t.entres)} entrées`
+                          : `${entier.format(t.vendus)} vendus / ${entier.format(t.emis)} · ${entier.format(t.entres)} entrés · ${entier.format(t.emis - t.entres)} non scannés`}
+                      </span>
+                    </div>
+                    <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-gw-fond dark:bg-white/10" role="img" aria-label={`${t.libelle} : ${t.entres} entrés sur ${t.emis}`}>
+                      <span className="h-full" style={{ width: `${pourcent(t.entres, t.emis)}%`, background: "var(--stat-1)" }} />
+                      {t.type !== "invitation" && (
+                        <span className="h-full" style={{ width: `${pourcent(Math.max(t.vendus - t.entres, 0), t.emis)}%`, background: "var(--stat-clair)" }} />
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-xs text-gw-texte-doux dark:text-white/55">
+                Barre : entrés (foncé), vendus pas encore entrés (clair), reste en dépôt ou non distribué (fond).
+              </p>
+            </Carte>
+          )}
 
           <div className="grid gap-6 lg:grid-cols-3">
             {/* ventes par jour */}
@@ -400,7 +460,7 @@ export function Statistiques() {
 
           {!unSeul && (
             <div className="grid gap-6 lg:grid-cols-2">
-              <Carte titre="Remplissage par événement" sousTitre="Billets vendus par rapport à la capacité">
+              <Carte titre="Remplissage par événement" sousTitre="Places occupées (en ligne, hors ligne et invitations) par rapport à la capacité">
                 <ul className="space-y-4">
                   {stats.evenements.map((e) => (
                     <li key={e.id}>
@@ -409,7 +469,7 @@ export function Statistiques() {
                           {e.titre}
                         </button>
                         <span className="shrink-0 text-xs text-gw-texte-doux tabular-nums dark:text-white/60">
-                          {e.capacite ? `${entier.format(e.vendus)} / ${entier.format(e.capacite)}  ` : `${entier.format(e.vendus)} vendus  `}
+                          {`${entier.format(e.vendus)} vendus${e.capacite ? ` · ${entier.format(e.capacite)} places` : ""} · `}
                           <strong className="text-gw-nuit dark:text-white">{e.taux_remplissage != null ? `${entier.format(e.taux_remplissage)} %` : "capacité ?"}</strong>
                         </span>
                       </div>

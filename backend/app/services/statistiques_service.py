@@ -2,6 +2,11 @@
 
 Périmètre : un événement, ou tous les événements de l'organisateur (tous pour l'administrateur).
 Les ventes sont regroupées par jour à l'heure de Madagascar.
+
+Les billets hors ligne (dépôt-vente, guichet, invitations) sont comptés avec les billets en ligne :
+- vendus : billets réglés, sinon ventes déclarées (au moins les billets déjà scannés) ; une invitation n'est pas vendue ;
+- places occupées et non scannés : tous les billets hors ligne valables (non annulés), invitations comprises ;
+- la courbe des ventes par jour ne contient que les ventes en ligne (une vente hors ligne n'a pas de date).
 """
 from datetime import date, datetime, timedelta, timezone
 from typing import Dict, List, Optional
@@ -10,6 +15,7 @@ from sqlalchemy import case, distinct, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.billet import Billet
+from app.models.billet_hors_ligne import BilletHorsLigne, LotHorsLigne
 from app.models.categorie_billet import CategorieBillet
 from app.models.evenement import Evenement
 from app.models.interaction_publique import InteractionPublique
@@ -102,6 +108,9 @@ class StatistiquesService:
             ).all()
         }
         quotas = await self._capacites(ids)
+        hors_ligne = await self._hors_ligne(ids)
+        hl_ev = hors_ligne.pop("_par_evenement")
+        hl_tarifs = hors_ligne.pop("_par_tarif")
 
         # --- popularité : points des réactions aux propositions (mêmes poids que les recommandations)
         scores: Dict[int, int] = {}
@@ -116,8 +125,12 @@ class StatistiquesService:
             scores[ev] = scores.get(ev, 0) + POIDS_INTERACTION.get(type_, 0) * int(n)
 
         evenements = []
+        occupees_ev: Dict[int, int] = {}
         for e in cibles:
             vendus, entres = par_ev.get(e.id, (0, 0))
+            hl = hl_ev.get(e.id, {"vendus": 0, "valables": 0, "entres": 0, "recettes": 0.0})
+            # places occupées : billets en ligne + billets hors ligne valables (invitations et dépôts non réglés compris)
+            occupees_ev[e.id] = vendus + hl["valables"]
             capacite = e.capacite or quotas.get(e.id)
             evenements.append(
                 {
@@ -125,19 +138,20 @@ class StatistiquesService:
                     "titre": e.titre,
                     "date_debut": e.date_debut,
                     "capacite": capacite,
-                    "vendus": vendus,
-                    "entres": entres,
-                    "recettes": recettes_ev.get(e.id, 0.0),
-                    "taux_remplissage": round(min(vendus / capacite * 100, 100), 1) if capacite else None,
+                    "vendus": vendus + hl["vendus"],
+                    "entres": entres + hl["entres"],
+                    "recettes": recettes_ev.get(e.id, 0.0) + hl["recettes"],
+                    "taux_remplissage": round(min(occupees_ev[e.id] / capacite * 100, 100), 1) if capacite else None,
                     "score_popularite": scores.get(e.id, 0),
                 }
             )
 
         vendus = sum(x["vendus"] for x in evenements)
         entres = sum(x["entres"] for x in evenements)
+        occupees = sum(occupees_ev.values())
         # remplissage calculé sur les événements dont la capacité est connue
         capacite = sum(x["capacite"] for x in evenements if x["capacite"]) or None
-        vendus_avec_capacite = sum(x["vendus"] for x in evenements if x["capacite"])
+        occupees_avec_capacite = sum(occupees_ev[x["id"]] for x in evenements if x["capacite"])
 
         en_attente = (
             await self.db.execute(
@@ -173,8 +187,8 @@ class StatistiquesService:
             ventes_par_jour = ventes_par_jour[-MAX_JOURS:]
 
         # --- par tarif
-        par_tarif = [
-            {"nom": nom, "vendus": int(n or 0), "montant": float(m or 0)}
+        par_tarif_en_ligne = [
+            (nom, int(n or 0), float(m or 0))
             for nom, n, m in (
                 await self.db.execute(
                     select(CategorieBillet.nom, func.count(Billet.id), func.sum(Paiement.montant))
@@ -187,6 +201,18 @@ class StatistiquesService:
                 )
             ).all()
         ]
+        cumul: Dict[str, List[float]] = {}
+        for nom, n, m in par_tarif_en_ligne:
+            cumul[nom] = [n, m]
+        for nom, (n, m) in hl_tarifs.items():
+            c = cumul.setdefault(nom, [0, 0.0])
+            c[0] += n
+            c[1] += m
+        par_tarif = sorted(
+            ({"nom": nom, "vendus": int(n), "montant": float(m)} for nom, (n, m) in cumul.items() if n),
+            key=lambda t: t["vendus"],
+            reverse=True,
+        )
 
         # --- public : acheteurs distincts (une personne peut acheter pour plusieurs)
         acheteurs = (
@@ -223,10 +249,11 @@ class StatistiquesService:
                 "billets_vendus": vendus,
                 "recettes": sum(x["recettes"] for x in evenements),
                 "entres": entres,
-                "non_scannes": vendus - entres,
+                # billets valables pas encore passés à l'entrée (en ligne et hors ligne, invitations comprises)
+                "non_scannes": max(occupees - entres, 0),
                 "capacite": capacite,
-                "places_restantes": max(capacite - vendus_avec_capacite, 0) if capacite else None,
-                "taux_remplissage": round(min(vendus_avec_capacite / capacite * 100, 100), 1) if capacite else None,
+                "places_restantes": max(capacite - occupees_avec_capacite, 0) if capacite else None,
+                "taux_remplissage": round(min(occupees_avec_capacite / capacite * 100, 100), 1) if capacite else None,
                 "en_attente": int(en_attente),
                 "participants": len(acheteurs),
             },
@@ -235,4 +262,68 @@ class StatistiquesService:
             "genres": [{"libelle": g, "nombre": genres[g]} for g in ordre_genres if genres.get(g)],
             "tranches_age": [{"libelle": k, "nombre": v} for k, v in tranches.items() if v or k != "Âge non précisé"],
             "evenements": sorted(evenements, key=lambda x: x["date_debut"], reverse=True),
+            "hors_ligne": hors_ligne,
+        }
+
+    async def _hors_ligne(self, ids: List[int]) -> Dict:
+        """Billets hors ligne du périmètre : totaux, détail par usage, et cumuls par événement et par tarif."""
+        lignes = (
+            await self.db.execute(
+                select(
+                    LotHorsLigne,
+                    CategorieBillet.nom,
+                    func.coalesce(func.sum(case((BilletHorsLigne.is_used.is_(True), 1), else_=0)), 0),
+                    func.coalesce(func.sum(case((BilletHorsLigne.annule.is_(True), 1), else_=0)), 0),
+                )
+                .join(CategorieBillet, LotHorsLigne.categorie_billet_id == CategorieBillet.id)
+                .outerjoin(BilletHorsLigne, BilletHorsLigne.lot_id == LotHorsLigne.id)
+                .where(LotHorsLigne.evenement_id.in_(ids))
+                .group_by(LotHorsLigne.id, CategorieBillet.nom)
+            )
+        ).all()
+        libelles = {"depot": "Dépôt-vente", "guichet": "Guichet", "invitation": "Invitations"}
+        par_type = {t: {"type": t, "libelle": l, "emis": 0, "vendus": 0, "entres": 0} for t, l in libelles.items()}
+        par_ev: Dict[int, Dict] = {}
+        par_tarif: Dict[str, List[float]] = {}
+        total = {"emis": 0, "vendus": 0, "invitations": 0, "en_depot": 0, "entres": 0, "recettes": 0.0, "a_encaisser": 0.0, "frais_payes": 0.0}
+        for lot, tarif, utilises, annules in lignes:
+            utilises, annules = int(utilises), int(annules)
+            valables = lot.quantite - annules
+            if lot.type == "invitation":
+                vendus = 0
+            elif lot.statut == "regle":
+                vendus = valables
+            else:
+                vendus = min(max(lot.vendus_declares or 0, utilises), valables)
+            recettes = vendus * lot.prix_unitaire
+            total["emis"] += valables
+            total["vendus"] += vendus
+            total["entres"] += utilises
+            total["recettes"] += recettes
+            total["frais_payes"] += lot.montant_frais
+            if lot.type == "invitation":
+                total["invitations"] += valables
+            else:
+                total["en_depot"] += valables - vendus  # billets encore chez le revendeur ou au guichet
+                if lot.statut != "regle":
+                    total["a_encaisser"] += recettes
+            t = par_type[lot.type]
+            t["emis"] += valables
+            t["vendus"] += vendus
+            t["entres"] += utilises
+            ev = par_ev.setdefault(lot.evenement_id, {"vendus": 0, "valables": 0, "entres": 0, "recettes": 0.0})
+            ev["vendus"] += vendus
+            ev["valables"] += valables
+            ev["entres"] += utilises
+            ev["recettes"] += recettes
+            if vendus:
+                c = par_tarif.setdefault(tarif, [0, 0.0])
+                c[0] += vendus
+                c[1] += recettes
+        return {
+            **total,
+            "non_scannes": total["emis"] - total["entres"],
+            "par_type": [t for t in par_type.values() if t["emis"]],
+            "_par_evenement": par_ev,
+            "_par_tarif": par_tarif,
         }

@@ -45,6 +45,27 @@ class Repartition(BaseModel):
     nombre: int
 
 
+class HorsLigneType(BaseModel):
+    type: str
+    libelle: str
+    emis: int
+    vendus: int
+    entres: int
+
+
+class StatHorsLigne(BaseModel):
+    emis: int  # billets hors ligne valables (non annulés)
+    vendus: int  # réglés, sinon déclarés par le revendeur (au moins les billets scannés)
+    invitations: int
+    en_depot: int  # pas encore vendus, chez le revendeur ou au guichet
+    entres: int
+    non_scannes: int
+    recettes: float  # billets vendus x prix
+    a_encaisser: float  # recettes des lots pas encore réglés
+    frais_payes: float
+    par_type: List[HorsLigneType]
+
+
 class Statistiques(BaseModel):
     evenement_id: Optional[int] = None
     indicateurs: Indicateurs
@@ -53,3 +74,4 @@ class Statistiques(BaseModel):
     genres: List[Repartition]
     tranches_age: List[Repartition]
     evenements: List[StatEvenement]
+    hors_ligne: StatHorsLigne

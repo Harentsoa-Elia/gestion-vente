@@ -30,4 +30,17 @@ export interface Statistiques {
   genres: { libelle: string; nombre: number }[]
   tranches_age: { libelle: string; nombre: number }[]
   evenements: StatEvenement[]
+  /** billets hors ligne (dépôt-vente, guichet, invitations), déjà inclus dans les indicateurs */
+  hors_ligne: {
+    emis: number
+    vendus: number
+    invitations: number
+    en_depot: number
+    entres: number
+    non_scannes: number
+    recettes: number
+    a_encaisser: number
+    frais_payes: number
+    par_type: { type: "depot" | "guichet" | "invitation"; libelle: string; emis: number; vendus: number; entres: number }[]
+  }
 }
