@@ -20,6 +20,7 @@ import {
 } from "@/services/horsLigneService"
 import { OPERATEURS, ariary, erreurTelephone, formaterTelephone, normaliserTelephone } from "@/lib/billetterie"
 import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui"
+import { useVoirPlus } from "@/components/organisateur/voir-plus"
 
 /*
  * Billets hors ligne : l'organisateur génère des lots de billets vendus ou offerts en dehors du site.
@@ -109,6 +110,8 @@ export function BilletsHorsLigne() {
       ),
     [donnees, filtre, revendeurFiltre],
   )
+  // cartes en 2 colonnes : 4 lots (2 rangées), le reste derrière « Voir plus »
+  const { visibles: lotsVisibles, bouton: boutonVoirPlusLots } = useVoirPlus(lots, 4)
 
   if (erreur) return <p className="px-4 py-16 text-center text-gw-rose-action lg:px-8">{erreur}</p>
   if (!donnees || !revendeurs) {
@@ -238,10 +241,13 @@ export function BilletsHorsLigne() {
               </Bouton>
             </div>
           ) : (
-            <div className="grid gap-4 xl:grid-cols-2">
-              {lots.map((l) => (
-                <CarteLot key={l.id} lot={l} seuilPct={donnees.seuil_pourcentage} onVentes={() => setVentes(l)} onReglement={() => setReglement(l)} />
-              ))}
+            <div>
+              <div className="grid gap-4 xl:grid-cols-2">
+                {lotsVisibles.map((l) => (
+                  <CarteLot key={l.id} lot={l} seuilPct={donnees.seuil_pourcentage} onVentes={() => setVentes(l)} onReglement={() => setReglement(l)} />
+                ))}
+              </div>
+              {boutonVoirPlusLots}
             </div>
           )}
         </>
@@ -300,6 +306,8 @@ function ListeRevendeurs({
   onModifier: (r: RevendeurFiche) => void
   onPremier: () => void
 }) {
+  // cartes en 3 colonnes : 6 revendeurs (2 rangées), le reste derrière « Voir plus »
+  const { visibles, bouton } = useVoirPlus(revendeurs, 6)
   if (revendeurs.length === 0) {
     return (
       <div className="gw-carte flex flex-col items-center gap-3 px-6 py-14 text-center">
@@ -324,10 +332,11 @@ function ListeRevendeurs({
         <span className="font-semibold text-gw-nuit dark:text-white">{montant(totalDu)}</span> à encaisser
       </p>
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-        {revendeurs.map((r) => (
+        {visibles.map((r) => (
           <CarteRevendeur key={r.id} revendeur={r} onVoirLots={() => onVoirLots(r)} onNouveauLot={() => onNouveauLot(r)} onModifier={() => onModifier(r)} />
         ))}
       </div>
+      {bouton}
     </div>
   )
 }

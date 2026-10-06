@@ -1,5 +1,6 @@
 "use client"
 
+import { useVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -15,7 +16,7 @@ import { BadgeStatut, Bouton, Modale, STATUTS } from "@/components/organisateur/
 import { FormulaireEvenement } from "@/components/organisateur/formulaire-evenement"
 
 /*
- * 'Mes événements' : les événements de l'organisateur connecté, filtrables par statut
+ * « Mes événements » : les événements de l'organisateur connecté, filtrables par statut
  * (brouillon, en attente de validation, validé, rejeté), et la création d'un événement.
  * Chaque ligne mène à la fiche de l'événement (informations, propositions, billets).
  */
@@ -64,6 +65,8 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
   }, [evenements])
 
   const affiches = filtre === "tous" ? evenements : evenements.filter((e) => e.statut_validation === filtre)
+  // 5 premiers événements, le reste derrière « Voir plus »
+  const { visibles: affichesVisibles, bouton: boutonVoirPlus } = useVoirPlus(affiches)
   const lieuxParId = useMemo(() => new Map(lieux.map((l) => [l.id, l])), [lieux])
 
   return (
@@ -83,7 +86,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
       </div>
 
       {/* filtres par statut */}
-      <div role="tablist" aria-label="Statut" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+      <div role="tablist" aria-label="Statut" className="-mx-1 flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-1 pb-1">
         {FILTRES.map((f) => {
           const actif = f === filtre
           return (
@@ -121,7 +124,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
         <div className="gw-carte flex flex-col items-center gap-3 px-6 py-14 text-center">
           <CalendarPlus className="h-8 w-8 text-gw-violet dark:text-gw-lavande" aria-hidden />
           <p className="font-titre text-lg font-semibold">
-            {filtre === "tous" ? "Vous n'avez pas encore d'événement" : `Aucun événement '${STATUTS[filtre as StatutValidation].libelle.toLowerCase()}'`}
+            {filtre === "tous" ? "Vous n'avez pas encore d'événement" : `Aucun événement « ${STATUTS[filtre as StatutValidation].libelle.toLowerCase()} »`}
           </p>
           {filtre === "tous" && (
             <Bouton onClick={() => setCreation(true)} className="mt-2">
@@ -131,7 +134,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
         </div>
       ) : (
         <ul className="space-y-3">
-          {affiches.map((e) => {
+          {affichesVisibles.map((e) => {
             const d = new Date(e.date_debut)
             const lieu = e.lieu_id != null ? lieuxParId.get(e.lieu_id) : undefined
             const n = nbPropositions.get(e.id) ?? 0
@@ -181,6 +184,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
           })}
         </ul>
       )}
+      {affiches.length > 0 && boutonVoirPlus}
 
       <Modale ouverte={creation} titre="Créer un événement" onFermer={() => setCreation(false)} large>
         <FormulaireEvenement
@@ -196,7 +200,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
               try {
                 await envoyerImageEvenement(cree.id, affiche)
               } catch {
-                toast.error("L'événement est créé, mais l'affiche n'a pas pu être envoyée : ajoutez-la dans l'onglet 'Informations'.")
+                toast.error("L'événement est créé, mais l'affiche n'a pas pu être envoyée : ajoutez-la dans l'onglet « Informations ».")
               }
             }
             toast.success("Événement créé en brouillon. Ajoutez maintenant vos propositions.")

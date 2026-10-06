@@ -16,7 +16,6 @@ import {
   TicketPlus,
   ShieldCheck,
   Moon,
-  ScanLine,
   Sparkles,
   Sun,
   Ticket,
@@ -32,11 +31,11 @@ import { cn } from "@/utils"
 
 /*
  * Mise en page de l'espace organisateur.
- * - Barre latérale en dégradé violet -> rose (palette guichetweb). L'onglet actif prend
+ * - Barre latérale en dégradé violet → rose (palette guichetweb). L'onglet actif prend
  *   la couleur du contenu et s'y raccorde par deux arrondis creusés (classe .gw-onglet-actif).
  * - Thème clair ou sombre, mémorisé dans le navigateur (clé organisateur_dark_mode),
  *   transmis aux pages via la prop darkMode (comme avant) et via la classe .dark.
- * - Sur mobile, la barre latérale s'ouvre en tiroir depuis un bouton 'Menu'.
+ * - Sur mobile, la barre latérale s'ouvre en tiroir depuis un bouton « Menu ».
  * - espace="admin" : même mise en page pour l'administrateur, avec ses propres liens.
  */
 
@@ -53,7 +52,6 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/reservations", label: "Réservations", icon: Ticket, disponible: true },
   { href: "/organisateur/billets-hors-ligne", label: "Billets hors ligne", icon: TicketPlus, disponible: true },
   { href: "/organisateur/impression", label: "Impression", icon: Printer, disponible: true },
-  { href: "/organisateur/controle-entrees", label: "Contrôle des entrées", icon: ScanLine, disponible: true },
   { href: "/organisateur/participants", label: "Participants", icon: Users, disponible: true },
   { href: "/organisateur/paiements", label: "Paiements", icon: Wallet, disponible: true },
   { href: "/organisateur/statistiques", label: "Statistiques", icon: BarChart3, disponible: true },
@@ -113,7 +111,7 @@ function BarreLaterale({
 
       <nav aria-label={espace === "admin" ? "Administration" : "Espace organisateur"} className="mt-6 flex-1 space-y-1 pl-5">
         {(espace === "admin" ? NAV_ADMIN : NAV_ITEMS).map(({ href, label, icon: Icone, disponible }) => {
-          // la fiche d'un événement (/organisateur/evenements/12) garde 'Mes événements' actif
+          // la fiche d'un événement (/organisateur/evenements/12) garde « Mes événements » actif
           const actif = pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`))
           if (!disponible) {
             return (
@@ -151,7 +149,7 @@ function BarreLaterale({
       </nav>
 
       <div className="space-y-3 px-5 pt-4 pb-6">
-        {/* carte d'appel, à la place du 'Go Pro' du modèle (organisateur seulement) */}
+        {/* carte d'appel, à la place du « Go Pro » du modèle (organisateur seulement) */}
         {espace === "organisateur" && (
         <Link
           href="/#avis"
@@ -212,7 +210,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
     setMounted(true)
   }, [])
 
-  // Une seule session 'équipe' par navigateur : si on se connecte avec un autre compte (ou si on
+  // Une seule session « équipe » par navigateur : si on se connecte avec un autre compte (ou si on
   // se déconnecte) dans un autre onglet, on recharge la page pour afficher le bon espace
   // au lieu de laisser à l'écran des pages d'un compte qui n'est plus connecté.
   useEffect(() => {

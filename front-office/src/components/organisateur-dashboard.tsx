@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, ChevronRight, Sparkles, Ticket, TrendingUp } from "lucide-react"
+import { ArrowRight, ChevronRight, Sparkles, Ticket, TicketPlus, TrendingUp } from "lucide-react"
 import {
   Area,
   AreaChart,
@@ -23,7 +23,7 @@ import { Anneau } from "@/components/organisateur/anneau"
 import { cn } from "@/utils"
 
 /*
- * Tableau de bord de l'organisateur, sur le modèle 'uTask' :
+ * Tableau de bord de l'organisateur, sur le modèle « uTask » :
  * bandeau de bienvenue, trois chiffres clés, anneau de remplissage, courbe des ventes,
  * événements populaires, réservations par catégorie, puis profil et agenda à droite.
  * Couleurs guichetweb ; thème clair ou sombre selon la barre latérale (prop darkMode).
@@ -78,6 +78,79 @@ function CarteChiffre({ valeur, libelle, titre }: { valeur: string; libelle: str
         <p className="mt-1.5 text-sm text-gw-texte-doux dark:text-white/65">{libelle}</p>
       </div>
     </div>
+  )
+}
+
+/** Billets générés hors du site : vendus, encore chez les revendeurs, invitations, entrées. */
+function CarteHorsLigne({ hl, piste }: { hl: DashboardOrganisateur["hors_ligne"] | null; piste: string }) {
+  const lien = (
+    <Link
+      href="/organisateur/billets-hors-ligne"
+      className="inline-flex items-center gap-1 text-xs font-semibold text-gw-violet hover:underline dark:text-gw-lavande"
+    >
+      {hl ? "Gérer" : "Générer des billets"} <ArrowRight className="h-3 w-3" aria-hidden />
+    </Link>
+  )
+  if (!hl) {
+    return (
+      <section className="gw-carte flex flex-wrap items-center gap-4 p-5 md:col-span-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gw-lavande/60 text-gw-violet dark:bg-white/10 dark:text-gw-lavande">
+          <TicketPlus className="h-5 w-5" aria-hidden />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-titre text-lg font-semibold">Billets hors ligne</h2>
+          <p className="text-sm text-gw-texte-doux dark:text-white/60">
+            Aucun pour l&apos;instant : confiez des billets à un revendeur, vendez au guichet ou offrez des invitations.
+          </p>
+        </div>
+        {lien}
+      </section>
+    )
+  }
+  // répartition des billets émis : vendus, encore à vendre, offerts
+  const segments = [
+    { libelle: "Vendus", nombre: hl.vendus, couleur: "linear-gradient(90deg,#6C5CE7,#E8479A)" },
+    { libelle: "Pas encore vendus", nombre: hl.en_depot, couleur: "#F5B544" },
+    { libelle: "Invitations", nombre: hl.invitations, couleur: "#B5A8F5" },
+  ].filter((x) => x.nombre > 0)
+  const tuiles = [
+    { valeur: hl.emis, libelle: "Billets émis", detail: `${entier.format(hl.invitations)} invitation${hl.invitations > 1 ? "s" : ""}` },
+    { valeur: hl.vendus, libelle: "Vendus", detail: `${entier.format(hl.recettes)} Ar` },
+    { valeur: hl.en_depot, libelle: "Pas encore vendus", detail: "chez les revendeurs ou au guichet" },
+    { valeur: hl.non_scannes, libelle: "Pas encore entrés", detail: `${entier.format(hl.entres)} déjà scanné${hl.entres > 1 ? "s" : ""}` },
+  ]
+  return (
+    <section className="gw-carte p-5 md:col-span-3">
+      <TitreCarte action={lien}>Billets hors ligne</TitreCarte>
+      <dl className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {tuiles.map((t) => (
+          <div key={t.libelle} className="rounded-2xl bg-gw-fond p-4 dark:bg-white/5">
+            <dt className="text-xs text-gw-texte-doux dark:text-white/60">{t.libelle}</dt>
+            <dd className="font-titre mt-1 text-2xl leading-none font-semibold tabular-nums">{entier.format(t.valeur)}</dd>
+            <dd className="mt-1 truncate text-xs text-gw-texte-doux dark:text-white/55">{t.detail}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className="mt-4 flex h-3 w-full gap-[2px] overflow-hidden rounded-full" style={{ background: piste }} role="img"
+        aria-label={segments.map((x) => `${x.libelle} : ${x.nombre}`).join(", ")}>
+        {segments.map((x) => (
+          <span key={x.libelle} className="h-full" style={{ width: `${(x.nombre / Math.max(1, hl.emis)) * 100}%`, background: x.couleur }} />
+        ))}
+      </div>
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-gw-texte dark:text-white/75">
+        {segments.map((x) => (
+          <span key={x.libelle} className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: x.couleur }} aria-hidden />
+            {x.libelle} <strong className="tabular-nums">{entier.format(x.nombre)}</strong>
+          </span>
+        ))}
+        {hl.a_encaisser > 0 && (
+          <span className="ml-auto rounded-full bg-amber-50 px-3 py-1 font-semibold text-amber-800 dark:bg-amber-400/10 dark:text-amber-200">
+            {entier.format(hl.a_encaisser)} Ar à encaisser auprès des revendeurs
+          </span>
+        )}
+      </div>
+    </section>
   )
 }
 
@@ -337,7 +410,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
                         <span className="min-w-0 truncate">
                           <span className="font-semibold">{c.categorie}</span>
                           {c.evenement && (
-                            <span className="text-gw-texte-doux dark:text-white/60">  {c.evenement}</span>
+                            <span className="text-gw-texte-doux dark:text-white/60"> · {c.evenement}</span>
                           )}
                         </span>
                         <span className="shrink-0 font-semibold tabular-nums">{entier.format(c.nombre)}</span>
@@ -382,6 +455,9 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
               </div>
             )}
           </section>
+
+          {/* billets hors ligne : dépôt-vente, guichet, invitations */}
+          <CarteHorsLigne hl={data.hors_ligne ?? null} piste={piste} />
         </div>
       </div>
 

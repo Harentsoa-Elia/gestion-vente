@@ -9,7 +9,6 @@ export * from "./notification";
 export * from "./referentiel";
 export * from "./recommandation";
 export * from "./billetterie";
-export * from "./controle-entree";
 export * from "./statistiques";
 export * from "./administration";
 export * from "./hors-ligne";

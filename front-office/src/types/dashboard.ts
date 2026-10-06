@@ -1,3 +1,4 @@
+import type { Statistiques } from "./statistiques"
 export interface EvenementPopulaire {
   id: number
   titre: string
@@ -23,4 +24,6 @@ export interface DashboardOrganisateur {
   ventes_par_jour: VenteParJour[]
   categories_populaires: CategoriePopulaire[]
   reservations_confirmees?: number
+  /** billets hors ligne (dépôt-vente, guichet, invitations) ; null s'il n'y en a pas */
+  hors_ligne?: Statistiques["hors_ligne"] | null
 }

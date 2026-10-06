@@ -1,5 +1,6 @@
 "use client"
 
+import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -329,7 +330,7 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
       </section>
 
       {/* onglets */}
-      <div role="tablist" aria-label="Sections" className="flex gap-6 overflow-x-auto border-b border-gw-bordure dark:border-gw-bordure-sombre">
+      <div role="tablist" aria-label="Sections" className="flex gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-gw-bordure dark:border-gw-bordure-sombre">
         {onglets.map((o) => (
           <button
             key={o.id}
@@ -535,8 +536,10 @@ function OngletPropositions({
                   Aucune proposition pour l&apos;instant.
                 </p>
               ) : (
+                <ListeVoirPlus elements={liste}>
+                  {(listeVisible) => (
                 <ul className="mt-4 space-y-2">
-                  {liste.map((p) => (
+                  {listeVisible.map((p) => (
                     <li key={p.id} className="flex items-center gap-3 rounded-xl bg-gw-fond px-3 py-2.5 dark:bg-white/5">
                       <VignetteImage
                         image={p.image_url}
@@ -569,6 +572,8 @@ function OngletPropositions({
                     </li>
                   ))}
                 </ul>
+                  )}
+                </ListeVoirPlus>
               )}
 
               <div className="mt-auto pt-4">

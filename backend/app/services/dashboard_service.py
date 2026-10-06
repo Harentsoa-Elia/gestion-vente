@@ -92,6 +92,7 @@ class DashboardService:
                 "ventes_par_jour": [],
                 "categories_populaires": [],
                 "reservations_confirmees": 0,
+                "hors_ligne": None,
             }
 
         result_billets = await self.db.execute(
@@ -132,8 +133,8 @@ class DashboardService:
             {"date": str(row[0]), "nombre": row[1]} for row in result_ventes.all()
         ]
 
-        # Billets confirmés par tarif : un tarif appartient à un événement ('Entrée' du concert
-        # n'est pas 'Entrée' du stand-up), on regroupe donc par événement ET par tarif.
+        # Billets confirmés par tarif : un tarif appartient à un événement (« Entrée » du concert
+        # n'est pas « Entrée » du stand-up), on regroupe donc par événement ET par tarif.
         result_categories = await self.db.execute(
             select(CategorieBillet.nom, Evenement.titre, func.count(Reservation.id))
             .join(Reservation, Reservation.categorie_billet_id == CategorieBillet.id)
@@ -156,6 +157,12 @@ class DashboardService:
             )
         )).scalar() or 0
 
+        # billets hors ligne (dépôt-vente, guichet, invitations) : mêmes chiffres que les Statistiques
+        from app.services.statistiques_service import StatistiquesService
+
+        hl = await StatistiquesService(self.db)._hors_ligne(evenement_ids)
+        hors_ligne = {k: v for k, v in hl.items() if not k.startswith("_")} if hl["emis"] else None
+
         return {
             "evenements_publies": evenements_publies,
             "billets_vendus": billets_vendus,
@@ -164,4 +171,5 @@ class DashboardService:
             "ventes_par_jour": ventes_par_jour,
             "categories_populaires": categories_populaires,
             "reservations_confirmees": reservations_confirmees,
+            "hors_ligne": hors_ligne,
         }

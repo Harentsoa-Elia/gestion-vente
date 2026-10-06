@@ -1,5 +1,6 @@
+from app.schemas.statistiques import StatHorsLigne
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 
 class EvenementPopulaireResponse(BaseModel):
@@ -27,3 +28,5 @@ class DashboardOrganisateurResponse(BaseModel):
     ventes_par_jour: List[VenteParJourItem]
     categories_populaires: List[CategoriePopulaireItem]
     reservations_confirmees: int = 0
+    # billets hors ligne (null s'il n'y en a pas)
+    hors_ligne: Optional[StatHorsLigne] = None

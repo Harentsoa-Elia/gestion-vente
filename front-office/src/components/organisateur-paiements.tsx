@@ -1,5 +1,6 @@
 "use client"
 
+import { useVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { fetchMesPaiements } from "@/services/reservationService"
@@ -33,6 +34,8 @@ const STATUT_LABELS: Record<string, string> = {
 
 export function OrganisateurPaiements() {
   const [paiements, setPaiements] = useState<PaiementOrganisateur[]>([])
+  // 5 premières lignes, le reste derrière « Voir plus »
+  const { visibles: paiementsVisibles, bouton: boutonVoirPlus } = useVoirPlus(paiements)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -78,6 +81,7 @@ export function OrganisateurPaiements() {
               Aucun paiement pour le moment.
             </p>
           ) : (
+            <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -91,7 +95,7 @@ export function OrganisateurPaiements() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paiements.map((p) => (
+                  {paiementsVisibles.map((p) => (
                     <tr key={p.id} className="border-b border-gray-50 dark:border-gray-800">
                       <td className="py-3 pr-4 text-[#0F172A] dark:text-white">
                         {p.participant_prenom} {p.participant_nom}
@@ -122,6 +126,8 @@ export function OrganisateurPaiements() {
                 </tbody>
               </table>
             </div>
+            {boutonVoirPlus}
+            </>
           )}
         </CardContent>
       </Card>

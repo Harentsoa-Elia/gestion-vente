@@ -1,5 +1,6 @@
 "use client"
 
+import { useVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useState } from "react"
 import { Search } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -67,6 +68,8 @@ export function OrganisateurReservations() {
     const texte = `${r.participant.nom} ${r.participant.prenom} ${r.participant.email}`.toLowerCase()
     return texte.includes(recherche.toLowerCase())
   })
+  // 5 premières lignes, le reste derrière « Voir plus »
+  const { visibles: reservationsFiltreesVisibles, bouton: boutonVoirPlus } = useVoirPlus(reservationsFiltrees)
 
   if (loadingEvenements) {
     return <p className="text-center py-16 text-muted-foreground dark:text-gray-400">Chargement...</p>
@@ -106,7 +109,7 @@ export function OrganisateurReservations() {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Rechercher un participant..."
+                placeholder="Rechercher un participant…"
                 value={recherche}
                 onChange={(e) => setRecherche(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"
@@ -123,13 +126,14 @@ export function OrganisateurReservations() {
             <CardContent>
               {loadingReservations ? (
                 <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
-                  Chargement des réservations...
+                  Chargement des réservations…
                 </p>
               ) : reservationsFiltrees.length === 0 ? (
                 <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
                   Aucune réservation pour cet événement.
                 </p>
               ) : (
+                <>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -142,7 +146,7 @@ export function OrganisateurReservations() {
                       </tr>
                     </thead>
                     <tbody>
-                      {reservationsFiltrees.map((r) => (
+                      {reservationsFiltreesVisibles.map((r) => (
                         <tr key={r.id} className="border-b border-gray-50 dark:border-gray-800">
                           <td className="py-3 pr-4">
                             <p className="font-medium text-[#0F172A] dark:text-white">
@@ -171,6 +175,8 @@ export function OrganisateurReservations() {
                     </tbody>
                   </table>
                 </div>
+                {boutonVoirPlus}
+                </>
               )}
             </CardContent>
           </Card>

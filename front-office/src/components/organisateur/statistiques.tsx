@@ -1,5 +1,6 @@
 "use client"
 
+import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import Link from "next/link"
@@ -431,9 +432,11 @@ export function Statistiques() {
               {stats.par_tarif.length === 0 ? (
                 <p className="py-10 text-center text-sm text-gw-texte-doux dark:text-white/55">Aucune vente pour l&apos;instant.</p>
               ) : (
+                <ListeVoirPlus elements={stats.par_tarif}>
+                  {(tarifs) => (
                 <>
                   <ul className="space-y-3">
-                    {stats.par_tarif.map((t) => (
+                    {tarifs.map((t) => (
                       <LigneBarre key={t.nom} libelle={t.nom} valeur={t.vendus} max={maxTarif} texte={entier.format(t.vendus)} />
                     ))}
                   </ul>
@@ -445,7 +448,7 @@ export function Statistiques() {
                       </tr>
                     </thead>
                     <tbody className="tabular-nums">
-                      {stats.par_tarif.map((t) => (
+                      {tarifs.map((t) => (
                         <tr key={t.nom} className="border-t border-gw-bordure dark:border-white/10">
                           <td className="py-1">{t.nom}</td>
                           <td className="py-1 text-right">{ariary(t.montant)}</td>
@@ -454,6 +457,8 @@ export function Statistiques() {
                     </tbody>
                   </table>
                 </>
+                  )}
+                </ListeVoirPlus>
               )}
             </Carte>
           </div>
@@ -461,8 +466,10 @@ export function Statistiques() {
           {!unSeul && (
             <div className="grid gap-6 lg:grid-cols-2">
               <Carte titre="Remplissage par événement" sousTitre="Places occupées (en ligne, hors ligne et invitations) par rapport à la capacité">
+                <ListeVoirPlus elements={stats.evenements}>
+                  {(evenementsVisibles) => (
                 <ul className="space-y-4">
-                  {stats.evenements.map((e) => (
+                  {evenementsVisibles.map((e) => (
                     <li key={e.id}>
                       <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
                         <button type="button" onClick={() => setEvenementId(e.id)} className="truncate text-left font-semibold hover:text-gw-violet dark:hover:text-gw-lavande">
@@ -477,6 +484,8 @@ export function Statistiques() {
                     </li>
                   ))}
                 </ul>
+                  )}
+                </ListeVoirPlus>
               </Carte>
 
               <Carte titre="Événements les plus populaires" sousTitre="Points des réactions du public aux propositions (J'aime 1, Waouh 2, Favori 2, J'adore 3)">
