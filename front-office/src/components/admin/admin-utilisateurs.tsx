@@ -4,7 +4,7 @@ import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
-import { BadgeCheck, Ban, KeyRound, Loader2, MailWarning, RotateCcw, Search, ShieldCheck, Trash2, UserPlus, UserRound } from "lucide-react"
+import { BadgeCheck, Ban, CalendarDays, ChevronRight, KeyRound, Loader2, Mail, MailWarning, Phone, RotateCcw, Search, ShieldCheck, Ticket, Trash2, UserPlus, UserRound, Wallet, X } from "lucide-react"
 import type { CompteEquipe, ParticipantAdmin } from "@/types"
 import { cn } from "@/utils"
 import {
@@ -21,7 +21,8 @@ import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui
  * Utilisateurs (administrateur) :
  *  - Équipe : organisateurs et administrateurs ; créer un compte, changer le rôle,
  *    suspendre / réactiver (la connexion est alors refusée), supprimer un compte sans événement ;
- *  - Participants : liste, recherche, suspendre / réactiver.
+ *  - Participants : liste compacte (nom, statut) ; tout le reste dans le panneau « Détails »,
+ *    d'où l'on peut aussi suspendre / réactiver.
  */
 
 type Onglet = "equipe" | "participants"
@@ -158,6 +159,8 @@ export function AdminUtilisateurs() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
   const [envoi, setEnvoi] = useState(false)
   const [moi, setMoi] = useState<number | null>(null)
+  /** participant ouvert dans le panneau « Détails » */
+  const [detailId, setDetailId] = useState<number | null>(null)
 
   const charger = useCallback(() => {
     Promise.allSettled([fetchComptesEquipe(), fetchParticipantsAdmin()])
@@ -206,6 +209,20 @@ export function AdminUtilisateurs() {
       setEnvoi(false)
     }
   }
+
+  const demanderStatut = (p: ParticipantAdmin) => {
+    const actif = p.statut !== "suspendu"
+    setConfirmation({
+      titre: actif ? `Suspendre ${p.prenom} ${p.nom} ?` : `Réactiver ${p.prenom} ${p.nom} ?`,
+      texte: actif
+        ? "La connexion sera refusée. Ses billets déjà payés restent valables à l'entrée."
+        : "La personne pourra de nouveau se connecter et réserver.",
+      libelle: actif ? "Suspendre" : "Réactiver",
+      danger: actif,
+      action: () => modifierParticipantAdmin(p.id, actif ? "suspendu" : "actif"),
+    })
+  }
+  const detail = participants.find((p) => p.id === detailId) ?? null
 
   const action = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-colors disabled:opacity-40"
 
@@ -396,24 +413,26 @@ export function AdminUtilisateurs() {
         <div className="gw-carte overflow-x-auto">
           <ListeVoirPlus elements={participantsFiltres} classePagination="mt-0 px-5 pb-3">
             {(participantsPage) => (
-          <table className="w-full min-w-[820px] text-left text-sm">
+          <table className="w-full text-left text-sm">
             <thead className="text-xs text-gw-texte-doux dark:text-white/55">
               <tr className="border-b border-gw-bordure dark:border-white/10">
                 <th className="px-5 py-3 font-medium">Participant</th>
-                <th className="px-3 py-3 font-medium">E-mail</th>
-                <th className="px-3 py-3 font-medium">Genre · âge</th>
-                <th className="px-3 py-3 font-medium">Inscrit le</th>
-                <th className="px-3 py-3 text-right font-medium">Billets</th>
                 <th className="px-3 py-3 font-medium">Statut</th>
-                <th className="px-5 py-3 text-right font-medium">Action</th>
+                <th className="px-5 py-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {participantsPage.map((p) => {
                 const actif = p.statut !== "suspendu"
-                const a = age(p.date_naissance)
                 return (
-                  <tr key={p.id} className="border-b border-gw-bordure last:border-0 dark:border-white/10">
+                  <tr
+                    key={p.id}
+                    onClick={() => setDetailId(p.id)}
+                    className={cn(
+                      "cursor-pointer border-b border-gw-bordure transition-colors last:border-0 hover:bg-gw-fond dark:border-white/10 dark:hover:bg-white/5",
+                      detailId === p.id && "bg-gw-lavande/30 dark:bg-white/10",
+                    )}
+                  >
                     <td className="px-5 py-3">
                       <p className="flex items-center gap-2 font-semibold">
                         <UserRound className="h-4 w-4 shrink-0 text-gw-texte-pale" aria-hidden />
@@ -422,48 +441,26 @@ export function AdminUtilisateurs() {
                       {p.telephone && <p className="pl-6 text-xs text-gw-texte-doux dark:text-white/55">{p.telephone}</p>}
                     </td>
                     <td className="px-3 py-3">
-                      <p className="truncate">{p.email}</p>
-                      {p.email_verifie ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-300">
-                          <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> confirmé
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300">
-                          <MailWarning className="h-3.5 w-3.5" aria-hidden /> non confirmé
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-3 py-3 text-gw-texte dark:text-white/80">
-                      {genreCourt(p.genre)}
-                      {a != null ? ` · ${a} ans` : ""}
-                    </td>
-                    <td className="px-3 py-3 text-gw-texte-doux dark:text-white/60">{p.date_creation ? new Date(p.date_creation).toLocaleDateString("fr-FR") : "—"}</td>
-                    <td className="px-3 py-3 text-right tabular-nums">
-                      {p.billets}
-                      {p.total_depense > 0 && <span className="block text-xs text-gw-texte-doux dark:text-white/55">{ariary(p.total_depense)}</span>}
-                    </td>
-                    <td className="px-3 py-3">
                       <BadgeStatut actif={actif} />
                     </td>
-                    <td className="px-5 py-3 text-right">
-                      <button
-                        type="button"
-                        className={cn(action, actif ? "text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-400/10" : "text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-400/10")}
-                        onClick={() =>
-                          setConfirmation({
-                            titre: actif ? `Suspendre ${p.prenom} ${p.nom} ?` : `Réactiver ${p.prenom} ${p.nom} ?`,
-                            texte: actif
-                              ? "La connexion sera refusée. Ses billets déjà payés restent valables à l'entrée."
-                              : "La personne pourra de nouveau se connecter et réserver.",
-                            libelle: actif ? "Suspendre" : "Réactiver",
-                            danger: actif,
-                            action: () => modifierParticipantAdmin(p.id, actif ? "suspendu" : "actif"),
-                          })
-                        }
-                      >
-                        {actif ? <Ban className="h-3.5 w-3.5" aria-hidden /> : <RotateCcw className="h-3.5 w-3.5" aria-hidden />}
-                        {actif ? "Suspendre" : "Réactiver"}
-                      </button>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => setDetailId(p.id)}
+                          className={cn(action, "text-gw-violet hover:bg-gw-lavande/40 dark:text-gw-lavande dark:hover:bg-white/10")}
+                        >
+                          Détails <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+                        </button>
+                        <button
+                          type="button"
+                          className={cn(action, actif ? "text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-400/10" : "text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-400/10")}
+                          onClick={() => demanderStatut(p)}
+                        >
+                          {actif ? <Ban className="h-3.5 w-3.5" aria-hidden /> : <RotateCcw className="h-3.5 w-3.5" aria-hidden />}
+                          <span className="hidden sm:inline">{actif ? "Suspendre" : "Réactiver"}</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )
@@ -485,6 +482,8 @@ export function AdminUtilisateurs() {
         }}
       />
 
+      <PanneauParticipant participant={detail} onFermer={() => setDetailId(null)} onStatut={demanderStatut} />
+
       <Modale ouverte={!!confirmation} titre={confirmation?.titre ?? ""} onFermer={() => setConfirmation(null)}>
         <p className="text-sm text-gw-texte dark:text-white/75">{confirmation?.texte}</p>
         <div className="mt-6 flex justify-end gap-2">
@@ -498,6 +497,121 @@ export function AdminUtilisateurs() {
           )}
         </div>
       </Modale>
+    </div>
+  )
+}
+
+/* ---------- panneau « Détails » d'un participant ---------- */
+
+function PanneauParticipant({
+  participant: p,
+  onFermer,
+  onStatut,
+}: {
+  participant: ParticipantAdmin | null
+  onFermer: () => void
+  onStatut: (p: ParticipantAdmin) => void
+}) {
+  useEffect(() => {
+    if (!p) return
+    const echap = (e: KeyboardEvent) => e.key === "Escape" && onFermer()
+    window.addEventListener("keydown", echap)
+    return () => window.removeEventListener("keydown", echap)
+  }, [p, onFermer])
+
+  if (!p) return null
+  const actif = p.statut !== "suspendu"
+  const a = age(p.date_naissance)
+  const initiales = `${p.prenom[0] ?? ""}${p.nom[0] ?? ""}`.toUpperCase() || "?"
+  const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "—")
+
+  const Ligne = ({ icone: Icone, libelle, children }: { icone: typeof Mail; libelle: string; children: React.ReactNode }) => (
+    <div className="flex gap-3 py-3">
+      <Icone className="mt-0.5 h-4 w-4 shrink-0 text-gw-violet dark:text-gw-lavande" aria-hidden />
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-gw-texte-doux dark:text-white/55">{libelle}</p>
+        <div className="mt-0.5 text-sm break-words">{children}</div>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label={`Détails de ${p.prenom} ${p.nom}`}>
+      <button type="button" aria-label="Fermer" className="absolute inset-0 bg-gw-nuit/40 backdrop-blur-[1px]" onClick={onFermer} />
+      <aside className="relative flex h-full w-full max-w-md flex-col bg-white text-gw-nuit shadow-2xl dark:bg-gw-carte-sombre dark:text-white">
+        <div className="flex items-start gap-4 border-b border-gw-bordure p-6 dark:border-white/10">
+          <span className="font-titre flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-lg font-semibold text-white">
+            {initiales}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-titre truncate text-xl font-semibold">
+              {p.prenom} {p.nom}
+            </h2>
+            <div className="mt-1.5">
+              <BadgeStatut actif={actif} />
+            </div>
+          </div>
+          <button type="button" onClick={onFermer} aria-label="Fermer" className="rounded-full p-1.5 text-gw-texte-doux hover:bg-gw-fond dark:text-white/60 dark:hover:bg-white/10">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6">
+          {/* achats en premier : ce que l'admin cherche le plus souvent */}
+          <div className="grid grid-cols-2 gap-3 py-5">
+            <div className="rounded-2xl bg-gw-fond p-4 dark:bg-white/5">
+              <p className="flex items-center gap-1.5 text-xs text-gw-texte-doux dark:text-white/55">
+                <Ticket className="h-3.5 w-3.5" aria-hidden /> Billets achetés
+              </p>
+              <p className="font-titre mt-1 text-2xl font-semibold tabular-nums">{entier.format(p.billets)}</p>
+            </div>
+            <div className="rounded-2xl bg-gw-fond p-4 dark:bg-white/5">
+              <p className="flex items-center gap-1.5 text-xs text-gw-texte-doux dark:text-white/55">
+                <Wallet className="h-3.5 w-3.5" aria-hidden /> Total dépensé
+              </p>
+              <p className="font-titre mt-1 text-2xl font-semibold tabular-nums">{ariary(p.total_depense)}</p>
+            </div>
+          </div>
+
+          <div className="divide-y divide-gw-bordure dark:divide-white/10">
+            <Ligne icone={Mail} libelle="E-mail">
+              {p.email}
+              <span className="mt-0.5 block">
+                {p.email_verifie ? (
+                  <span className="inline-flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-300">
+                    <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> adresse confirmée
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300">
+                    <MailWarning className="h-3.5 w-3.5" aria-hidden /> adresse non confirmée
+                  </span>
+                )}
+              </span>
+            </Ligne>
+            <Ligne icone={Phone} libelle="Téléphone">
+              {p.telephone ?? "—"}
+            </Ligne>
+            <Ligne icone={UserRound} libelle="Genre et âge">
+              {genreCourt(p.genre)}
+              {a != null ? ` · ${a} ans` : ""}
+              {p.date_naissance && <span className="block text-xs text-gw-texte-doux dark:text-white/55">né(e) le {date(p.date_naissance)}</span>}
+            </Ligne>
+            <Ligne icone={CalendarDays} libelle="Inscrit le">
+              {date(p.date_creation)}
+            </Ligne>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 border-t border-gw-bordure p-4 dark:border-white/10">
+          <Bouton variante="discret" onClick={onFermer}>
+            Fermer
+          </Bouton>
+          <Bouton variante={actif ? "danger" : "principal"} onClick={() => onStatut(p)}>
+            {actif ? <Ban className="h-4 w-4" aria-hidden /> : <RotateCcw className="h-4 w-4" aria-hidden />}
+            {actif ? "Suspendre le compte" : "Réactiver le compte"}
+          </Bouton>
+        </div>
+      </aside>
     </div>
   )
 }
