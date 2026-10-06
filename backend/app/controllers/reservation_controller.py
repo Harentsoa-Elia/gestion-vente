@@ -53,6 +53,7 @@ async def get_mes_participants(
             prenom=row.prenom,
             email=row.email,
             telephone=row.telephone,
+            avatar=row.avatar,
             nb_reservations=row.nb_reservations,
             montant_total_depense=row.montant_total_depense,
             derniere_reservation=row.derniere_reservation,

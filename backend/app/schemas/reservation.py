@@ -8,6 +8,8 @@ class ParticipantSummary(BaseModel):
     nom: str
     prenom: str
     email: str
+    telephone: Optional[str] = None
+    avatar: Optional[str] = None  # photo de profil
 
     class Config:
         from_attributes = True
@@ -39,6 +41,7 @@ class ParticipantOrganisateurResponse(BaseModel):
     prenom: str
     email: str
     telephone: Optional[str] = None
+    avatar: Optional[str] = None  # photo de profil
     nb_reservations: int
     montant_total_depense: float
     derniere_reservation: datetime

@@ -9,6 +9,7 @@ import type { CompteEquipe, ParticipantAdmin } from "@/types"
 import { cn } from "@/utils"
 import { formaterTelephone } from "@/lib/billetterie"
 import { AvatarParticipant } from "@/components/avatar-participant"
+import { BoutonDetails, PanneauDetails, ligneCliquable } from "@/components/organisateur/panneau-details"
 import {
   creerCompteEquipe,
   fetchComptesEquipe,
@@ -21,8 +22,9 @@ import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui
 
 /*
  * Utilisateurs (administrateur) :
- *  - Équipe : organisateurs et administrateurs ; créer un compte, changer le rôle,
- *    suspendre / réactiver (la connexion est alors refusée), supprimer un compte sans événement ;
+ *  - Équipe : organisateurs et administrateurs ; liste compacte (nom, rôle, statut) et panneau
+ *    « Détails » : événements, ventes, changer le rôle, suspendre / réactiver, supprimer
+ *    (seulement un compte sans événement) ; créer un compte ;
  *  - Participants : liste compacte (nom, statut) ; tout le reste dans le panneau « Détails »,
  *    d'où l'on peut aussi suspendre / réactiver.
  */
@@ -51,6 +53,16 @@ function BadgeStatut({ actif }: { actif: boolean }) {
     <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-400/15 dark:text-red-300">
       <Ban className="h-3 w-3" aria-hidden /> Suspendu
     </span>
+  )
+}
+
+function BadgeRole({ role }: { role: CompteEquipe["role"] }) {
+  return role === "admin" ? (
+    <span className="inline-flex items-center gap-1 rounded-full bg-gw-nuit px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-white dark:text-gw-nuit">
+      <ShieldCheck className="h-3 w-3" aria-hidden /> Administrateur
+    </span>
+  ) : (
+    <span className="inline-flex rounded-full bg-gw-lavande/60 px-2.5 py-0.5 text-xs font-semibold text-gw-nuit dark:bg-white/10 dark:text-white">Organisateur</span>
   )
 }
 
@@ -163,6 +175,8 @@ export function AdminUtilisateurs() {
   const [moi, setMoi] = useState<number | null>(null)
   /** participant ouvert dans le panneau « Détails » */
   const [detailId, setDetailId] = useState<number | null>(null)
+  /** membre de l'équipe ouvert dans le panneau « Détails » */
+  const [detailEquipeId, setDetailEquipeId] = useState<number | null>(null)
 
   const charger = useCallback(() => {
     Promise.allSettled([fetchComptesEquipe(), fetchParticipantsAdmin()])
@@ -225,6 +239,56 @@ export function AdminUtilisateurs() {
     })
   }
   const detail = participants.find((p) => p.id === detailId) ?? null
+  const detailEquipe = equipe.find((u) => u.id === detailEquipeId) ?? null
+
+  // actions sur un compte de l'équipe (depuis le panneau « Détails »)
+  const demanderRole = (u: CompteEquipe) => {
+    const nouveau = u.role === "admin" ? "organisateur" : "admin"
+    setConfirmation({
+      titre: nouveau === "admin" ? "Nommer administrateur ?" : "Retirer les droits d'administrateur ?",
+      texte:
+        nouveau === "admin"
+          ? `${u.fullname} pourra valider les événements et gérer tous les comptes. Il n'aura plus d'espace organisateur.`
+          : `${u.fullname} redeviendra organisateur et n'aura plus accès à l'administration.`,
+      libelle: nouveau === "admin" ? "Nommer administrateur" : "Rendre organisateur",
+      action: () => modifierCompteEquipe(u.id, { role: nouveau }),
+    })
+  }
+  const demanderStatutEquipe = (u: CompteEquipe) =>
+    setConfirmation({
+      titre: u.actif ? `Suspendre ${u.fullname} ?` : `Réactiver ${u.fullname} ?`,
+      texte: u.actif
+        ? "La connexion sera refusée tant que le compte est suspendu. Ses événements et ses ventes sont conservés."
+        : "La personne pourra de nouveau se connecter.",
+      libelle: u.actif ? "Suspendre" : "Réactiver",
+      danger: u.actif,
+      action: () => modifierCompteEquipe(u.id, { actif: !u.actif }),
+    })
+  const demanderSuppression = (u: CompteEquipe) =>
+    setConfirmation(
+      u.evenements > 0
+        ? {
+            titre: "Suppression impossible",
+            texte: `${u.fullname} a ${u.evenements} événement${u.evenements > 1 ? "s" : ""} : supprimer son compte effacerait l'historique des ventes. ${
+              u.actif ? "Suspendez-le plutôt : il ne pourra plus se connecter, et ses événements et ses ventes sont conservés." : "Son compte est déjà suspendu."
+            }`,
+            libelle: "Suspendre le compte",
+            danger: true,
+            sansAction: !u.actif,
+            action: () => modifierCompteEquipe(u.id, { actif: false }),
+          }
+        : {
+            titre: `Supprimer le compte de ${u.fullname} ?`,
+            texte: "Cette action est définitive.",
+            libelle: "Supprimer",
+            danger: true,
+            action: async () => {
+              const r = await supprimerCompteEquipe(u.id)
+              setDetailEquipeId(null)
+              return r
+            },
+          },
+    )
 
   const action = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-colors disabled:opacity-40"
 
@@ -282,125 +346,39 @@ export function AdminUtilisateurs() {
         <div className="gw-carte overflow-x-auto">
           <ListeVoirPlus elements={equipeFiltree} classePagination="mt-0 px-5 pb-3">
             {(equipePage) => (
-          <table className="w-full min-w-[760px] text-left text-sm">
+          <table className="w-full text-left text-sm">
             <thead className="text-xs text-gw-texte-doux dark:text-white/55">
               <tr className="border-b border-gw-bordure dark:border-white/10">
                 <th className="px-5 py-3 font-medium">Nom</th>
                 <th className="px-3 py-3 font-medium">Rôle</th>
                 <th className="px-3 py-3 font-medium">Statut</th>
-                <th className="px-3 py-3 text-right font-medium">Événements</th>
-                <th className="px-3 py-3 text-right font-medium">Billets vendus</th>
-                <th className="px-5 py-3 text-right font-medium">Actions</th>
+                <th className="px-5 py-3 text-right font-medium">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
               {equipePage.map((u) => {
                 const soiMeme = u.id === moi
+                const [prenom, ...reste] = u.fullname.split(" ")
                 return (
-                  <tr key={u.id} className="border-b border-gw-bordure last:border-0 dark:border-white/10">
+                  <tr key={u.id} onClick={() => setDetailEquipeId(u.id)} className={ligneCliquable(detailEquipeId === u.id)}>
                     <td className="px-5 py-3">
-                      <p className="font-semibold">
-                        {u.fullname} {soiMeme && <span className="text-xs font-normal text-gw-texte-doux dark:text-white/55">(vous)</span>}
-                      </p>
-                      <p className="text-xs text-gw-texte-doux dark:text-white/55">{u.email}</p>
+                      <div className="flex items-center gap-3">
+                        <AvatarParticipant prenom={prenom ?? ""} nom={reste.join(" ")} className="h-9 w-9 text-xs" />
+                        <p className="min-w-0 truncate font-semibold">
+                          {u.fullname} {soiMeme && <span className="text-xs font-normal text-gw-texte-doux dark:text-white/55">(vous)</span>}
+                        </p>
+                      </div>
                     </td>
                     <td className="px-3 py-3">
-                      {u.role === "admin" ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-gw-nuit px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-white dark:text-gw-nuit">
-                          <ShieldCheck className="h-3 w-3" aria-hidden /> Administrateur
-                        </span>
-                      ) : (
-                        <span className="inline-flex rounded-full bg-gw-lavande/60 px-2.5 py-0.5 text-xs font-semibold text-gw-nuit dark:bg-white/10 dark:text-white">Organisateur</span>
-                      )}
+                      <BadgeRole role={u.role} />
                     </td>
                     <td className="px-3 py-3">
                       <BadgeStatut actif={u.actif} />
                     </td>
-                    <td className="px-3 py-3 text-right tabular-nums">
-                      {u.evenements}
-                      {u.evenements > 0 && (
-                        <span className="block text-xs text-gw-texte-doux dark:text-white/55">
-                          {u.evenements_valides} publié{u.evenements_valides > 1 ? "s" : ""}
-                          {u.evenements_en_attente ? ` · ${u.evenements_en_attente} à valider` : ""}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-3 py-3 text-right tabular-nums">
-                      {entier.format(u.billets_vendus)}
-                      {u.total_ventes > 0 && <span className="block text-xs text-gw-texte-doux dark:text-white/55">{ariary(u.total_ventes)}</span>}
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex justify-end gap-1">
-                        <button
-                          type="button"
-                          disabled={soiMeme}
-                          className={cn(action, "text-gw-violet hover:bg-gw-fond dark:text-gw-lavande dark:hover:bg-white/10")}
-                          onClick={() => {
-                            const nouveau = u.role === "admin" ? "organisateur" : "admin"
-                            setConfirmation({
-                              titre: nouveau === "admin" ? "Nommer administrateur ?" : "Retirer les droits d'administrateur ?",
-                              texte:
-                                nouveau === "admin"
-                                  ? `${u.fullname} pourra valider les événements et gérer tous les comptes. Il n'aura plus d'espace organisateur.`
-                                  : `${u.fullname} redeviendra organisateur et n'aura plus accès à l'administration.`,
-                              libelle: nouveau === "admin" ? "Nommer administrateur" : "Rendre organisateur",
-                              action: () => modifierCompteEquipe(u.id, { role: nouveau }),
-                            })
-                          }}
-                        >
-                          <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> {u.role === "admin" ? "Rendre organisateur" : "Nommer admin"}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={soiMeme}
-                          className={cn(action, u.actif ? "text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-400/10" : "text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-400/10")}
-                          onClick={() =>
-                            setConfirmation({
-                              titre: u.actif ? `Suspendre ${u.fullname} ?` : `Réactiver ${u.fullname} ?`,
-                              texte: u.actif
-                                ? "La connexion sera refusée tant que le compte est suspendu. Ses événements et ses ventes sont conservés."
-                                : "La personne pourra de nouveau se connecter.",
-                              libelle: u.actif ? "Suspendre" : "Réactiver",
-                              danger: u.actif,
-                              action: () => modifierCompteEquipe(u.id, { actif: !u.actif }),
-                            })
-                          }
-                        >
-                          {u.actif ? <Ban className="h-3.5 w-3.5" aria-hidden /> : <RotateCcw className="h-3.5 w-3.5" aria-hidden />}
-                          {u.actif ? "Suspendre" : "Réactiver"}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={soiMeme}
-                          title={u.evenements > 0 ? "Suppression impossible : ce compte a des événements" : "Supprimer le compte"}
-                          aria-label={`Supprimer le compte de ${u.fullname}`}
-                          className={cn(action, "text-gw-texte-doux hover:bg-red-50 hover:text-red-700 dark:text-white/55 dark:hover:bg-red-400/10", u.evenements > 0 && "opacity-50")}
-                          onClick={() =>
-                            setConfirmation(
-                              u.evenements > 0
-                                ? {
-                                    titre: "Suppression impossible",
-                                    texte: `${u.fullname} a ${u.evenements} événement${u.evenements > 1 ? "s" : ""} : supprimer son compte effacerait l'historique des ventes. ${
-                                      u.actif ? "Suspendez-le plutôt : il ne pourra plus se connecter, et ses événements et ses ventes sont conservés." : "Son compte est déjà suspendu."
-                                    }`,
-                                    libelle: "Suspendre le compte",
-                                    danger: true,
-                                    sansAction: !u.actif,
-                                    action: () => modifierCompteEquipe(u.id, { actif: false }),
-                                  }
-                                : {
-                                    titre: `Supprimer le compte de ${u.fullname} ?`,
-                                    texte: "Cette action est définitive.",
-                                    libelle: "Supprimer",
-                                    danger: true,
-                                    action: () => supprimerCompteEquipe(u.id),
-                                  },
-                            )
-                          }
-                        >
-                          <Trash2 className="h-3.5 w-3.5" aria-hidden />
-                        </button>
-                      </div>
+                    <td className="px-5 py-3 text-right">
+                      <BoutonDetails onClick={() => setDetailEquipeId(u.id)} />
                     </td>
                   </tr>
                 )
@@ -489,6 +467,14 @@ export function AdminUtilisateurs() {
       />
 
       <PanneauParticipant participant={detail} onFermer={() => setDetailId(null)} onStatut={demanderStatut} />
+      <PanneauEquipe
+        compte={detailEquipe}
+        soiMeme={detailEquipe?.id === moi}
+        onFermer={() => setDetailEquipeId(null)}
+        onRole={demanderRole}
+        onStatut={demanderStatutEquipe}
+        onSupprimer={demanderSuppression}
+      />
 
       <Modale ouverte={!!confirmation} titre={confirmation?.titre ?? ""} onFermer={() => setConfirmation(null)}>
         <p className="text-sm text-gw-texte dark:text-white/75">{confirmation?.texte}</p>
@@ -616,5 +602,86 @@ function PanneauParticipant({
         </div>
       </aside>
     </div>
+  )
+}
+
+/* ---------- panneau « Détails » d'un membre de l'équipe ---------- */
+
+function PanneauEquipe({
+  compte: u,
+  soiMeme,
+  onFermer,
+  onRole,
+  onStatut,
+  onSupprimer,
+}: {
+  compte: CompteEquipe | null
+  soiMeme: boolean
+  onFermer: () => void
+  onRole: (u: CompteEquipe) => void
+  onStatut: (u: CompteEquipe) => void
+  onSupprimer: (u: CompteEquipe) => void
+}) {
+  if (!u) return <PanneauDetails ouvert={false} onFermer={onFermer} titre="" lignes={[]} />
+  const [prenom, ...reste] = u.fullname.split(" ")
+  const bouton = "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40"
+  return (
+    <PanneauDetails
+      ouvert
+      onFermer={onFermer}
+      titre={u.fullname + (soiMeme ? " (vous)" : "")}
+      visuel={<AvatarParticipant prenom={prenom ?? ""} nom={reste.join(" ")} className="h-16 w-16 text-lg" />}
+      badge={
+        <>
+          <BadgeRole role={u.role} />
+          <BadgeStatut actif={u.actif} />
+        </>
+      }
+      chiffres={
+        u.role === "organisateur" || u.evenements > 0
+          ? [
+              {
+                icone: CalendarDays,
+                libelle: "Événements",
+                valeur: entier.format(u.evenements),
+                detail: `${u.evenements_valides} publié${u.evenements_valides > 1 ? "s" : ""}${u.evenements_en_attente ? ` · ${u.evenements_en_attente} à valider` : ""}`,
+              },
+              { icone: Ticket, libelle: "Billets vendus", valeur: entier.format(u.billets_vendus), detail: ariary(u.total_ventes) },
+            ]
+          : undefined
+      }
+      lignes={[
+        { icone: Mail, libelle: "E-mail", contenu: u.email },
+        {
+          icone: ShieldCheck,
+          libelle: "Rôle",
+          contenu: u.role === "admin" ? "Administrateur : valide les événements et gère les comptes" : "Organisateur : crée et gère ses événements",
+        },
+      ]}
+      pied={
+        soiMeme ? (
+          <p className="self-center text-xs text-gw-texte-doux dark:text-white/55">Vous ne pouvez pas modifier votre propre compte ici.</p>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => onSupprimer(u)}
+              title={u.evenements > 0 ? "Suppression impossible : ce compte a des événements" : "Supprimer le compte"}
+              aria-label={`Supprimer le compte de ${u.fullname}`}
+              className="grid h-9 w-9 place-items-center rounded-full text-gw-texte-doux transition-colors hover:bg-red-50 hover:text-red-700 dark:text-white/60 dark:hover:bg-red-400/10"
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
+            </button>
+            <button type="button" onClick={() => onRole(u)} className={cn(bouton, "bg-gw-fond text-gw-violet hover:bg-gw-lavande/50 dark:bg-white/10 dark:text-gw-lavande")}>
+              <ShieldCheck className="h-4 w-4" aria-hidden /> {u.role === "admin" ? "Rendre organisateur" : "Nommer admin"}
+            </button>
+            <Bouton variante={u.actif ? "danger" : "principal"} onClick={() => onStatut(u)}>
+              {u.actif ? <Ban className="h-4 w-4" aria-hidden /> : <RotateCcw className="h-4 w-4" aria-hidden />}
+              {u.actif ? "Suspendre" : "Réactiver"}
+            </Bouton>
+          </>
+        )
+      }
+    />
   )
 }

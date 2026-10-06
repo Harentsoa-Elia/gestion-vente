@@ -2,10 +2,13 @@
 
 import { useVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useState } from "react"
-import { Search } from "lucide-react"
+import { CalendarDays, Mail, Phone, Search, Ticket, Wallet } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { fetchMesParticipants } from "@/services/reservationService"
 import type { ParticipantOrganisateur } from "@/types"
+import { AvatarParticipant } from "@/components/avatar-participant"
+import { BoutonDetails, PanneauDetails, ligneCliquable } from "@/components/organisateur/panneau-details"
+import { formaterTelephone } from "@/lib/billetterie"
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })
@@ -20,6 +23,8 @@ export function OrganisateurParticipants() {
   const [recherche, setRecherche] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  /** participant ouvert dans le panneau « Détails » */
+  const [detail, setDetail] = useState<ParticipantOrganisateur | null>(null)
 
   useEffect(() => {
     fetchMesParticipants()
@@ -32,7 +37,7 @@ export function OrganisateurParticipants() {
     const texte = `${p.nom} ${p.prenom} ${p.email}`.toLowerCase()
     return texte.includes(recherche.toLowerCase())
   })
-  // 5 premières lignes, le reste derrière « Voir plus »
+  // pagination : 5 lignes par page
   const { visibles: participantsFiltresVisibles, bouton: boutonVoirPlus } = useVoirPlus(participantsFiltres)
 
   if (loading) return <p className="text-center py-16 text-muted-foreground dark:text-gray-400">Chargement...</p>
@@ -76,30 +81,26 @@ export function OrganisateurParticipants() {
                 <thead>
                   <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                     <th className="pb-2 pr-4 font-medium">Participant</th>
-                    <th className="pb-2 pr-4 font-medium">Téléphone</th>
-                    <th className="pb-2 pr-4 font-medium">Réservations</th>
-                    <th className="pb-2 pr-4 font-medium">Total dépensé</th>
-                    <th className="pb-2 font-medium">Dernière réservation</th>
+                    <th className="pb-2 pr-4 text-right font-medium">Réservations</th>
+                    <th className="pb-2 font-medium">
+                      <span className="sr-only">Détails</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {participantsFiltresVisibles.map((p) => (
-                    <tr key={p.id} className="border-b border-gray-50 dark:border-gray-800">
+                    <tr key={p.id} onClick={() => setDetail(p)} className={ligneCliquable(detail?.id === p.id)}>
                       <td className="py-3 pr-4">
-                        <p className="font-medium text-[#0F172A] dark:text-white">
-                          {p.prenom} {p.nom}
-                        </p>
-                        <p className="text-xs text-muted-foreground dark:text-gray-400">{p.email}</p>
+                        <div className="flex items-center gap-3">
+                          <AvatarParticipant prenom={p.prenom} nom={p.nom} avatar={p.avatar} className="h-9 w-9 text-xs" />
+                          <p className="min-w-0 truncate font-medium text-[#0F172A] dark:text-white">
+                            {p.prenom} {p.nom}
+                          </p>
+                        </div>
                       </td>
-                      <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400">
-                        {p.telephone ?? "-"}
-                      </td>
-                      <td className="py-3 pr-4 text-[#0F172A] dark:text-gray-200">{p.nb_reservations}</td>
-                      <td className="py-3 pr-4 text-[#0F172A] dark:text-gray-200">
-                        {formatAr(p.montant_total_depense)}
-                      </td>
-                      <td className="py-3 text-muted-foreground dark:text-gray-400">
-                        {formatDate(p.derniere_reservation)}
+                      <td className="py-3 pr-4 text-right tabular-nums text-[#0F172A] dark:text-gray-200">{p.nb_reservations}</td>
+                      <td className="py-3 text-right">
+                        <BoutonDetails onClick={() => setDetail(p)} />
                       </td>
                     </tr>
                   ))}
@@ -111,6 +112,30 @@ export function OrganisateurParticipants() {
           )}
         </CardContent>
       </Card>
+
+      <PanneauDetails
+        ouvert={detail !== null}
+        onFermer={() => setDetail(null)}
+        titre={detail ? `${detail.prenom} ${detail.nom}` : ""}
+        visuel={detail && <AvatarParticipant prenom={detail.prenom} nom={detail.nom} avatar={detail.avatar} className="h-16 w-16 text-lg" />}
+        chiffres={
+          detail
+            ? [
+                { icone: Ticket, libelle: "Réservations", valeur: detail.nb_reservations },
+                { icone: Wallet, libelle: "Total dépensé", valeur: formatAr(detail.montant_total_depense) },
+              ]
+            : []
+        }
+        lignes={
+          detail
+            ? [
+                { icone: Mail, libelle: "E-mail", contenu: detail.email },
+                { icone: Phone, libelle: "Téléphone", contenu: detail.telephone ? formaterTelephone(detail.telephone) : "—" },
+                { icone: CalendarDays, libelle: "Dernière réservation", contenu: formatDate(detail.derniere_reservation) },
+              ]
+            : []
+        }
+      />
     </div>
   )
 }

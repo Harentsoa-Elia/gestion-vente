@@ -30,6 +30,7 @@ class ReservationService:
                 Participant.prenom,
                 Participant.email,
                 Participant.telephone,
+                Participant.avatar,
                 func.count(Reservation.id).label("nb_reservations"),
                 func.coalesce(func.sum(Paiement.montant), 0).label("montant_total_depense"),
                 func.max(Reservation.date_reservation).label("derniere_reservation"),
@@ -38,7 +39,7 @@ class ReservationService:
             .join(Participant, Reservation.participant_id == Participant.id)
             .outerjoin(Paiement, Paiement.reservation_id == Reservation.id)
             .where(Evenement.organisateur_id == organisateur_id)
-            .group_by(Participant.id, Participant.nom, Participant.prenom, Participant.email, Participant.telephone)
+            .group_by(Participant.id, Participant.nom, Participant.prenom, Participant.email, Participant.telephone, Participant.avatar)
             .order_by(func.max(Reservation.date_reservation).desc())
         )
         return result.all()

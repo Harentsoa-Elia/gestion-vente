@@ -13,6 +13,9 @@ export interface ParticipantSummary {
   nom: string
   prenom: string
   email: string
+  telephone?: string | null
+  /** photo de profil */
+  avatar?: string | null
 }
 
 export interface CategorieBilletSummary {
@@ -36,6 +39,8 @@ export interface ParticipantOrganisateur {
   prenom: string
   email: string
   telephone: string | null
+  /** photo de profil */
+  avatar?: string | null
   nb_reservations: number
   montant_total_depense: number
   derniere_reservation: string

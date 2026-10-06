@@ -2,12 +2,15 @@
 
 import { useVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useState } from "react"
-import { Search } from "lucide-react"
+import { CalendarDays, Hash, Mail, Phone, Search, Tag, Wallet } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { fetchAllEvenements } from "@/services/evenementService"
 import { fetchReservationsByEvenement } from "@/services/reservationService"
 import { fetchUserData } from "@/services/auth.service"
 import type { Evenement, ReservationDetail, AuthUser } from "@/types"
+import { AvatarParticipant } from "@/components/avatar-participant"
+import { BoutonDetails, PanneauDetails, ligneCliquable } from "@/components/organisateur/panneau-details"
+import { formaterTelephone } from "@/lib/billetterie"
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", {
@@ -41,6 +44,8 @@ export function OrganisateurReservations() {
   const [loadingEvenements, setLoadingEvenements] = useState(true)
   const [loadingReservations, setLoadingReservations] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  /** réservation ouverte dans le panneau « Détails » */
+  const [detail, setDetail] = useState<ReservationDetail | null>(null)
 
   useEffect(() => {
     Promise.all([fetchAllEvenements(), fetchUserData()])
@@ -68,7 +73,7 @@ export function OrganisateurReservations() {
     const texte = `${r.participant.nom} ${r.participant.prenom} ${r.participant.email}`.toLowerCase()
     return texte.includes(recherche.toLowerCase())
   })
-  // 5 premières lignes, le reste derrière « Voir plus »
+  // pagination : 5 lignes par page
   const { visibles: reservationsFiltreesVisibles, bouton: boutonVoirPlus } = useVoirPlus(reservationsFiltrees)
 
   if (loadingEvenements) {
@@ -140,35 +145,31 @@ export function OrganisateurReservations() {
                       <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                         <th className="pb-2 pr-4 font-medium">Participant</th>
                         <th className="pb-2 pr-4 font-medium">Tarif</th>
-                        <th className="pb-2 pr-4 font-medium">Prix</th>
-                        <th className="pb-2 pr-4 font-medium">Date</th>
-                        <th className="pb-2 font-medium">Statut</th>
+                        <th className="pb-2 pr-4 font-medium">Statut</th>
+                        <th className="pb-2 font-medium">
+                          <span className="sr-only">Détails</span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {reservationsFiltreesVisibles.map((r) => (
-                        <tr key={r.id} className="border-b border-gray-50 dark:border-gray-800">
+                        <tr key={r.id} onClick={() => setDetail(r)} className={ligneCliquable(detail?.id === r.id)}>
                           <td className="py-3 pr-4">
-                            <p className="font-medium text-[#0F172A] dark:text-white">
-                              {r.participant.prenom} {r.participant.nom}
-                            </p>
-                            <p className="text-xs text-muted-foreground dark:text-gray-400">{r.participant.email}</p>
+                            <div className="flex items-center gap-3">
+                              <AvatarParticipant prenom={r.participant.prenom} nom={r.participant.nom} avatar={r.participant.avatar} className="h-9 w-9 text-xs" />
+                              <p className="min-w-0 truncate font-medium text-[#0F172A] dark:text-white">
+                                {r.participant.prenom} {r.participant.nom}
+                              </p>
+                            </div>
                           </td>
                           <td className="py-3 pr-4 text-[#0F172A] dark:text-gray-200">{r.categorie_billet.nom}</td>
-                          <td className="py-3 pr-4 text-[#0F172A] dark:text-gray-200">
-                            {formatAr(r.categorie_billet.prix)}
-                          </td>
-                          <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400">
-                            {formatDate(r.date_reservation)}
-                          </td>
-                          <td className="py-3">
-                            <span
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                STATUT_STYLES[r.statut] ?? "bg-gray-100 text-gray-600"
-                              }`}
-                            >
+                          <td className="py-3 pr-4">
+                            <span className={`text-xs px-2 py-1 rounded-full ${STATUT_STYLES[r.statut] ?? "bg-gray-100 text-gray-600"}`}>
                               {STATUT_LABELS[r.statut] ?? r.statut}
                             </span>
+                          </td>
+                          <td className="py-3 text-right">
+                            <BoutonDetails onClick={() => setDetail(r)} />
                           </td>
                         </tr>
                       ))}
@@ -182,6 +183,40 @@ export function OrganisateurReservations() {
           </Card>
         </>
       )}
+
+      <PanneauDetails
+        ouvert={detail !== null}
+        onFermer={() => setDetail(null)}
+        titre={detail ? `${detail.participant.prenom} ${detail.participant.nom}` : ""}
+        visuel={
+          detail && (
+            <AvatarParticipant prenom={detail.participant.prenom} nom={detail.participant.nom} avatar={detail.participant.avatar} className="h-16 w-16 text-lg" />
+          )
+        }
+        badge={
+          detail && (
+            <span className={`text-xs px-2 py-1 rounded-full ${STATUT_STYLES[detail.statut] ?? "bg-gray-100 text-gray-600"}`}>
+              {STATUT_LABELS[detail.statut] ?? detail.statut}
+            </span>
+          )
+        }
+        chiffres={detail ? [{ icone: Wallet, libelle: "Prix du billet", valeur: formatAr(detail.categorie_billet.prix) }] : []}
+        lignes={
+          detail
+            ? [
+                { icone: Tag, libelle: "Tarif", contenu: detail.categorie_billet.nom },
+                { icone: CalendarDays, libelle: "Réservée le", contenu: formatDate(detail.date_reservation) },
+                { icone: Hash, libelle: "N° de réservation", contenu: `#${detail.id}` },
+                { icone: Mail, libelle: "E-mail du participant", contenu: detail.participant.email },
+                {
+                  icone: Phone,
+                  libelle: "Téléphone",
+                  contenu: detail.participant.telephone ? formaterTelephone(detail.participant.telephone) : "—",
+                },
+              ]
+            : []
+        }
+      />
     </div>
   )
 }
