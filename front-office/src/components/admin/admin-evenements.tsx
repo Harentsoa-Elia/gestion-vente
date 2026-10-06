@@ -1,7 +1,7 @@
 "use client"
 
 import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import {
   AlertTriangle,
@@ -36,7 +36,8 @@ import { BadgeStatut, Bouton, Modale, STATUTS, classeChamp } from "@/components/
 
 /*
  * Administration : validation des événements soumis par les organisateurs.
- * - onglets par statut, « À valider » en premier ;
+ * - onglets par statut dans l'ordre de vie d'un événement : Tous, En préparation, À valider,
+ *   Validés, Rejetés ; « À valider » est ouvert d'office s'il y a des demandes en attente ;
  * - pour chaque événement : affiche, date, lieu, organisateur, et un détail dépliable
  *   (description, propositions soumises au public, tarifs) avec une liste de points à vérifier ;
  * - Valider (l'événement devient public) ou Rejeter avec un motif : dans les deux cas
@@ -45,11 +46,11 @@ import { BadgeStatut, Bouton, Modale, STATUTS, classeChamp } from "@/components/
 
 type Filtre = "en_attente_validation" | "valide" | "rejete" | "brouillon" | "tous"
 const FILTRES: { id: Filtre; libelle: string }[] = [
+  { id: "tous", libelle: "Tous" },
+  { id: "brouillon", libelle: "En préparation" },
   { id: "en_attente_validation", libelle: "À valider" },
   { id: "valide", libelle: "Validés" },
   { id: "rejete", libelle: "Rejetés" },
-  { id: "brouillon", libelle: "En préparation" },
-  { id: "tous", libelle: "Tous" },
 ]
 
 const TYPES: { type: PropositionType; titre: string; singulier: string; pluriel: string; icone: LucideIcon }[] = [
@@ -89,7 +90,9 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
   const [organisateurs, setOrganisateurs] = useState<Map<number, Organisateur>>(new Map())
   const [chargement, setChargement] = useState(true)
   const [erreur, setErreur] = useState<string | null>(null)
-  const [filtre, setFiltre] = useState<Filtre>("en_attente_validation")
+  const [filtre, setFiltre] = useState<Filtre>("tous")
+  // au premier chargement seulement : « À valider » s'il y a des demandes, sinon « Tous »
+  const premierChoix = useRef(true)
 
   const [aValider, setAValider] = useState<Evenement | null>(null)
   const [aRejeter, setARejeter] = useState<Evenement | null>(null)
@@ -100,6 +103,10 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
     try {
       const [evs, ls, cs, us] = await Promise.all([fetchAllEvenements(), fetchLieux(), fetchCategories(), fetchOrganisateurs()])
       setEvenements(evs)
+      if (premierChoix.current) {
+        premierChoix.current = false
+        if (evs.some((e) => e.statut_validation === "en_attente_validation")) setFiltre("en_attente_validation")
+      }
       setLieux(new Map(ls.map((l) => [l.id, l])))
       setCategories(new Map(cs.map((c) => [c.id, c])))
       setOrganisateurs(new Map(us.map((u) => [u.id, u])))
