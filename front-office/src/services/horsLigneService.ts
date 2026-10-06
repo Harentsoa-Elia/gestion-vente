@@ -70,13 +70,16 @@ export async function pdfLot(id: number, options: OptionsImpression): Promise<{ 
   const params = new URLSearchParams({ format: options.format })
   if (options.de) params.set("de", String(options.de))
   if (options.a) params.set("a", String(options.a))
-  const res = await fetch(`${API_BASE_URL}/organisateur/hors-ligne/lots/${id}/billets.pdf?${params}`, { headers: getAuthHeaders() })
-  if (!res.ok) {
-    const data = await parseJsonSafe(res)
+  // PDF emballé en JSON : un gestionnaire de téléchargement (IDM…) ne l'intercepte pas
+  // et la page peut l'afficher en aperçu (voir backend : billets-apercu)
+  const res = await fetch(`${API_BASE_URL}/organisateur/hors-ligne/lots/${id}/billets-apercu?${params}`, { headers: getAuthHeaders() })
+  const data = await parseJsonSafe(res)
+  if (!res.ok || typeof data?.pdf_base64 !== "string") {
     throw new Error(typeof data?.detail === "string" ? data.detail : "Le PDF n'a pas pu être préparé.")
   }
-  const nom = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? `lot-${id}.pdf`
-  return { url: URL.createObjectURL(await res.blob()), nom }
+  const octets = Uint8Array.from(atob(data.pdf_base64), (c) => c.charCodeAt(0))
+  const blob = new Blob([octets], { type: "application/pdf" })
+  return { url: URL.createObjectURL(blob), nom: typeof data.nom === "string" ? data.nom : `lot-${id}.pdf` }
 }
 
 export function telechargerUrl(url: string, nom: string) {

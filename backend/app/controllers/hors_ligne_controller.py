@@ -1,4 +1,5 @@
 """Billets hors ligne (espace organisateur) et facturation de la plateforme (administrateur)."""
+import base64
 from typing import Literal, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response
@@ -72,6 +73,28 @@ async def pdf(
     except ErreurHorsLigne as e:
         raise erreur(e)
     return Response(content=contenu, media_type="application/pdf", headers={"Content-Disposition": f'inline; filename="{nom}"'})
+
+
+@router.get(
+    "/organisateur/hors-ligne/lots/{lot_id}/billets-apercu",
+    summary="Impression : même PDF, encodé en base64 dans du JSON (aperçu dans la page)",
+)
+async def pdf_apercu(
+    lot_id: int,
+    format: Literal["planche", "a5"] = Query("planche"),
+    de: Optional[int] = Query(None, ge=1),
+    a: Optional[int] = Query(None, ge=1),
+    auth_data: dict = Depends(equipe),
+    db: AsyncSession = Depends(get_db),
+):
+    """Les gestionnaires de téléchargement (Internet Download Manager…) interceptent les réponses PDF
+    et coupent la requête du site (« Failed to fetch »). Emballé en JSON, le PDF arrive bien à la page,
+    qui l'affiche en aperçu et le propose au téléchargement."""
+    try:
+        contenu, nom = await HorsLigneService(db).pdf(auth_data, lot_id, format, de, a)
+    except ErreurHorsLigne as e:
+        raise erreur(e)
+    return {"nom": nom, "pdf_base64": base64.b64encode(contenu).decode("ascii")}
 
 
 @router.patch("/organisateur/hors-ligne/lots/{lot_id}/vendus", response_model=LotDetail, summary="Déclarer les billets vendus par le revendeur")

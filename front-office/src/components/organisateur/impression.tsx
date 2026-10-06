@@ -104,7 +104,14 @@ export function Impression() {
       })
       return fichier
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Le PDF n'a pas pu être préparé.")
+      toast.error(
+        // « Failed to fetch » : serveur arrêté, ou requête coupée par un gestionnaire de téléchargement
+        e instanceof TypeError
+          ? "Le PDF n'a pas pu être récupéré : vérifiez que l'API est démarrée. Si Internet Download Manager s'ouvre, ajoutez « localhost » à ses exceptions."
+          : e instanceof Error
+            ? e.message
+            : "Le PDF n'a pas pu être préparé.",
+      )
       return null
     } finally {
       setPreparation(false)
