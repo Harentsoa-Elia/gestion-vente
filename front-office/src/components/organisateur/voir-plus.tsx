@@ -18,7 +18,8 @@ import { cn } from "@/utils"
 
 export const LIGNES_VISIBLES = 5
 
-export function useVoirPlus<T>(liste: T[], parPage = LIGNES_VISIBLES) {
+/** classePagination : marges de la barre quand la liste n'a pas de marge intérieure (tableau collé au bord). */
+export function useVoirPlus<T>(liste: T[], parPage = LIGNES_VISIBLES, classePagination?: string) {
   const [page, setPage] = useState(1)
   const pages = Math.max(1, Math.ceil(liste.length / parPage))
   // nouvelle liste : retour à la première page
@@ -28,7 +29,7 @@ export function useVoirPlus<T>(liste: T[], parPage = LIGNES_VISIBLES) {
   const debut = (courante - 1) * parPage
   const visibles = liste.slice(debut, debut + parPage)
   const bouton = (
-    <Pagination page={courante} pages={pages} total={liste.length} debut={debut} affiches={visibles.length} onPage={setPage} />
+    <Pagination page={courante} pages={pages} total={liste.length} debut={debut} affiches={visibles.length} onPage={setPage} className={classePagination} />
   )
   return { visibles, bouton, page: courante }
 }
@@ -53,7 +54,9 @@ export function Pagination({
   debut,
   affiches,
   onPage,
+  className,
 }: {
+  className?: string
   page: number
   pages: number
   total: number
@@ -66,7 +69,10 @@ export function Pagination({
   const fleche =
     "flex h-8 w-8 items-center justify-center rounded-full text-gw-nuit transition-colors hover:bg-gw-lavande/40 disabled:pointer-events-none disabled:opacity-30 dark:text-white dark:hover:bg-white/10"
   return (
-    <nav aria-label="Pagination" className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gw-bordure pt-3 dark:border-white/10">
+    <nav
+      aria-label="Pagination"
+      className={cn("mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gw-bordure pt-3 dark:border-white/10", className)}
+    >
       <p className="text-xs text-gw-texte-doux tabular-nums dark:text-white/55">
         {debut + 1}–{debut + affiches} sur {total.toLocaleString("fr-FR")}
       </p>
@@ -110,13 +116,15 @@ export function Pagination({
 export function ListeVoirPlus<T>({
   elements,
   nombre = LIGNES_VISIBLES,
+  classePagination,
   children,
 }: {
   elements: T[]
   nombre?: number
+  classePagination?: string
   children: (visibles: T[]) => ReactNode
 }) {
-  const { visibles, bouton } = useVoirPlus(elements, nombre)
+  const { visibles, bouton } = useVoirPlus(elements, nombre, classePagination)
   return (
     <>
       {children(visibles)}

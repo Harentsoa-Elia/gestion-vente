@@ -1,5 +1,6 @@
 "use client"
 
+import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useState } from "react"
 import { Loader2, Receipt } from "lucide-react"
 import type { Facturation, TypeLot } from "@/types"
@@ -77,6 +78,8 @@ export function AdminFacturation() {
           </div>
         ) : (
           <div className="mt-4 overflow-x-auto">
+            <ListeVoirPlus elements={donnees.organisateurs}>
+              {(organisateursPage) => (
             <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="text-left text-xs text-gw-texte-doux uppercase dark:text-white/55">
@@ -88,7 +91,7 @@ export function AdminFacturation() {
                 </tr>
               </thead>
               <tbody>
-                {donnees.organisateurs.map((o) => (
+                {organisateursPage.map((o) => (
                   <tr key={o.organisateur_id} className="border-t border-gw-bordure dark:border-gw-bordure-sombre">
                     <td className="py-3">
                       <p className="font-semibold">{o.nom}</p>
@@ -102,6 +105,8 @@ export function AdminFacturation() {
                 ))}
               </tbody>
             </table>
+              )}
+            </ListeVoirPlus>
           </div>
         )}
       </section>
@@ -112,6 +117,8 @@ export function AdminFacturation() {
             Derniers lots générés
           </h2>
           <div className="mt-4 overflow-x-auto">
+            <ListeVoirPlus elements={donnees.lots_recents}>
+              {(lotsPage) => (
             <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="text-left text-xs text-gw-texte-doux uppercase dark:text-white/55">
@@ -124,7 +131,7 @@ export function AdminFacturation() {
                 </tr>
               </thead>
               <tbody>
-                {donnees.lots_recents.map((l) => (
+                {lotsPage.map((l) => (
                   <tr key={l.id} className="border-t border-gw-bordure dark:border-gw-bordure-sombre">
                     <td className="py-3">
                       <span className="flex items-center gap-2">
@@ -143,6 +150,8 @@ export function AdminFacturation() {
                 ))}
               </tbody>
             </table>
+              )}
+            </ListeVoirPlus>
           </div>
         </section>
       )}

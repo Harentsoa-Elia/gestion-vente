@@ -1,5 +1,6 @@
 "use client"
 
+import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react"
 import { toast } from "sonner"
 import { Loader2, MapPin, Mic2, Pencil, Plus, Search, Shapes, Trash2, type LucideIcon } from "lucide-react"
@@ -260,8 +261,10 @@ export function AdminReferentiel() {
           <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
         </p>
       ) : (
+        <ListeVoirPlus elements={elements} classePagination="border-t-0 px-1">
+          {(elementsPage) => (
         <ul className="gw-carte divide-y divide-gw-bordure dark:divide-white/10">
-          {elements.map((e) => (
+          {elementsPage.map((e) => (
             <li key={e.id} className="flex items-center gap-3 px-5 py-3">
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold">{e.nom}</p>
@@ -311,6 +314,8 @@ export function AdminReferentiel() {
           ))}
           {elements.length === 0 && <li className="px-5 py-10 text-center text-sm text-gw-texte-doux dark:text-white/55">Aucun élément ne correspond.</li>}
         </ul>
+          )}
+        </ListeVoirPlus>
       )}
 
       <ModaleElement

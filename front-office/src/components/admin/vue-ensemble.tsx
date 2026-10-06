@@ -1,5 +1,6 @@
 "use client"
 
+import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
@@ -98,7 +99,7 @@ export function VueEnsemble() {
   if (!d && chargement) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
       </div>
     )
   }
@@ -194,8 +195,10 @@ export function VueEnsemble() {
           {d.top_evenements.length === 0 ? (
             <p className="mt-2 text-sm text-gw-texte-doux dark:text-white/55">Aucune vente pour l&apos;instant.</p>
           ) : (
+            <ListeVoirPlus elements={d.top_evenements}>
+              {(topPage) => (
             <ul className="mt-3 space-y-3">
-              {d.top_evenements.map((e) => (
+              {topPage.map((e) => (
                 <li key={e.id}>
                   <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
                     <Link href={`/evenements/${e.id}`} className="truncate hover:text-gw-violet dark:hover:text-gw-lavande">
@@ -207,6 +210,8 @@ export function VueEnsemble() {
                 </li>
               ))}
             </ul>
+              )}
+            </ListeVoirPlus>
           )}
         </section>
       </div>
@@ -217,8 +222,10 @@ export function VueEnsemble() {
         {d.activite.length === 0 ? (
           <p className="py-10 text-center text-sm text-gw-texte-doux dark:text-white/55">Rien pour l&apos;instant.</p>
         ) : (
+          <ListeVoirPlus elements={d.activite}>
+            {(activitePage) => (
           <ol className="mt-4 divide-y divide-gw-bordure dark:divide-white/10">
-            {d.activite.map((a, k) => {
+            {activitePage.map((a, k) => {
               const style = ACTIVITE[a.type]
               const Icone = style.icone
               const texte = <span className="text-sm">{a.texte}</span>
@@ -243,6 +250,8 @@ export function VueEnsemble() {
               )
             })}
           </ol>
+            )}
+          </ListeVoirPlus>
         )}
       </section>
     </div>

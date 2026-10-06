@@ -1,5 +1,6 @@
 "use client"
 
+import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
@@ -229,8 +230,10 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
           </p>
         </div>
       ) : (
+        <ListeVoirPlus elements={affiches}>
+          {(affichesPage) => (
         <ul className="space-y-4">
-          {affiches.map((ev) => (
+          {affichesPage.map((ev) => (
             <CarteAValider
               key={ev.id}
               evenement={ev}
@@ -245,6 +248,8 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
             />
           ))}
         </ul>
+          )}
+        </ListeVoirPlus>
       )}
 
       {/* confirmation de validation */}
