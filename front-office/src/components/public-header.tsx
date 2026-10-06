@@ -76,26 +76,49 @@ export function PublicHeader() {
     setIsMounted(true)
   }, [])
 
+  // Session : relue à chaque changement de page, au retour sur l'onglet et quand un autre onglet
+  // se connecte ou se déconnecte. Sans cela, l'en-tête gardait « Connexion » après une connexion
+  // faite sans recharger la page (ou dans un autre onglet).
   useEffect(() => {
     if (!isMounted) return
-    setRoleStaff(staffConnecte())
-    const token = getParticipantToken()
-    if (!token) {
-      setLoadingParticipant(false)
-      return
-    }
-    fetchParticipantMe()
-      .then((participant) => {
-        setParticipantName(`${participant.prenom} ${participant.nom}`.trim())
-        setCompte(participant)
-      })
-      .catch(() => {
-        clearParticipantToken()
+    let actif = true
+    const lireSession = () => {
+      setRoleStaff(staffConnecte())
+      const token = getParticipantToken()
+      if (!token) {
         setParticipantName(null)
         setCompte(null)
-      })
-      .finally(() => setLoadingParticipant(false))
-  }, [isMounted])
+        setLoadingParticipant(false)
+        return
+      }
+      fetchParticipantMe()
+        .then((participant) => {
+          if (!actif) return
+          setParticipantName(`${participant.prenom} ${participant.nom}`.trim())
+          setCompte(participant)
+        })
+        .catch((e) => {
+          if (!actif) return
+          // serveur injoignable : on garde la session ; jeton refusé ou expiré : on le retire
+          if (e instanceof TypeError) return
+          clearParticipantToken()
+          setParticipantName(null)
+          setCompte(null)
+        })
+        .finally(() => actif && setLoadingParticipant(false))
+    }
+    lireSession()
+    const surStockage = (e: StorageEvent) => {
+      if (e.key === null || e.key === "access_token" || e.key === "participant_access_token") lireSession()
+    }
+    window.addEventListener("storage", surStockage)
+    window.addEventListener("focus", lireSession)
+    return () => {
+      actif = false
+      window.removeEventListener("storage", surStockage)
+      window.removeEventListener("focus", lireSession)
+    }
+  }, [isMounted, pathname])
 
   // Fermer le menu quand on change de page
   useEffect(() => {
