@@ -4,7 +4,8 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { jetonValide, lireJetonStaff, redirectionSiInterdit, roleDepuisJeton } from "@/lib/role"
+import { lireJetonStaff, redirectionSiInterdit, roleDepuisJeton } from "@/lib/role"
+import { assurerSession, effacerSession } from "@/lib/jetons"
 
 interface AuthWrapperProps {
   children: React.ReactNode
@@ -17,23 +18,31 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
   const pathname = usePathname()
 
   useEffect(() => {
-    const charge = lireJetonStaff()
-    if (!jetonValide(charge)) {
-      localStorage.removeItem("access_token")
-      router.push("/login")
-      setLoading(false)
-      return
-    }
+    let actif = true
+    // jeton d'accès expiré ? il est d'abord renouvelé avec le jeton de rafraîchissement
+    assurerSession("equipe").then((ok) => {
+      if (!actif) return
+      if (!ok) {
+        effacerSession("equipe")
+        router.push("/login")
+        setLoading(false)
+        return
+      }
+      const charge = lireJetonStaff()
 
     // chaque rôle reste dans son espace (voir src/lib/role.ts)
-    const redirection = redirectionSiInterdit(roleDepuisJeton(charge), pathname ?? "")
-    if (redirection) {
-      router.replace(redirection)
-      return
-    }
+      const redirection = redirectionSiInterdit(roleDepuisJeton(charge), pathname ?? "")
+      if (redirection) {
+        router.replace(redirection)
+        return
+      }
 
-    setIsAuthenticated(true)
-    setLoading(false)
+      setIsAuthenticated(true)
+      setLoading(false)
+    })
+    return () => {
+      actif = false
+    }
   }, [router, pathname])
 
   if (loading) {

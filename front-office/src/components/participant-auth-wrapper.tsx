@@ -4,7 +4,8 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { getParticipantToken, clearParticipantToken } from "@/services/participantService"
+import { clearParticipantToken } from "@/services/participantService"
+import { assurerSession } from "@/lib/jetons"
 
 interface ParticipantAuthWrapperProps {
   children: React.ReactNode
@@ -23,29 +24,20 @@ export default function ParticipantAuthWrapper({ children }: ParticipantAuthWrap
   const pathname = usePathname()
 
   useEffect(() => {
-    const token = getParticipantToken()
-
-    if (!token) {
-      router.push(`/participants/login?redirect=${encodeURIComponent(pathname)}`)
-      setLoading(false)
-      return
-    }
-
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]))
-      const currentTime = Date.now() / 1000
-
-      if (payload.expires > currentTime) {
-        setIsAuthenticated(true)
-      } else {
+    let actif = true
+    // jeton d'accès expiré ? il est d'abord renouvelé avec le jeton de rafraîchissement
+    assurerSession("participant").then((ok) => {
+      if (!actif) return
+      if (ok) setIsAuthenticated(true)
+      else {
         clearParticipantToken()
         router.push(`/participants/login?redirect=${encodeURIComponent(pathname)}`)
       }
-    } catch {
-      clearParticipantToken()
-      router.push(`/participants/login?redirect=${encodeURIComponent(pathname)}`)
+      setLoading(false)
+    })
+    return () => {
+      actif = false
     }
-    setLoading(false)
   }, [router, pathname])
 
   if (loading) {

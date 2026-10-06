@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "@/services/apiConfig"
+import { type Espace } from "@/lib/jetons"
 
 /*
  * Connexion par e-mail et mot de passe aux deux types de comptes :
@@ -20,7 +21,13 @@ async function essayer(chemin: string, corps: object): Promise<string | null> {
   if (res.status === 403 || res.status === 401 || res.status === 404 || res.status === 422) return null
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "La connexion a échoué.")
-  return typeof data.access_token === "string" ? data.access_token : null
+  if (typeof data.access_token !== "string") return null
+  // le jeton de rafraîchissement est rangé tout de suite ; l'appelant enregistre le jeton d'accès
+  if (typeof data.refresh_token === "string") {
+    const espace: Espace = chemin.startsWith("/participants") ? "participant" : "equipe"
+    localStorage.setItem(espace === "participant" ? "participant_refresh_token" : "refresh_token", data.refresh_token)
+  }
+  return data.access_token
 }
 
 export function connexionParticipant(email: string, motDePasse: string) {

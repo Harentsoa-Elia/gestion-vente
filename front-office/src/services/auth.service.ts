@@ -1,3 +1,4 @@
+import { effacerSession, lireRafraichissement } from "@/lib/jetons";
 import type { AuthUser } from "../types";
 import { API_BASE_URL, getAuthHeaders, parseJsonSafe } from "./apiConfig";
 
@@ -25,6 +26,8 @@ export async function logout(): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/logout`, {
       method: "POST",
       headers: getAuthHeaders(),
+      // la session (jeton de rafraîchissement) est fermée aussi côté serveur
+      body: JSON.stringify({ refresh_token: lireRafraichissement("equipe") }),
     });
     if (!res.ok) {
       const data = await parseJsonSafe(res);
@@ -33,6 +36,6 @@ export async function logout(): Promise<void> {
   } catch (erreur) {
     console.warn("Déconnexion côté serveur impossible :", erreur);
   } finally {
-    localStorage.removeItem("access_token");
+    effacerSession("equipe");
   }
 }

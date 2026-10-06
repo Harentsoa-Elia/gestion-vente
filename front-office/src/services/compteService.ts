@@ -40,5 +40,5 @@ export function demanderCodeMotDePasse(espace: EspaceCompte, email: string) {
 
 /** Participant : la réponse contient aussi un jeton (connexion directe). */
 export function reinitialiserMotDePasse(espace: EspaceCompte, saisie: { email: string; code: string; nouveau_mot_de_passe: string }) {
-  return poster<{ message: string; access_token?: string }>(`${prefixe(espace)}/mot-de-passe/reinitialiser`, saisie);
+  return poster<{ message: string; access_token?: string; refresh_token?: string }>(`${prefixe(espace)}/mot-de-passe/reinitialiser`, saisie);
 }

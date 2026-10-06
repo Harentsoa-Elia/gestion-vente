@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,7 +9,7 @@ from app.schemas.participant import (
     ParticipantResponse,
 )
 from app.services.participant_service import ParticipantService, verify_password
-from app.auth.auth_handler import sign_jwt_participant
+from app.services.session_service import SessionService
 from app.auth.auth_bearer import ParticipantBearer, BLACKLISTED_TOKENS
 from app.database import get_db
 from app.services.code_email_service import COMPTE_PARTICIPANT, USAGE_VERIFICATION, CodeEmailService, RenvoiTropRapide
@@ -34,7 +35,7 @@ async def signup_participant(
         taches.add_task(envoyer_email_sans_erreur, participant.email, *email_code_verification(participant.prenom, code))
     except RenvoiTropRapide:
         pass
-    return sign_jwt_participant(participant.email, participant.id)
+    return await SessionService(db).ouvrir_participant(participant)
 
 
 @router.post("/participants/login")
@@ -48,13 +49,18 @@ async def login_participant(
         raise HTTPException(status_code=403, detail="Email ou mot de passe incorrect")
     if participant.statut == "suspendu":
         raise HTTPException(status_code=423, detail="Ce compte est suspendu. Contactez l'administrateur de guichetweb.")
-    return sign_jwt_participant(participant.email, participant.id)
+    return await SessionService(db).ouvrir_participant(participant)
 
 
 @router.post("/participants/logout")
-async def logout_participant(auth_data: dict = Depends(ParticipantBearer())):
-    token = auth_data["token"]
-    BLACKLISTED_TOKENS.add(token)
+async def logout_participant(
+    auth_data: dict = Depends(ParticipantBearer()),
+    refresh_token: Optional[str] = Body(None, embed=True),
+    db: AsyncSession = Depends(get_db),
+):
+    BLACKLISTED_TOKENS.add(auth_data["token"])
+    # la session (jeton de rafraîchissement) est fermée aussi
+    await SessionService(db).fermer(refresh_token)
     return {"message": "Deconnexion reussie"}
 
 

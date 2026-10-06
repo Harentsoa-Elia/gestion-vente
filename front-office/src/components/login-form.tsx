@@ -1,5 +1,6 @@
 "use client"
 
+import { enregistrerSession } from "@/lib/jetons"
 import type React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -55,7 +56,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
     try {
       // /signup crée le compte sans renvoyer de jeton : on se connecte juste après
       if (!isLogin) await appeler("/signup", { fullname: fullName, email, password }, "L'inscription a échoué.")
-      let data: { access_token?: string }
+      let data: { access_token?: string; refresh_token?: string }
       try {
         data = await appeler("/login", { email, password }, MESSAGE_IDENTIFIANTS)
       } catch (err) {
@@ -76,7 +77,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       }
       if (!data.access_token) throw new Error("La connexion a échoué.")
 
-      localStorage.setItem("access_token", data.access_token)
+      enregistrerSession("equipe", { access_token: data.access_token, refresh_token: data.refresh_token })
       onLoginSuccess(data.access_token)
     } catch (err) {
       setError(

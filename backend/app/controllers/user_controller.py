@@ -1,9 +1,10 @@
+from typing import Optional
 from fastapi import APIRouter, Body, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from passlib.context import CryptContext
 from app.schemas.user import UserSchema, UserLoginSchema
-from app.auth.auth_handler import sign_jwt
+from app.services.session_service import SessionService
 from app.models.user import User
 from app.database import get_db
 from app.auth.auth_bearer import BLACKLISTED_TOKENS
@@ -57,16 +58,22 @@ async def user_login(user: UserLoginSchema = Body(...), db: AsyncSession = Depen
         if verify_password(user.password, db_user.password):
             if db_user.actif is False:
                 raise HTTPException(status_code=423, detail="Ce compte est suspendu. Contactez l'administrateur de guichetweb.")
-            return sign_jwt(db_user.email, db_user.id, db_user.role)
+            # jeton d'accès court + jeton de rafraîchissement (session de plusieurs jours)
+            return await SessionService(db).ouvrir_equipe(db_user)
         else:
             raise HTTPException(status_code=403, detail="Wrong login details!")
     else:
         raise HTTPException(status_code=403, detail="Wrong login details!")
 
 @router.post("/logout", tags=["user"])
-async def logout(auth_data: dict = Depends(JWTBearer())):
-    token = auth_data["token"]
-    BLACKLISTED_TOKENS.add(token)
+async def logout(
+    auth_data: dict = Depends(JWTBearer()),
+    refresh_token: Optional[str] = Body(None, embed=True),
+    db: AsyncSession = Depends(get_db),
+):
+    BLACKLISTED_TOKENS.add(auth_data["token"])
+    # la session (jeton de rafraîchissement) est fermée aussi
+    await SessionService(db).fermer(refresh_token)
     return {"message": "Successfully logged out"}
 
 

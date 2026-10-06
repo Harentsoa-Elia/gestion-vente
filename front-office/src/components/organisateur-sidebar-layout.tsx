@@ -216,8 +216,16 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
   // se déconnecte) dans un autre onglet, on recharge la page pour afficher le bon espace
   // au lieu de laisser à l'écran des pages d'un compte qui n'est plus connecté.
   useEffect(() => {
+    const compteDe = (jeton: string | null) => {
+      try {
+        return jeton ? JSON.parse(atob(jeton.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).user_id ?? null : null
+      } catch {
+        return null
+      }
+    }
     const changement = (e: StorageEvent) => {
-      if (e.key === "access_token" || e.key === null) window.location.reload()
+      // le jeton est renouvelé toutes les 15 min (même compte) : on ne recharge que si le compte change
+      if (e.key === null || (e.key === "access_token" && compteDe(e.oldValue) !== compteDe(e.newValue))) window.location.reload()
     }
     window.addEventListener("storage", changement)
     return () => window.removeEventListener("storage", changement)

@@ -2,33 +2,24 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { clearParticipantToken, getParticipantToken } from "@/services/participantService"
+import { assurerSession } from "@/lib/jetons"
 import { accueilSelonRole, jetonValide, lireJetonStaff, roleDepuisJeton, type RoleStaff } from "@/lib/role"
 
 /*
- * Session déjà ouverte ? Les jetons (24 h) restent dans le navigateur tant que l'utilisateur
- * ne se déconnecte pas : passer par la page d'accueil ne le déconnecte pas. Ces fonctions
+ * Session déjà ouverte ? Les jetons restent dans le navigateur tant que l'utilisateur ne se
+ * déconnecte pas (jeton d'accès renouvelé automatiquement pendant 7 jours, voir lib/jetons.ts) : passer par la page d'accueil ne le déconnecte pas. Ces fonctions
  * évitent de lui redemander son mot de passe quand il revient vers son espace.
  */
 
-/** Jeton participant présent et non expiré (sinon il est retiré). */
-export function participantConnecte(): boolean {
+/** Session participant utilisable (jeton d'accès renouvelé si besoin). */
+export async function participantConnecte(): Promise<boolean> {
   if (typeof window === "undefined") return false
-  const jeton = getParticipantToken()
-  if (!jeton) return false
-  try {
-    const charge = JSON.parse(atob(jeton.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")))
-    if (typeof charge.expires === "number" && charge.expires > Date.now() / 1000) return true
-  } catch {
-    // jeton illisible
-  }
-  clearParticipantToken()
-  return false
+  return assurerSession("participant")
 }
 
-/** Rôle du compte organisateur / administrateur connecté, ou null. */
-export function staffConnecte(): RoleStaff | null {
-  if (typeof window === "undefined") return null
+/** Rôle du compte organisateur / administrateur connecté (jeton renouvelé si besoin), ou null. */
+export async function staffConnecte(): Promise<RoleStaff | null> {
+  if (typeof window === "undefined" || !(await assurerSession("equipe"))) return null
   const charge = lireJetonStaff()
   return jetonValide(charge) ? roleDepuisJeton(charge) : null
 }
@@ -47,17 +38,23 @@ export function useRedirectionSiConnecte(
   const router = useRouter()
   const [afficher, setAfficher] = useState(false)
   useEffect(() => {
-    const role = staffConnecte()
-    if (type === "participant" && participantConnecte()) {
-      router.replace(redirection && redirection !== "/" ? redirection : "/participants/mes-reservations")
-      return
+    let actif = true
+    ;(async () => {
+      if (type === "participant" && (await participantConnecte())) {
+        if (actif) router.replace(redirection && redirection !== "/" ? redirection : "/participants/mes-reservations")
+        return
+      }
+      const role = type === "equipe" ? await staffConnecte() : null
+      if (!actif) return
+      if (role) {
+        router.replace(accueilSelonRole(role))
+        return
+      }
+      setAfficher(true)
+    })()
+    return () => {
+      actif = false
     }
-    if (type === "equipe" && role) {
-      router.replace(accueilSelonRole(role))
-      return
-    }
-    if (type === "equipe" && lireJetonStaff()) localStorage.removeItem("access_token") // expiré
-    setAfficher(true)
   }, [type, redirection, router])
   return afficher
 }

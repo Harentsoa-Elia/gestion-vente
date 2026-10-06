@@ -24,6 +24,7 @@ from sqlalchemy import delete, func, select
 from app.database import AsyncSessionLocal
 from app.models.billet import Billet
 from app.models.billet_hors_ligne import LotHorsLigne
+from app.models.jeton_rafraichissement import JetonRafraichissement
 from app.models.categorie_billet import CategorieBillet
 from app.models.code_email import CodeEmail
 from app.models.evenement import Evenement
@@ -84,6 +85,9 @@ async def principal(confirme: bool) -> None:
         await db.execute(delete(CategorieBillet))
         await db.execute(delete(Evenement))
         await db.execute(delete(CodeEmail).where(CodeEmail.email.notin_(list(gardes) or [""])))
+        # sessions des comptes supprimés (les comptes gardés restent connectés)
+        await db.execute(delete(JetonRafraichissement).where(JetonRafraichissement.compte == "participant", JetonRafraichissement.compte_id.in_(ids_parts_suppr)))
+        await db.execute(delete(JetonRafraichissement).where(JetonRafraichissement.compte == "equipe", JetonRafraichissement.compte_id.in_(ids_users_suppr)))
         await db.execute(delete(Participant).where(Participant.id.in_(ids_parts_suppr)))
         await db.execute(delete(User).where(User.id.in_(ids_users_suppr)))
         await db.commit()

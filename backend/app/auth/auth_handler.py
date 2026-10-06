@@ -5,6 +5,9 @@ from decouple import config
 
 JWT_SECRET = config("secret")
 JWT_ALGORITHM = config("algorithm")
+# Jeton d'accès court : il est renouvelé automatiquement grâce au jeton de rafraîchissement
+# (app/services/session_service.py), l'utilisateur ne se reconnecte pas.
+DUREE_ACCES_MINUTES = config("ACCESS_TOKEN_MINUTES", default=15, cast=int)
 
 def token_response(token: str):
     return {"access_token": token}
@@ -15,7 +18,8 @@ def sign_jwt(email: str, user_id: int, role: str = "organisateur") -> Dict[str, 
         "user_id": user_id,
         "role": role,  # "admin" ou "organisateur" (app/auth/roles.py)
         "account_type": "staff",
-        "expires": time.time() + 86400  # 24h
+        "type": "access",
+        "expires": time.time() + DUREE_ACCES_MINUTES * 60
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token_response(token)
@@ -25,7 +29,8 @@ def sign_jwt_participant(email: str, participant_id: int) -> Dict[str, str]:
         "email": email,
         "participant_id": participant_id,
         "account_type": "participant",
-        "expires": time.time() + 86400  # 24h
+        "type": "access",
+        "expires": time.time() + DUREE_ACCES_MINUTES * 60
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token_response(token)

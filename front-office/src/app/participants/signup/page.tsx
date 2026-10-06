@@ -80,7 +80,7 @@ function ParticipantSignupForm() {
         date_naissance: dateNaissance,
         genre,
       })
-      saveParticipantToken(result.access_token)
+      saveParticipantToken(result.access_token, result.refresh_token)
       toast.success(`Bienvenue sur guichetweb, ${prenom.trim()} ! Un code vient de vous être envoyé par e-mail.`)
       router.push(`/participants/verifier-email?redirect=${encodeURIComponent(redirectTo)}`)
     } catch (err) {

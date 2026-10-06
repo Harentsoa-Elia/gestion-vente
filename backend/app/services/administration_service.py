@@ -23,6 +23,8 @@ from app.utils.fuseau import FUSEAU_MADAGASCAR
 TABLES = {"categories": (Categorie, "categorie_id"), "lieux": (Lieu, "lieu_id"), "artistes": (Artiste, "artiste_id")}
 
 
+from app.services.session_service import COMPTE_EQUIPE, COMPTE_PARTICIPANT, SessionService
+
 class ErreurAdministration(ValueError):
     pass
 
@@ -222,6 +224,9 @@ class AdministrationService:
         if actif is not None:
             u.actif = actif
         await self.db.commit()
+        if actif is False:
+            # compte suspendu : ses sessions ouvertes ne pourront plus être rafraîchies
+            await SessionService(self.db).revoquer_compte(COMPTE_EQUIPE, user_id)
 
     async def supprimer_organisateur(self, admin_id: int, user_id: int) -> None:
         if user_id == admin_id:
@@ -273,6 +278,8 @@ class AdministrationService:
             raise ErreurAdministration("Participant introuvable.")
         p.statut = statut
         await self.db.commit()
+        if statut == "suspendu":
+            await SessionService(self.db).revoquer_compte(COMPTE_PARTICIPANT, participant_id)
 
     # ---------- référentiel ----------
     async def _utilisations(self, colonne_ev: Optional[str], colonne_prop: str) -> Dict[int, int]:

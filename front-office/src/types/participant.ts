@@ -29,4 +29,6 @@ export interface ParticipantSignupPayload {
 
 export interface ParticipantAuthResponse {
   access_token: string
+  /** jeton de rafraîchissement (7 jours) : renouvelle le jeton d'accès sans reconnexion */
+  refresh_token?: string
 }

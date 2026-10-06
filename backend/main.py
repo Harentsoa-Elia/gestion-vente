@@ -17,6 +17,7 @@ from app.controllers import (
     notification_controller,
     media_controller,
     compte_controller,
+    session_controller,
     billetterie_controller,
     controle_entree_controller,
     statistiques_controller,
@@ -61,6 +62,7 @@ app.include_router(categorie_billet_controller.router, prefix="/api/v1")
 app.include_router(notification_controller.router, prefix="/api/v1")
 app.include_router(media_controller.router, prefix="/api/v1")
 app.include_router(compte_controller.router, prefix="/api/v1")
+app.include_router(session_controller.router, prefix="/api/v1")
 
 # Images envoyées par les organisateurs (affiches, visuels des propositions)
 MEDIA_DIR.mkdir(parents=True, exist_ok=True)

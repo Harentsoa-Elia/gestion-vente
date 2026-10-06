@@ -64,7 +64,7 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
     try {
       const r = await reinitialiserMotDePasse(espace, { email: email.trim(), code, nouveau_mot_de_passe: motDePasse })
       if (participant && r.access_token) {
-        saveParticipantToken(r.access_token)
+        saveParticipantToken(r.access_token, r.refresh_token)
         toast.success("Mot de passe modifié. Vous êtes connecté.")
         router.push(redirectTo)
       } else {

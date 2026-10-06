@@ -1,5 +1,6 @@
 "use client"
 
+import { lireRafraichissement } from "@/lib/jetons"
 import { Suspense, useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -20,7 +21,7 @@ function Contenu() {
   const [email, setEmail] = useState<string>()
 
   useEffect(() => {
-    if (!getParticipantToken()) {
+    if (!getParticipantToken() && !lireRafraichissement("participant")) {
       router.replace(`/participants/login?redirect=${encodeURIComponent("/participants/verifier-email")}`)
       return
     }

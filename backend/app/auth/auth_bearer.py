@@ -39,7 +39,7 @@ class JWTBearer(HTTPBearer):
             current_time = time.time()
             BLACKLISTED_TOKENS = {
                 token for token in BLACKLISTED_TOKENS
-                if decode_jwt(token).get("expires", 0) > current_time
+                if (decode_jwt(token) or {}).get("expires", 0) > current_time
             }
 
 

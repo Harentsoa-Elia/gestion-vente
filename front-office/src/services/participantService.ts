@@ -1,5 +1,6 @@
 import { API_BASE_URL, parseJsonSafe } from "./apiConfig";
 import type { Participant, ParticipantSignupPayload, ParticipantAuthResponse } from "../types";
+import { effacerSession, enregistrerSession, lireRafraichissement } from "@/lib/jetons";
 
 const PARTICIPANT_TOKEN_KEY = "participant_access_token";
 
@@ -11,12 +12,13 @@ export function getParticipantAuthHeaders() {
   };
 }
 
-export function saveParticipantToken(token: string) {
-  localStorage.setItem(PARTICIPANT_TOKEN_KEY, token);
+/** Jeton d'accès + jeton de rafraîchissement (rafraîchissement automatique : lib/jetons.ts). */
+export function saveParticipantToken(token: string, refreshToken?: string | null) {
+  enregistrerSession("participant", { access_token: token, refresh_token: refreshToken });
 }
 
 export function clearParticipantToken() {
-  localStorage.removeItem(PARTICIPANT_TOKEN_KEY);
+  effacerSession("participant");
 }
 
 export function getParticipantToken(): string | null {
@@ -48,9 +50,11 @@ export async function fetchParticipantMe(): Promise<Participant> {
 }
 
 export async function logoutParticipant(): Promise<void> {
+  // la session (jeton de rafraîchissement) est fermée aussi côté serveur
   const res = await fetch(`${API_BASE_URL}/participants/logout`, {
     method: "POST",
     headers: getParticipantAuthHeaders(),
+    body: JSON.stringify({ refresh_token: lireRafraichissement("participant") }),
   });
   if (!res.ok) {
     const data = await parseJsonSafe(res);

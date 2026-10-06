@@ -27,6 +27,7 @@ import { MenuCompte, type CompteParticipant } from "@/components/menu-compte"
 import { useConfirmationDeconnexion } from "@/components/confirmation-deconnexion"
 import { accueilSelonRole, type RoleStaff } from "@/lib/role"
 import { staffConnecte } from "@/lib/session"
+import { assurerSession } from "@/lib/jetons"
 
 /*
  * En-tête du site public, construit sur le modèle de HelloAsso :
@@ -82,9 +83,12 @@ export function PublicHeader() {
   useEffect(() => {
     if (!isMounted) return
     let actif = true
-    const lireSession = () => {
-      setRoleStaff(staffConnecte())
-      const token = getParticipantToken()
+    const lireSession = async () => {
+      // jetons expirés renouvelés d'abord (retour sur le site après une pause)
+      const [role, participant] = await Promise.all([staffConnecte(), assurerSession("participant")])
+      if (!actif) return
+      setRoleStaff(role)
+      const token = participant ? getParticipantToken() : null
       if (!token) {
         setParticipantName(null)
         setCompte(null)
@@ -107,16 +111,18 @@ export function PublicHeader() {
         })
         .finally(() => actif && setLoadingParticipant(false))
     }
-    lireSession()
+    void lireSession()
     const surStockage = (e: StorageEvent) => {
-      if (e.key === null || e.key === "access_token" || e.key === "participant_access_token") lireSession()
+      // un simple renouvellement de jeton (même compte) ne change rien à l'affichage
+      if (e.key === null || ((e.key === "access_token" || e.key === "participant_access_token") && (!e.oldValue || !e.newValue))) void lireSession()
     }
+    const surFocus = () => void lireSession()
     window.addEventListener("storage", surStockage)
-    window.addEventListener("focus", lireSession)
+    window.addEventListener("focus", surFocus)
     return () => {
       actif = false
       window.removeEventListener("storage", surStockage)
-      window.removeEventListener("focus", lireSession)
+      window.removeEventListener("focus", surFocus)
     }
   }, [isMounted, pathname])
 

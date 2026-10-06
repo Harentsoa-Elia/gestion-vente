@@ -9,6 +9,10 @@ import { PublicFooter } from "@/components/public-footer"
 import { variablesPolices } from "@/components/accueil/fonts"
 import { usePathname } from "next/navigation"
 import { isPublicRoute } from "@/utils"
+import { installerRafraichissement } from "@/lib/jetons"
+
+// rafraîchissement automatique des jetons : installé avant le premier appel à l'API
+if (typeof window !== "undefined") installerRafraichissement()
 
 const inter = Inter({ subsets: ["latin"] })
 

@@ -15,6 +15,7 @@ from .categorie_billet import CategorieBillet
 from .notification import Notification
 from .code_email import CodeEmail
 from .billet_hors_ligne import Revendeur, LotHorsLigne, BilletHorsLigne
+from .jeton_rafraichissement import JetonRafraichissement
 
 __all__ = [
     'User',
@@ -35,4 +36,5 @@ __all__ = [
     'Revendeur',
     'LotHorsLigne',
     'BilletHorsLigne',
+    'JetonRafraichissement',
 ]

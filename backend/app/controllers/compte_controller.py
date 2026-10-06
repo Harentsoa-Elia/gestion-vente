@@ -17,7 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.auth_bearer import ParticipantBearer
-from app.auth.auth_handler import sign_jwt_participant
+from app.services.session_service import COMPTE_EQUIPE as SESSION_EQUIPE, COMPTE_PARTICIPANT as SESSION_PARTICIPANT, SessionService
 from app.database import get_db
 from app.models.participant import Participant
 from app.models.user import User
@@ -122,7 +122,10 @@ async def reinitialiser_participant(saisie: Reinitialisation = Body(...), db: As
     # le code reçu prouve aussi que l'adresse lui appartient
     participant.email_verifie = True
     await db.commit()
-    return {"message": "Mot de passe modifié.", **sign_jwt_participant(participant.email, participant.id)}
+    # mot de passe changé : les autres sessions (peut-être celle d'un voleur) sont fermées
+    sessions = SessionService(db)
+    await sessions.revoquer_compte(SESSION_PARTICIPANT, participant.id)
+    return {"message": "Mot de passe modifié.", **await sessions.ouvrir_participant(participant)}
 
 
 # ---------- mot de passe oublié : équipe (organisateurs, administrateurs) ----------
@@ -153,4 +156,5 @@ async def reinitialiser_equipe(saisie: Reinitialisation = Body(...), db: AsyncSe
         raise HTTPException(status_code=400, detail=CODE_INVALIDE)
     user.password = hash_equipe(saisie.nouveau_mot_de_passe)
     await db.commit()
+    await SessionService(db).revoquer_compte(SESSION_EQUIPE, user.id)
     return {"message": "Mot de passe modifié. Vous pouvez vous connecter."}
