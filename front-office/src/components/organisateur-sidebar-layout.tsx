@@ -11,6 +11,9 @@ import {
   Library,
   LogOut,
   Menu,
+  Printer,
+  Receipt,
+  TicketPlus,
   ShieldCheck,
   Moon,
   ScanLine,
@@ -47,6 +50,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/dashboard", label: "Tableau de bord", icon: LayoutDashboard, disponible: true },
   { href: "/organisateur/evenements", label: "Mes événements", icon: CalendarRange, disponible: true },
   { href: "/organisateur/reservations", label: "Réservations", icon: Ticket, disponible: true },
+  { href: "/organisateur/billets-hors-ligne", label: "Billets hors ligne", icon: TicketPlus, disponible: true },
+  { href: "/organisateur/impression", label: "Impression", icon: Printer, disponible: true },
   { href: "/organisateur/controle-entrees", label: "Contrôle des entrées", icon: ScanLine, disponible: true },
   { href: "/organisateur/participants", label: "Participants", icon: Users, disponible: true },
   { href: "/organisateur/paiements", label: "Paiements", icon: Wallet, disponible: true },
@@ -60,6 +65,7 @@ const NAV_ADMIN: NavItem[] = [
   { href: "/admin/evenements", label: "Événements à valider", icon: ShieldCheck, disponible: true },
   { href: "/admin/utilisateurs", label: "Utilisateurs", icon: Users, disponible: true },
   { href: "/admin/referentiel", label: "Référentiel", icon: Library, disponible: true },
+  { href: "/admin/facturation", label: "Facturation", icon: Receipt, disponible: true },
 ]
 
 export type EspaceStaff = "organisateur" | "admin"

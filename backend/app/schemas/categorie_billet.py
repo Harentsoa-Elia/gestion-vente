@@ -21,6 +21,7 @@ class CategorieBilletUpdate(BaseModel):
 class CategorieBilletResponse(CategorieBilletBase):
     id: int
     evenement_id: int
+    fond_url: Optional[str] = None
 
     class Config:
         from_attributes = True

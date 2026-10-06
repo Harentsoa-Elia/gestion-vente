@@ -74,6 +74,7 @@ class ElementReferentiel(BaseModel):
     nom: str
     detail: Optional[str] = None
     utilisations: int  # événements + propositions qui l'utilisent
+    fond_url: Optional[str] = None  # types d'événement : fond des billets
 
 
 class Referentiel(BaseModel):

@@ -13,6 +13,7 @@ class CategorieCreate(CategorieBase):
 
 class CategorieResponse(CategorieBase):
     id: int = Field(..., description="Unique ID de la categorie")
+    fond_url: Optional[str] = Field(None, description="Fond d'image par défaut des billets de ce type d'événement")
 
     class Config:
         from_attributes = True

@@ -36,6 +36,7 @@ from sqlalchemy import delete, func, or_, select
 from app.database import AsyncSessionLocal
 from app.models.artiste import Artiste
 from app.models.billet import Billet
+from app.models.billet_hors_ligne import LotHorsLigne
 from app.models.categorie import Categorie
 from app.models.categorie_billet import CategorieBillet
 from app.models.code_email import CodeEmail
@@ -214,6 +215,7 @@ async def supprimer(db) -> bool:
     await db.execute(delete(Reservation).where(Reservation.id.in_(resas or [-1])))
     await db.execute(delete(Recommandation).where(Recommandation.evenement_id.in_(evs or [-1])))
     await db.execute(delete(Proposition).where(Proposition.id.in_(props or [-1])))
+    await db.execute(delete(LotHorsLigne).where(LotHorsLigne.evenement_id.in_(evs or [-1])))
     await db.execute(delete(CategorieBillet).where(CategorieBillet.evenement_id.in_(evs or [-1])))
     await db.execute(delete(Evenement).where(Evenement.id.in_(evs or [-1])))
     await db.execute(delete(CodeEmail).where(CodeEmail.email.like(f"%{DOMAINE_PARTICIPANTS}")))

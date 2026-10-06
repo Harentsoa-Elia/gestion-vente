@@ -12,6 +12,8 @@ export interface Categorie {
   id: number
   nom: string
   description: string | null
+  /** fond par défaut des billets des événements de ce type */
+  fond_url?: string | null
 }
 
 export interface Artiste {

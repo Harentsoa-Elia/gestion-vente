@@ -8,6 +8,8 @@ class Categorie(Base):
     id = Column(Integer, primary_key=True, index=True)
     nom = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    # fond d'image par défaut des billets des événements de ce type
+    fond_url = Column(String, nullable=True)
 
     evenements = relationship("Evenement", back_populates="categorie")
     propositions = relationship("Proposition", back_populates="categorie")

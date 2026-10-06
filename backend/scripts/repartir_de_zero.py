@@ -7,7 +7,7 @@ GARDE :
   - le référentiel : lieux, artistes, types d'événement ;
 SUPPRIME :
   - tous les événements, avec leurs tarifs, propositions, réactions, recommandations,
-    réservations, paiements, billets et notifications ;
+    réservations, paiements, billets (en ligne et hors ligne) et notifications ;
   - tous les autres comptes : organisateurs et participants de test, données de démonstration.
 
 Action définitive : faire une sauvegarde de la base avant (pgAdmin, clic droit sur la base, Backup...).
@@ -23,6 +23,7 @@ from sqlalchemy import delete, func, select
 
 from app.database import AsyncSessionLocal
 from app.models.billet import Billet
+from app.models.billet_hors_ligne import LotHorsLigne
 from app.models.categorie_billet import CategorieBillet
 from app.models.code_email import CodeEmail
 from app.models.evenement import Evenement
@@ -79,6 +80,7 @@ async def principal(confirme: bool) -> None:
         await db.execute(delete(Reservation))
         await db.execute(delete(Recommandation))
         await db.execute(delete(Proposition))
+        await db.execute(delete(LotHorsLigne))  # billets hors ligne supprimés avec leur lot (ON DELETE CASCADE)
         await db.execute(delete(CategorieBillet))
         await db.execute(delete(Evenement))
         await db.execute(delete(CodeEmail).where(CodeEmail.email.notin_(list(gardes) or [""])))

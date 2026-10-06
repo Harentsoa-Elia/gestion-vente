@@ -9,6 +9,8 @@ import { enregistrerElementReferentiel, fetchReferentielAdmin, supprimerElementR
 import { fetchArtistes, fetchCategories, fetchLieux } from "@/services/referentielService"
 import { REGION_ENTREPRISE, REGIONS, regionDeLaVille } from "@/lib/regions"
 import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui"
+import { ChoixFond } from "@/components/organisateur/fond-billet"
+import { definirFondType } from "@/services/horsLigneService"
 
 /*
  * Référentiel (administrateur) : types d'événement, lieux et artistes proposés aux organisateurs.
@@ -216,6 +218,7 @@ export function AdminReferentiel() {
           <h1 className="font-titre text-2xl font-semibold">Référentiel</h1>
           <p className="mt-1 max-w-2xl text-sm text-gw-texte-doux dark:text-white/65">
             Types d&apos;événement, lieux et artistes que les organisateurs choisissent et soumettent au vote du public.
+            {table === "categories" && " Le fond d'un type d'événement s'imprime sur les billets dont le tarif n'a pas son propre fond."}
           </p>
         </div>
         <Bouton onClick={() => setEdition({ element: null })}>
@@ -272,6 +275,17 @@ export function AdminReferentiel() {
               >
                 {e.utilisations ? `Utilisé ${e.utilisations} fois` : "Pas encore utilisé"}
               </span>
+              {table === "categories" && (
+                <ChoixFond
+                  compact
+                  url={e.fond_url}
+                  libelle={`fond des billets « ${e.nom} »`}
+                  onChanger={async (f) => {
+                    await definirFondType(e.id, f)
+                    charger()
+                  }}
+                />
+              )}
               <button
                 type="button"
                 onClick={() => setEdition({ element: complets[table].get(e.id) ?? ({ id: e.id, nom: e.nom } as Complet) })}

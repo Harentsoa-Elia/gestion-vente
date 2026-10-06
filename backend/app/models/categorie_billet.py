@@ -10,6 +10,8 @@ class CategorieBillet(Base):
     nom = Column(String, nullable=False)
     prix = Column(Float, nullable=False)
     quantite_disponible = Column(Integer, nullable=True)
+    # fond d'image des billets de ce tarif (sinon celui du type d'événement, sinon le design guichetweb)
+    fond_url = Column(String, nullable=True)
 
     evenement_id = Column(Integer, ForeignKey("evenements.id"), nullable=False)
 

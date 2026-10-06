@@ -294,7 +294,9 @@ class AdministrationService:
         lieux = (await self.db.execute(select(Lieu).order_by(Lieu.nom))).scalars().all()
         arts = (await self.db.execute(select(Artiste).order_by(Artiste.nom))).scalars().all()
         return {
-            "categories": [{"id": c.id, "nom": c.nom, "detail": c.description, "utilisations": u_cat.get(c.id, 0)} for c in cats],
+            "categories": [
+                {"id": c.id, "nom": c.nom, "detail": c.description, "utilisations": u_cat.get(c.id, 0), "fond_url": c.fond_url} for c in cats
+            ],
             "lieux": [
                 {
                     "id": l.id,

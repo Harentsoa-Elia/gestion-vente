@@ -54,6 +54,8 @@ export interface ElementReferentiel {
   nom: string
   detail: string | null
   utilisations: number
+  /** types d'événement : fond des billets */
+  fond_url?: string | null
 }
 
 export type TableReferentiel = "categories" | "lieux" | "artistes"

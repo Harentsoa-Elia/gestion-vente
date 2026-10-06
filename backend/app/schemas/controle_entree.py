@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 
 class CodeScanne(BaseModel):
-    code: str = Field(..., min_length=1, max_length=500, description="Contenu du QR code, ou numéro du billet saisi à la main (BLT-...)")
+    code: str = Field(..., min_length=1, max_length=500, description="Contenu du QR code, ou numéro du billet saisi à la main (BLT-… ou BHL-… pour un billet hors ligne)")
 
 
 class BilletScanne(BaseModel):
@@ -35,7 +35,7 @@ class EtatEntrees(EvenementControle):
     derniers: List[BilletScanne]
 
 
-StatutScan = Literal["valide", "deja_utilise", "autre_evenement", "inconnu"]
+StatutScan = Literal["valide", "deja_utilise", "autre_evenement", "inconnu", "annule"]
 
 
 class ResultatScan(BaseModel):

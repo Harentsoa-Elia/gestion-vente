@@ -13,6 +13,8 @@ from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.billet import Billet
+from app.models.billet_hors_ligne import BilletHorsLigne, LotHorsLigne
+from app.models.categorie import Categorie
 from app.models.categorie_billet import CategorieBillet
 from app.models.evenement import Evenement
 from app.models.lieu import Lieu
@@ -61,7 +63,7 @@ class BilletterieService:
         self.db = db
 
     async def places_prises(self, categorie_id: int) -> int:
-        """Billets payés + réservations en attente encore valables."""
+        """Billets payés + réservations en attente encore valables + billets hors ligne non annulés."""
         limite = maintenant() - DUREE_RESERVATION
         result = await self.db.execute(
             select(func.count(Reservation.id)).where(
@@ -69,7 +71,12 @@ class BilletterieService:
                 or_(Reservation.statut == "confirmee", and_(Reservation.statut == "en_attente", Reservation.date_reservation >= limite)),
             )
         )
-        return result.scalar() or 0
+        hors_ligne = await self.db.execute(
+            select(func.count(BilletHorsLigne.id))
+            .join(LotHorsLigne, BilletHorsLigne.lot_id == LotHorsLigne.id)
+            .where(LotHorsLigne.categorie_billet_id == categorie_id, BilletHorsLigne.annule.is_(False))
+        )
+        return (result.scalar() or 0) + (hors_ligne.scalar() or 0)
 
     async def tarifs(self, evenement_id: int) -> List[dict]:
         """Tarifs d'un événement avec les places restantes (None = sans limite)."""
@@ -171,10 +178,11 @@ class BilletterieService:
 
     async def billets_participant(self, participant_id: int, reservation_ids: Optional[List[int]] = None) -> List[dict]:
         requete = (
-            select(Reservation, Evenement, CategorieBillet, Lieu, Paiement, Billet)
+            select(Reservation, Evenement, CategorieBillet, Lieu, Paiement, Billet, Categorie.fond_url)
             .join(Evenement, Reservation.evenement_id == Evenement.id)
             .join(CategorieBillet, Reservation.categorie_billet_id == CategorieBillet.id)
             .outerjoin(Lieu, Evenement.lieu_id == Lieu.id)
+            .outerjoin(Categorie, Evenement.categorie_id == Categorie.id)
             .outerjoin(Paiement, Paiement.reservation_id == Reservation.id)
             .outerjoin(Billet, Billet.reservation_id == Reservation.id)
             .where(Reservation.participant_id == participant_id)
@@ -184,7 +192,7 @@ class BilletterieService:
             requete = requete.where(Reservation.id.in_(reservation_ids))
         lignes = (await self.db.execute(requete)).all()
         resultat = []
-        for r, e, c, l, p, b in lignes:
+        for r, e, c, l, p, b, fond_type in lignes:
             # une réservation abandonnée depuis plus de 15 minutes n'est plus proposée
             expire = r.date_reservation + DUREE_RESERVATION if r.statut == "en_attente" and r.date_reservation else None
             if r.statut == "en_attente" and expire and expire < maintenant() and reservation_ids is None:
@@ -208,6 +216,8 @@ class BilletterieService:
                     "qr_code": b.qr_code if b else None,
                     "utilise": bool(b.is_used) if b else False,
                     "date_scan": b.date_scan if b else None,
+                    # fond du billet PDF : celui du tarif, sinon celui du type d'événement
+                    "fond_url": c.fond_url or fond_type,
                 }
             )
         return resultat

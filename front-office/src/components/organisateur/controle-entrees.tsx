@@ -81,6 +81,7 @@ const STYLES_VERDICT = {
   deja_utilise: { fond: "bg-red-600", icone: XCircle, titre: "Déjà utilisé" },
   inconnu: { fond: "bg-red-600", icone: XCircle, titre: "Billet inconnu" },
   autre_evenement: { fond: "bg-amber-500", icone: AlertTriangle, titre: "Autre événement" },
+  annule: { fond: "bg-red-600", icone: XCircle, titre: "Billet annulé" },
 } as const
 
 function PanneauVerdict({ verdict, enCours }: { verdict: Verdict | null; enCours: boolean }) {
@@ -111,7 +112,7 @@ function PanneauVerdict({ verdict, enCours }: { verdict: Verdict | null; enCours
       {b && (
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-2xl bg-black/15 p-4 text-sm">
           <div className="col-span-2">
-            <dt className="text-xs text-white/70">Participant</dt>
+            <dt className="text-xs text-white/70">{b.numero.startsWith("BHL-") ? "Billet hors ligne" : "Participant"}</dt>
             <dd className="font-titre text-xl font-semibold">{b.participant}</dd>
           </div>
           <div>

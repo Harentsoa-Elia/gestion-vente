@@ -30,6 +30,7 @@ def infos_pdf(billets: List[dict], participant: Participant) -> List[InfosBillet
             prix=b["prix"],
             participant=nom,
             utilise=b["utilise"],
+            fond=b.get("fond_url"),
         )
         for b in billets
         if b["numero_billet"]

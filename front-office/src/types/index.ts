@@ -12,3 +12,4 @@ export * from "./billetterie";
 export * from "./controle-entree";
 export * from "./statistiques";
 export * from "./administration";
+export * from "./hors-ligne";

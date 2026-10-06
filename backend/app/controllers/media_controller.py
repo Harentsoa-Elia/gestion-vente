@@ -1,4 +1,5 @@
-"""Images des événements (affiche) et des propositions (visuel).
+"""Images des événements (affiche), des propositions (visuel) et fonds des billets
+(par tarif pour l'organisateur, par type d'événement pour l'administrateur).
 
 Le fichier est envoyé brut dans le corps de la requête (Content-Type image/jpeg, image/png
 ou image/webp) : pas besoin du paquet python-multipart.
@@ -11,8 +12,13 @@ from app.auth.auth_bearer import JWTBearer
 from app.controllers.evenement_controller import check_access
 from app.controllers.proposition_controller import check_evenement_access
 from app.database import get_db
+from app.auth.roles import exiger_admin
+from app.models.categorie import Categorie
+from app.models.categorie_billet import CategorieBillet
 from app.models.evenement import Evenement
 from app.models.proposition import Proposition
+from app.schemas.categorie import CategorieResponse
+from app.schemas.categorie_billet import CategorieBilletResponse
 from app.schemas.evenement import EvenementResponse
 from app.schemas.proposition import PropositionResponse
 from app.services.evenement_service import EvenementService
@@ -124,3 +130,66 @@ async def retirer_image_proposition(
     await db.refresh(proposition)
     supprimer_image(ancienne)
     return proposition
+
+
+# ---------- fond des billets : par tarif (organisateur) ----------
+
+async def tarif_modifiable(categorie_id: int, auth_data: dict, db: AsyncSession) -> CategorieBillet:
+    tarif = await db.get(CategorieBillet, categorie_id)
+    if not tarif:
+        raise HTTPException(status_code=404, detail="Tarif introuvable.")
+    evenement = await db.get(Evenement, tarif.evenement_id)
+    check_access(auth_data, evenement.organisateur_id)
+    return tarif
+
+
+@router.put("/categories-billet/{categorie_id}/fond", response_model=CategorieBilletResponse, summary="Fond d'image des billets d'un tarif")
+async def definir_fond_tarif(categorie_id: int, request: Request, auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
+    tarif = await tarif_modifiable(categorie_id, auth_data, db)
+    url = await enregistrer(await lire_image(request), "fonds")
+    ancienne, tarif.fond_url = tarif.fond_url, url
+    await db.commit()
+    await db.refresh(tarif)
+    supprimer_image(ancienne)
+    return tarif
+
+
+@router.delete("/categories-billet/{categorie_id}/fond", response_model=CategorieBilletResponse, summary="Retirer le fond des billets d'un tarif")
+async def retirer_fond_tarif(categorie_id: int, auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
+    tarif = await tarif_modifiable(categorie_id, auth_data, db)
+    ancienne, tarif.fond_url = tarif.fond_url, None
+    await db.commit()
+    await db.refresh(tarif)
+    supprimer_image(ancienne)
+    return tarif
+
+
+# ---------- fond des billets : par type d'événement (administrateur) ----------
+
+async def type_modifiable(categorie_id: int, auth_data: dict, db: AsyncSession) -> Categorie:
+    exiger_admin(auth_data)
+    categorie = await db.get(Categorie, categorie_id)
+    if not categorie:
+        raise HTTPException(status_code=404, detail="Type d'événement introuvable.")
+    return categorie
+
+
+@router.put("/categories/{categorie_id}/fond", response_model=CategorieResponse, summary="Fond par défaut des billets d'un type d'événement")
+async def definir_fond_type(categorie_id: int, request: Request, auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
+    categorie = await type_modifiable(categorie_id, auth_data, db)
+    url = await enregistrer(await lire_image(request), "fonds")
+    ancienne, categorie.fond_url = categorie.fond_url, url
+    await db.commit()
+    await db.refresh(categorie)
+    supprimer_image(ancienne)
+    return categorie
+
+
+@router.delete("/categories/{categorie_id}/fond", response_model=CategorieResponse, summary="Retirer le fond d'un type d'événement")
+async def retirer_fond_type(categorie_id: int, auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
+    categorie = await type_modifiable(categorie_id, auth_data, db)
+    ancienne, categorie.fond_url = categorie.fond_url, None
+    await db.commit()
+    await db.refresh(categorie)
+    supprimer_image(ancienne)
+    return categorie

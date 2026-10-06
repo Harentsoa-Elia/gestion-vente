@@ -21,7 +21,7 @@ export interface EtatEntrees extends EvenementControle {
   derniers: BilletScanne[]
 }
 
-export type StatutScan = "valide" | "deja_utilise" | "autre_evenement" | "inconnu"
+export type StatutScan = "valide" | "deja_utilise" | "autre_evenement" | "inconnu" | "annule"
 
 export interface ResultatScan {
   statut: StatutScan
