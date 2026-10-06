@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { saveParticipantToken } from "@/services/participantService"
 import { connexionEquipe, connexionParticipant, MESSAGE_IDENTIFIANTS } from "@/lib/connexion"
 import { accueilSelonRole, lireJetonStaff, roleDepuisJeton } from "@/lib/role"
+import { useRedirectionSiConnecte } from "@/lib/session"
 import { BoutonAuth, CadreAuth, ChampAuth, LienPied, MessageErreur } from "@/components/auth/cadre-auth"
 
 function ParticipantLoginForm() {
@@ -17,6 +18,8 @@ function ParticipantLoginForm() {
   // l'onglet 'Inscription' garde la page de retour (ex. réservation en cours)
   const suite = searchParams.get("redirect") ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
 
+  // déjà connecté : retour direct à la page demandée (ou à « Mes billets »), sans redemander le mot de passe
+  const afficher = useRedirectionSiConnecte("participant", searchParams.get("redirect"))
   const [email, setEmail] = useState(searchParams.get("email") ?? "")
   const [motDePasse, setMotDePasse] = useState("")
   const [loading, setLoading] = useState(false)
@@ -60,6 +63,8 @@ function ParticipantLoginForm() {
       setLoading(false)
     }
   }
+
+  if (!afficher) return <div className="min-h-[60vh]" />
 
   return (
     <CadreAuth

@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useRedirectionSiConnecte } from "@/lib/session"
 import { ArrowLeft, ArrowRight, CalendarDays, KeyRound, Lock, Mail, User, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { signupParticipant, saveParticipantToken } from "@/services/participantService"
@@ -30,6 +31,8 @@ function ParticipantSignupForm() {
   const redirectTo = searchParams.get("redirect") || "/"
   const suite = searchParams.get("redirect") ? `?redirect=${encodeURIComponent(redirectTo)}` : ""
 
+  // déjà connecté : pas besoin de créer un compte, retour direct à son espace
+  const afficher = useRedirectionSiConnecte("participant", searchParams.get("redirect"))
   const [etape, setEtape] = useState(0)
   const [nom, setNom] = useState("")
   const [prenom, setPrenom] = useState("")
@@ -98,6 +101,8 @@ function ParticipantSignupForm() {
     if (etape === 0) router.push(`/participants/login${suite}`)
     else setEtape(0)
   }
+
+  if (!afficher) return <div className="min-h-[60vh]" />
 
   return (
     <CadreAuth

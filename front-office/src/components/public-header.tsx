@@ -24,6 +24,9 @@ import {
   logoutParticipant,
 } from "@/services/participantService"
 import { MenuCompte, type CompteParticipant } from "@/components/menu-compte"
+import { useConfirmationDeconnexion } from "@/components/confirmation-deconnexion"
+import { accueilSelonRole, type RoleStaff } from "@/lib/role"
+import { staffConnecte } from "@/lib/session"
 
 /*
  * En-tête du site public, construit sur le modèle de HelloAsso :
@@ -39,11 +42,19 @@ const ESPACE_PARTICIPANT = [
   { href: "/participants/mes-reservations", libelle: "Où trouver mon billet ?", icone: Ticket },
 ]
 
-const ESPACE_ORGANISATEUR = [
-  { href: "/login", libelle: "Accéder à mon espace organisateur", icone: LayoutDashboard },
-  { href: "/login", libelle: "Publier un événement", icone: Megaphone },
+/** Liens de l'espace organisateur : directs vers l'espace si le compte est déjà connecté. */
+const espaceOrganisateur = (role: RoleStaff | null) => [
+  {
+    href: role ? accueilSelonRole(role) : "/login",
+    libelle: role === "admin" ? "Accéder à l'administration" : "Accéder à mon espace organisateur",
+    icone: LayoutDashboard,
+  },
+  { href: lienPublier(role), libelle: "Publier un événement", icone: Megaphone },
   { href: "/#organiser", libelle: "Comment ça marche ?", icone: HelpCircle },
 ]
+
+/** « Publier un événement » : la liste de ses événements si l'organisateur est connecté. */
+const lienPublier = (role: RoleStaff | null) => (role === "organisateur" ? "/organisateur/evenements" : role ? accueilSelonRole(role) : "/login")
 
 export function PublicHeader() {
   const pathname = usePathname()
@@ -56,6 +67,8 @@ export function PublicHeader() {
   const [compte, setCompte] = useState<CompteParticipant | null>(null)
   const [loadingParticipant, setLoadingParticipant] = useState(true)
   const [recherche, setRecherche] = useState("")
+  /** organisateur ou administrateur déjà connecté : on lui propose de revenir à son espace sans se reconnecter */
+  const [roleStaff, setRoleStaff] = useState<RoleStaff | null>(null)
   const panneauRef = useRef<HTMLDivElement>(null)
   const boutonMenuRef = useRef<HTMLButtonElement>(null)
 
@@ -65,6 +78,7 @@ export function PublicHeader() {
 
   useEffect(() => {
     if (!isMounted) return
+    setRoleStaff(staffConnecte())
     const token = getParticipantToken()
     if (!token) {
       setLoadingParticipant(false)
@@ -122,6 +136,9 @@ export function PublicHeader() {
     setMenuOuvert(false)
     router.push("/")
   }
+
+  // « Se déconnecter ? » avant de quitter le compte (Annuler / Se déconnecter)
+  const { demander: demanderDeconnexion, fenetre: confirmationDeconnexion } = useConfirmationDeconnexion(handleLogout, participantName)
 
   const lancerRecherche = (e: FormEvent) => {
     e.preventDefault()
@@ -181,11 +198,26 @@ export function PublicHeader() {
             <span className="hidden sm:inline">Menu</span>
           </button>
 
+          {roleStaff && (
+            <Link
+              href={accueilSelonRole(roleStaff)}
+              className={
+                compte
+                  ? "hidden h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond lg:flex"
+                  : "flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond"
+              }
+              title="Vous êtes déjà connecté : retour direct à votre espace"
+            >
+              <LayoutDashboard className="h-4 w-4 text-gw-rose" aria-hidden />
+              <span className="hidden sm:inline">{roleStaff === "admin" ? "Administration" : "Mon espace"}</span>
+            </Link>
+          )}
+
           {!loadingParticipant &&
             (compte ? (
               // clic sur le nom : Mes réservations, confirmation de l'e-mail, Déconnexion
-              <MenuCompte compte={compte} onDeconnexion={handleLogout} />
-            ) : (
+              <MenuCompte compte={compte} onDeconnexion={demanderDeconnexion} />
+            ) : roleStaff ? null : (
               <Link
                 href="/participants/login"
                 className="hidden h-10 items-center rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond sm:flex"
@@ -195,7 +227,7 @@ export function PublicHeader() {
             ))}
 
           <Link
-            href="/login"
+            href={lienPublier(roleStaff)}
             className="hidden h-10 items-center rounded-full bg-gw-rose-action px-5 text-sm font-semibold text-white transition-colors hover:bg-gw-rose-action-fonce focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-rose lg:flex"
           >
             Publier un événement
@@ -239,7 +271,10 @@ export function PublicHeader() {
                     </Link>
                     <button
                       type="button"
-                      onClick={handleLogout}
+                      onClick={() => {
+                        setMenuOuvert(false)
+                        demanderDeconnexion()
+                      }}
                       className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-gw-texte hover:bg-gw-fond"
                     >
                       <LogOut className="h-4 w-4" aria-hidden />
@@ -268,7 +303,7 @@ export function PublicHeader() {
             <div className="md:border-l md:border-gw-bordure md:pl-12">
               <p className="font-titre text-lg font-semibold text-gw-nuit">Espace organisateur</p>
               <ul className="mt-3 space-y-1">
-                {ESPACE_ORGANISATEUR.map(({ href, libelle, icone: Icone }) => (
+                {espaceOrganisateur(roleStaff).map(({ href, libelle, icone: Icone }) => (
                   <li key={libelle}>
                     <Link href={href} onClick={() => setMenuOuvert(false)} className={lienMenu}>
                       <Icone className="h-4 w-4 text-gw-rose" aria-hidden />
@@ -281,6 +316,7 @@ export function PublicHeader() {
           </nav>
         </div>
       )}
+      {confirmationDeconnexion}
     </header>
   )
 }

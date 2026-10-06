@@ -26,6 +26,7 @@ import {
   X,
 } from "lucide-react"
 import { logout } from "@/services/auth.service"
+import { useConfirmationDeconnexion } from "@/components/confirmation-deconnexion"
 import { Logo } from "@/components/marque/logo"
 import { cn } from "@/utils"
 
@@ -235,11 +236,12 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
     localStorage.setItem("organisateur_dark_mode", String(suivant))
   }
 
-  const deconnexion = async () => {
+  // « Se déconnecter ? » : rien ne se passe tant que l'utilisateur n'a pas confirmé
+  const { demander: deconnexion, fenetre: confirmationDeconnexion } = useConfirmationDeconnexion(async () => {
     // logout() retire toujours le jeton du navigateur, même en cas d'erreur du serveur
     await logout()
     router.replace("/login")
-  }
+  })
 
   if (!mounted) return null
 
@@ -304,6 +306,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
             : children}
         </main>
       </div>
+      {confirmationDeconnexion}
     </div>
   )
 }
