@@ -3,12 +3,13 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useId, useRef, useState } from "react"
-import { BadgeCheck, ChevronDown, LogOut, MailWarning, Ticket } from "lucide-react"
+import { BadgeCheck, ChevronDown, LogOut, MailWarning, Ticket, UserPen } from "lucide-react"
 import { cn } from "@/utils"
 
 /*
  * Menu du participant connecté, dans l'en-tête public : un clic sur son nom ouvre
- * 'Mes réservations', la confirmation de l'adresse e-mail (si besoin) et 'Déconnexion'.
+ * « Mes billets », « Mon profil » (avec un rappel s'il manque le téléphone, le genre ou la date
+ * de naissance), la confirmation de l'adresse e-mail (si besoin) et « Déconnexion ».
  * Se ferme avec Échap, par un clic ailleurs ou en changeant de page.
  */
 
@@ -17,7 +18,13 @@ export interface CompteParticipant {
   nom: string
   email: string
   email_verifie: boolean
+  telephone?: string | null
+  genre?: string | null
+  date_naissance?: string | null
 }
+
+/** Profil incomplet : téléphone, genre ou date de naissance manquant. */
+export const profilIncomplet = (c: CompteParticipant) => !c.telephone || !c.genre || !c.date_naissance
 
 export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipant; onDeconnexion: () => void }) {
   const [ouvert, setOuvert] = useState(false)
@@ -102,6 +109,15 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
               <Link href="/participants/mes-reservations" className={element}>
                 <Ticket className="h-4 w-4 text-gw-violet" aria-hidden />
                 Mes billets
+              </Link>
+            </li>
+            <li>
+              <Link href="/participants/profil" className={element}>
+                <UserPen className="h-4 w-4 text-gw-violet" aria-hidden />
+                <span className="flex-1">Mon profil</span>
+                {profilIncomplet(compte) && (
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">à compléter</span>
+                )}
               </Link>
             </li>
             {!compte.email_verifie && (

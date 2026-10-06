@@ -3,17 +3,18 @@
 import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useRedirectionSiConnecte } from "@/lib/session"
-import { ArrowLeft, ArrowRight, CalendarDays, KeyRound, Lock, Mail, User, UserPlus } from "lucide-react"
+import { ArrowLeft, ArrowRight, CalendarDays, KeyRound, Lock, Mail, Phone, User, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { signupParticipant, saveParticipantToken } from "@/services/participantService"
 import { BoutonAuth, CadreAuth, ChampAuth, ChoixSegmente, MessageErreur } from "@/components/auth/cadre-auth"
 import { cn } from "@/utils"
+import { formaterTelephone, normaliserTelephone } from "@/lib/billetterie"
 import type { Genre } from "@/types"
 
 /*
  * Inscription d'un participant en deux étapes :
- * 1. 'Vous' : prénom, nom, date de naissance, genre ;
- * 2. 'Votre compte' : e-mail et mot de passe.
+ * 1. « Vous » : prénom, nom, date de naissance, genre ;
+ * 2. « Votre compte » : e-mail et mot de passe.
  * Barre de pied Retour / Continuer, comme sur le modèle.
  */
 
@@ -40,6 +41,8 @@ function ParticipantSignupForm() {
   const [motDePasse, setMotDePasse] = useState("")
   const [confirmation, setConfirmation] = useState("")
   const [dateNaissance, setDateNaissance] = useState("")
+  /** facultatif : sert aux organisateurs et pré-remplit le paiement Mobile Money */
+  const [telephone, setTelephone] = useState("")
   const [genre, setGenre] = useState<Genre | "">("")
   const [loading, setLoading] = useState(false)
   const [erreur, setErreur] = useState("")
@@ -54,6 +57,10 @@ function ParticipantSignupForm() {
     if (etape === 0) {
       if (!genre) {
         setErreur("Choisissez votre genre pour continuer.")
+        return
+      }
+      if (telephone && !/^03[2-8]\d{7}$/.test(normaliserTelephone(telephone))) {
+        setErreur("Numéro invalide : 10 chiffres, ex. 034 12 345 67 (ou laissez vide).")
         return
       }
       setEtape(1)
@@ -77,6 +84,7 @@ function ParticipantSignupForm() {
         prenom: prenom.trim(),
         email: email.trim(),
         mot_de_passe: motDePasse,
+        telephone: telephone ? normaliserTelephone(telephone) : undefined,
         date_naissance: dateNaissance,
         genre,
       })
@@ -163,6 +171,16 @@ function ParticipantSignupForm() {
               autoComplete="bday"
               required
             />
+            <ChampAuth
+              libelle="Téléphone (facultatif)"
+              icone={Phone}
+              type="tel"
+              inputMode="tel"
+              value={formaterTelephone(telephone)}
+              onChange={(e) => setTelephone(e.target.value)}
+              placeholder="034 12 345 67"
+              autoComplete="tel-national"
+            />
             <ChoixSegmente
               libelle="Genre"
               options={GENRES}
@@ -227,7 +245,7 @@ function ParticipantSignupForm() {
               <ArrowRight className="h-4 w-4" aria-hidden />
             </>
           ) : loading ? (
-            "Inscription..."
+            "Inscription…"
           ) : (
             "Créer mon compte"
           )}

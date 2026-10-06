@@ -61,3 +61,21 @@ export async function logoutParticipant(): Promise<void> {
     throw new Error(data?.detail || `Failed to logout: ${res.statusText}`);
   }
 }
+/** Page « Mon profil » : prénom, nom, téléphone, genre, date de naissance (l'e-mail ne change pas ici). */
+export async function updateParticipantMe(
+  champs: Partial<Pick<Participant, "nom" | "prenom" | "telephone" | "genre" | "date_naissance">>,
+): Promise<Participant> {
+  const res = await fetch(`${API_BASE_URL}/participants/me`, {
+    method: "PUT",
+    headers: getParticipantAuthHeaders(),
+    body: JSON.stringify(champs),
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok) {
+    const detail = Array.isArray(data?.detail)
+      ? String(data.detail[0]?.msg ?? "").replace(/^Value error, /, "")
+      : data?.detail;
+    throw new Error(detail || "Le profil n'a pas été enregistré.");
+  }
+  return data;
+}

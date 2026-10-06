@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { BadgeCheck, Ban, CalendarDays, ChevronRight, KeyRound, Loader2, Mail, MailWarning, Phone, RotateCcw, Search, ShieldCheck, Ticket, Trash2, UserPlus, UserRound, Wallet, X } from "lucide-react"
 import type { CompteEquipe, ParticipantAdmin } from "@/types"
 import { cn } from "@/utils"
+import { formaterTelephone } from "@/lib/billetterie"
 import {
   creerCompteEquipe,
   fetchComptesEquipe,
@@ -438,7 +439,7 @@ export function AdminUtilisateurs() {
                         <UserRound className="h-4 w-4 shrink-0 text-gw-texte-pale" aria-hidden />
                         {p.prenom} {p.nom}
                       </p>
-                      {p.telephone && <p className="pl-6 text-xs text-gw-texte-doux dark:text-white/55">{p.telephone}</p>}
+                      {p.telephone && <p className="pl-6 text-xs text-gw-texte-doux dark:text-white/55">{formaterTelephone(p.telephone)}</p>}
                     </td>
                     <td className="px-3 py-3">
                       <BadgeStatut actif={actif} />
@@ -589,7 +590,7 @@ function PanneauParticipant({
               </span>
             </Ligne>
             <Ligne icone={Phone} libelle="Téléphone">
-              {p.telephone ?? "—"}
+              {p.telephone ? formaterTelephone(p.telephone) : "—"}
             </Ligne>
             <Ligne icone={UserRound} libelle="Genre et âge">
               {genreCourt(p.genre)}

@@ -41,7 +41,7 @@ def maintenant() -> datetime:
 
 
 def normaliser_telephone(telephone: str) -> str:
-    """'+261 34 12 345 67', '034 12 345 67'... -> '0341234567'."""
+    """« +261 34 12 345 67 », « 034 12 345 67 »… -> « 0341234567 »."""
     chiffres = re.sub(r"\D", "", telephone or "")
     if chiffres.startswith("261"):
         chiffres = "0" + chiffres[3:]
@@ -105,10 +105,10 @@ class BilletterieService:
         if categorie.quantite_disponible is not None:
             restantes = categorie.quantite_disponible - await self.places_prises(categorie_id)
             if restantes <= 0:
-                raise ErreurBilletterie(f"Plus de places '{categorie.nom}' disponibles.")
+                raise ErreurBilletterie(f"Plus de places « {categorie.nom} » disponibles.")
             if quantite > restantes:
                 reste = "qu'une place" if restantes == 1 else f"que {restantes} places"
-                raise ErreurBilletterie(f"Il ne reste {reste} '{categorie.nom}'.")
+                raise ErreurBilletterie(f"Il ne reste {reste} « {categorie.nom} ».")
 
         reservations = [
             Reservation(evenement_id=evenement_id, categorie_billet_id=categorie_id, participant_id=participant_id, statut="en_attente")
@@ -121,7 +121,7 @@ class BilletterieService:
         return evenement, categorie, reservations
 
     async def payer(self, participant_id: int, reservation_ids: List[int], mode: str, telephone: str):
-        verifier_telephone(mode, telephone)
+        numero_paiement = verifier_telephone(mode, telephone)
         result = await self.db.execute(select(Reservation).where(Reservation.id.in_(reservation_ids)))
         reservations = result.scalars().all()
         if len(reservations) != len(set(reservation_ids)):
@@ -155,11 +155,16 @@ class BilletterieService:
             self.db.add(billet)
             billets.append(billet)
 
+        # profil sans téléphone : on garde le numéro Mobile Money qui vient de servir au paiement
+        participant = await self.db.get(Participant, participant_id)
+        if participant and not (participant.telephone or "").strip():
+            participant.telephone = numero_paiement
+
         n = len(reservations)
         self.db.add(
             Notification(
                 organisateur_id=evenement.organisateur_id,
-                message=f"{n} billet{'s' if n > 1 else ''} '{categorie.nom}' vendu{'s' if n > 1 else ''} pour '{evenement.titre}' ({categorie.prix * n:.0f} Ar).",
+                message=f"{n} billet{'s' if n > 1 else ''} « {categorie.nom} » vendu{'s' if n > 1 else ''} pour '{evenement.titre}' ({categorie.prix * n:.0f} Ar).",
                 lu=False,
                 reservation_id=premiere.id,
             )
