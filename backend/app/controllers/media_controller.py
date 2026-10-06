@@ -1,5 +1,6 @@
-"""Images des événements (affiche), des propositions (visuel) et fonds des billets
-(par tarif pour l'organisateur, par type d'événement pour l'administrateur).
+"""Images des événements (affiche), des propositions (visuel), fonds des billets
+(par tarif pour l'organisateur, par type d'événement pour l'administrateur)
+et photo de profil des participants.
 
 Le fichier est envoyé brut dans le corps de la requête (Content-Type image/jpeg, image/png
 ou image/webp) : pas besoin du paquet python-multipart.
@@ -8,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.auth_bearer import JWTBearer
+from app.auth.auth_bearer import JWTBearer, ParticipantBearer
 from app.controllers.evenement_controller import check_access
 from app.controllers.proposition_controller import check_evenement_access
 from app.database import get_db
@@ -16,10 +17,12 @@ from app.auth.roles import exiger_admin
 from app.models.categorie import Categorie
 from app.models.categorie_billet import CategorieBillet
 from app.models.evenement import Evenement
+from app.models.participant import Participant
 from app.models.proposition import Proposition
 from app.schemas.categorie import CategorieResponse
 from app.schemas.categorie_billet import CategorieBilletResponse
 from app.schemas.evenement import EvenementResponse
+from app.schemas.participant import ParticipantResponse
 from app.schemas.proposition import PropositionResponse
 from app.services.evenement_service import EvenementService
 from app.services.proposition_service import PropositionService
@@ -43,9 +46,9 @@ async def lire_image(request: Request) -> bytes:
     return contenu
 
 
-async def enregistrer(contenu: bytes, dossier: str) -> str:
+async def enregistrer(contenu: bytes, dossier: str, carre: int | None = None) -> str:
     try:
-        return await run_in_threadpool(enregistrer_image, contenu, dossier)
+        return await run_in_threadpool(enregistrer_image, contenu, dossier, carre)
     except ImageInvalide as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -193,3 +196,35 @@ async def retirer_fond_type(categorie_id: int, auth_data: dict = Depends(JWTBear
     await db.refresh(categorie)
     supprimer_image(ancienne)
     return categorie
+
+
+# ---------- photo de profil du participant ----------
+
+COTE_PHOTO_PROFIL = 400  # carré, recadré au centre
+
+
+@router.put("/participants/me/photo", response_model=ParticipantResponse, summary="Ajouter ou remplacer sa photo de profil (participant)")
+async def definir_photo_profil(request: Request, auth_data: dict = Depends(ParticipantBearer()), db: AsyncSession = Depends(get_db)):
+    participant = await db.get(Participant, auth_data["participant_id"])
+    if not participant:
+        raise HTTPException(status_code=404, detail="Participant non trouvé.")
+    url = await enregistrer(await lire_image(request), "profils", COTE_PHOTO_PROFIL)
+    ancienne = participant.avatar
+    participant.avatar = url
+    await db.commit()
+    await db.refresh(participant)
+    supprimer_image(ancienne)
+    return participant
+
+
+@router.delete("/participants/me/photo", response_model=ParticipantResponse, summary="Retirer sa photo de profil (participant)")
+async def retirer_photo_profil(auth_data: dict = Depends(ParticipantBearer()), db: AsyncSession = Depends(get_db)):
+    participant = await db.get(Participant, auth_data["participant_id"])
+    if not participant:
+        raise HTTPException(status_code=404, detail="Participant non trouvé.")
+    ancienne = participant.avatar
+    participant.avatar = None
+    await db.commit()
+    await db.refresh(participant)
+    supprimer_image(ancienne)
+    return participant

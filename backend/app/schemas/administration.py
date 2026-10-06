@@ -58,6 +58,7 @@ class ParticipantAdmin(BaseModel):
     telephone: Optional[str] = None
     genre: Optional[str] = None
     date_naissance: Optional[date] = None
+    avatar: Optional[str] = None  # photo de profil
     email_verifie: bool
     statut: str
     date_creation: Optional[datetime] = None

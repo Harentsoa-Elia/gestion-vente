@@ -116,7 +116,7 @@ class AdministrationService:
                 {
                     "type": "vente",
                     "date": quand,
-                    "texte": f"{prenom} {nom[:1]}. a acheté {n} billet{'s' if n > 1 else ''} '{tarif}' pour {titre} ({ariary(montant or 0)})",
+                    "texte": f"{prenom} {nom[:1]}. a acheté {n} billet{'s' if n > 1 else ''} « {tarif} » pour {titre} ({ariary(montant or 0)})",
                     "lien": f"/evenements/{ev_id}",
                 }
             )
@@ -140,7 +140,7 @@ class AdministrationService:
             )
         ).all():
             suite = {"en_attente_validation": " (en attente de validation)", "valide": " (validé)", "rejete": " (rejeté)"}.get(statut, "")
-            items.append({"type": "evenement", "date": quand, "texte": f"{orga or 'Un organisateur'} a créé '{titre}'{suite}", "lien": "/admin/evenements"})
+            items.append({"type": "evenement", "date": quand, "texte": f"{orga or 'Un organisateur'} a créé « {titre} »{suite}", "lien": "/admin/evenements"})
 
         minute_scan = func.date_trunc("minute", Billet.date_scan)
         for quand, titre, n in (
@@ -263,6 +263,7 @@ class AdministrationService:
                 "telephone": p.telephone,
                 "genre": p.genre,
                 "date_naissance": p.date_naissance,
+                "avatar": p.avatar,
                 "email_verifie": bool(p.email_verifie),
                 "statut": p.statut or "actif",
                 "date_creation": p.date_creation,
@@ -325,10 +326,10 @@ class AdministrationService:
             raise ErreurAdministration("Élément introuvable.")
         n = (await self._utilisations(None if table == "artistes" else colonne, colonne)).get(element_id, 0)
         if n:
-            raise ErreurAdministration(f"'{element.nom}' est utilisé par {n} événement{'s' if n > 1 else ''} ou proposition{'s' if n > 1 else ''} : il ne peut pas être supprimé.")
+            raise ErreurAdministration(f"« {element.nom} » est utilisé par {n} événement{'s' if n > 1 else ''} ou proposition{'s' if n > 1 else ''} : il ne peut pas être supprimé.")
         col_reco = getattr(Recommandation, colonne)
         if (await self.db.execute(select(func.count(Recommandation.id)).where(col_reco == element_id))).scalar():
-            raise ErreurAdministration(f"'{element.nom}' figure dans des recommandations : il ne peut pas être supprimé.")
+            raise ErreurAdministration(f"« {element.nom} » figure dans des recommandations : il ne peut pas être supprimé.")
         nom = element.nom
         await self.db.delete(element)
         await self.db.commit()

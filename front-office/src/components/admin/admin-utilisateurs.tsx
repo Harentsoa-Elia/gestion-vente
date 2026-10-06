@@ -8,6 +8,7 @@ import { BadgeCheck, Ban, CalendarDays, ChevronRight, KeyRound, Loader2, Mail, M
 import type { CompteEquipe, ParticipantAdmin } from "@/types"
 import { cn } from "@/utils"
 import { formaterTelephone } from "@/lib/billetterie"
+import { AvatarParticipant } from "@/components/avatar-participant"
 import {
   creerCompteEquipe,
   fetchComptesEquipe,
@@ -435,11 +436,15 @@ export function AdminUtilisateurs() {
                     )}
                   >
                     <td className="px-5 py-3">
-                      <p className="flex items-center gap-2 font-semibold">
-                        <UserRound className="h-4 w-4 shrink-0 text-gw-texte-pale" aria-hidden />
-                        {p.prenom} {p.nom}
-                      </p>
-                      {p.telephone && <p className="pl-6 text-xs text-gw-texte-doux dark:text-white/55">{formaterTelephone(p.telephone)}</p>}
+                      <div className="flex items-center gap-3">
+                        <AvatarParticipant prenom={p.prenom} nom={p.nom} avatar={p.avatar} className="h-9 w-9 text-xs" />
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold">
+                            {p.prenom} {p.nom}
+                          </p>
+                          {p.telephone && <p className="text-xs text-gw-texte-doux dark:text-white/55">{formaterTelephone(p.telephone)}</p>}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-3 py-3">
                       <BadgeStatut actif={actif} />
@@ -523,7 +528,6 @@ function PanneauParticipant({
   if (!p) return null
   const actif = p.statut !== "suspendu"
   const a = age(p.date_naissance)
-  const initiales = `${p.prenom[0] ?? ""}${p.nom[0] ?? ""}`.toUpperCase() || "?"
   const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "—")
 
   const Ligne = ({ icone: Icone, libelle, children }: { icone: typeof Mail; libelle: string; children: React.ReactNode }) => (
@@ -541,9 +545,7 @@ function PanneauParticipant({
       <button type="button" aria-label="Fermer" className="absolute inset-0 bg-gw-nuit/40 backdrop-blur-[1px]" onClick={onFermer} />
       <aside className="relative flex h-full w-full max-w-md flex-col bg-white text-gw-nuit shadow-2xl dark:bg-gw-carte-sombre dark:text-white">
         <div className="flex items-start gap-4 border-b border-gw-bordure p-6 dark:border-white/10">
-          <span className="font-titre flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-lg font-semibold text-white">
-            {initiales}
-          </span>
+          <AvatarParticipant prenom={p.prenom} nom={p.nom} avatar={p.avatar} className="h-16 w-16 text-lg" />
           <div className="min-w-0 flex-1">
             <h2 className="font-titre truncate text-xl font-semibold">
               {p.prenom} {p.nom}

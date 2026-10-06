@@ -1,7 +1,7 @@
 """Enregistrement des images envoyées par les organisateurs (affiches, visuels des propositions).
 
 Les fichiers sont ré-encodés avec Pillow avant d'être écrits : on n'enregistre jamais tel quel
-un fichier reçu, ce qui écarte les faux fichiers image et retire les métadonnées (position GPS...).
+un fichier reçu, ce qui écarte les faux fichiers image et retire les métadonnées (position GPS…).
 Ils sont servis par FastAPI sous /media (voir main.py) ; le dossier media/ n'est pas versionné.
 """
 from io import BytesIO
@@ -23,8 +23,9 @@ class ImageInvalide(ValueError):
     pass
 
 
-def enregistrer_image(contenu: bytes, dossier: str) -> str:
-    """Vérifie, redimensionne et enregistre l'image ; renvoie son URL relative (/media/...)."""
+def enregistrer_image(contenu: bytes, dossier: str, carre: Optional[int] = None) -> str:
+    """Vérifie, redimensionne et enregistre l'image ; renvoie son URL relative (/media/...).
+    carre : recadrage au centre en carré de ce côté (photos de profil)."""
     if not contenu:
         raise ImageInvalide("Aucune image reçue.")
     if len(contenu) > TAILLE_MAX_OCTETS:
@@ -39,7 +40,10 @@ def enregistrer_image(contenu: bytes, dossier: str) -> str:
         raise ImageInvalide("Format non accepté : utilisez JPEG, PNG ou WebP.")
 
     image = ImageOps.exif_transpose(image).convert("RGB")
-    image.thumbnail((COTE_MAX_PX, COTE_MAX_PX))
+    if carre:
+        image = ImageOps.fit(image, (carre, carre), Image.Resampling.LANCZOS)
+    else:
+        image.thumbnail((COTE_MAX_PX, COTE_MAX_PX))
 
     cible = MEDIA_DIR / dossier
     cible.mkdir(parents=True, exist_ok=True)

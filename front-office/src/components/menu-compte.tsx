@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { useEffect, useId, useRef, useState } from "react"
 import { BadgeCheck, ChevronDown, LogOut, MailWarning, Ticket, UserPen } from "lucide-react"
 import { cn } from "@/utils"
+import { AvatarParticipant } from "@/components/avatar-participant"
 
 /*
  * Menu du participant connecté, dans l'en-tête public : un clic sur son nom ouvre
@@ -21,6 +22,7 @@ export interface CompteParticipant {
   telephone?: string | null
   genre?: string | null
   date_naissance?: string | null
+  avatar?: string | null
 }
 
 /** Profil incomplet : téléphone, genre ou date de naissance manquant. */
@@ -34,7 +36,6 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
   const pathname = usePathname()
 
   const nomComplet = `${compte.prenom} ${compte.nom}`.trim()
-  const initiales = `${compte.prenom[0] ?? ""}${compte.nom[0] ?? ""}`.toUpperCase() || "?"
 
   useEffect(() => setOuvert(false), [pathname])
 
@@ -74,8 +75,8 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
           ouvert && "bg-gw-fond",
         )}
       >
-        <span className="relative grid h-8 w-8 place-items-center rounded-full bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-xs font-bold text-white">
-          {initiales}
+        <span className="relative">
+          <AvatarParticipant prenom={compte.prenom} nom={compte.nom} avatar={compte.avatar} className="h-8 w-8 text-xs" />
           {!compte.email_verifie && (
             // pastille : adresse e-mail à confirmer
             <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white" />
@@ -90,7 +91,9 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
           id={idMenu}
           className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-gw-bordure bg-white shadow-[0_24px_48px_-20px_rgba(30,26,60,0.45)]"
         >
-          <div className="border-b border-gw-bordure bg-gw-fond/60 px-4 py-3.5">
+          <div className="flex items-center gap-3 border-b border-gw-bordure bg-gw-fond/60 px-4 py-3.5">
+            <AvatarParticipant prenom={compte.prenom} nom={compte.nom} avatar={compte.avatar} className="h-11 w-11 text-sm" />
+            <div className="min-w-0 flex-1">
             <p className="truncate font-titre font-semibold text-gw-nuit">{nomComplet}</p>
             <p className="truncate text-xs text-gw-texte-doux">{compte.email}</p>
             {compte.email_verifie ? (
@@ -102,6 +105,7 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
                 <MailWarning className="h-3.5 w-3.5" aria-hidden /> Adresse à confirmer
               </p>
             )}
+            </div>
           </div>
 
           <ul className="p-2">

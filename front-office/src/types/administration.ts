@@ -42,6 +42,8 @@ export interface ParticipantAdmin {
   telephone: string | null
   genre: string | null
   date_naissance: string | null
+  /** photo de profil (/media/profils/...) */
+  avatar?: string | null
   email_verifie: boolean
   statut: "actif" | "suspendu" | string
   date_creation: string | null

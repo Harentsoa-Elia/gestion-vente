@@ -79,3 +79,16 @@ export async function updateParticipantMe(
   }
   return data;
 }
+
+/** Photo de profil : envoi de l'image (JPEG, PNG ou WebP, 8 Mo max), ou retrait avec null. */
+export async function envoyerPhotoProfil(fichier: File | null): Promise<Participant> {
+  const entetes = getParticipantAuthHeaders() as Record<string, string>;
+  const res = await fetch(`${API_BASE_URL}/participants/me/photo`, {
+    method: fichier ? "PUT" : "DELETE",
+    headers: fichier ? { Authorization: entetes.Authorization ?? "", "Content-Type": fichier.type } : entetes,
+    body: fichier ?? undefined,
+  });
+  const data = await parseJsonSafe(res);
+  if (!res.ok) throw new Error(data?.detail || "La photo n'a pas été enregistrée.");
+  return data;
+}

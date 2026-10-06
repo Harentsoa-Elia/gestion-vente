@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState, type FormEvent } from "react"
+import { useEffect, useRef, useState, type FormEvent } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { AlertCircle, BadgeCheck, CalendarDays, Loader2, Mail, MailWarning, Phone, User } from "lucide-react"
+import { AlertCircle, BadgeCheck, CalendarDays, Camera, Loader2, Mail, MailWarning, Phone, Trash2, User } from "lucide-react"
 import type { Genre, Participant } from "@/types"
-import { fetchParticipantMe, updateParticipantMe } from "@/services/participantService"
+import { envoyerPhotoProfil, fetchParticipantMe, updateParticipantMe } from "@/services/participantService"
+import { AvatarParticipant } from "@/components/avatar-participant"
 import { formaterTelephone, normaliserTelephone } from "@/lib/billetterie"
 import { BoutonAuth, ChampAuth, ChoixSegmente, MessageErreur } from "@/components/auth/cadre-auth"
 
@@ -13,6 +14,7 @@ import { BoutonAuth, ChampAuth, ChoixSegmente, MessageErreur } from "@/component
  * « Mon profil » (participant) : compléter ou corriger son téléphone, son genre et sa date de naissance.
  * Les comptes créés avant que ces champs soient demandés à l'inscription peuvent ainsi être complétés.
  * Le téléphone est aussi retenu automatiquement au premier paiement Mobile Money.
+ * Photo de profil : envoyée tout de suite au choix du fichier, recadrée en carré par le serveur.
  */
 
 const GENRES: { valeur: Genre; libelle: string }[] = [
@@ -30,6 +32,8 @@ export function ProfilParticipant() {
   const [naissance, setNaissance] = useState("")
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState("")
+  const [envoiPhoto, setEnvoiPhoto] = useState(false)
+  const champPhoto = useRef<HTMLInputElement>(null)
 
   const remplir = (p: Participant) => {
     setProfil(p)
@@ -54,6 +58,22 @@ export function ProfilParticipant() {
         <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
       </p>
     )
+  }
+
+  const changerPhoto = async (fichier: File | null) => {
+    if (fichier && fichier.size > 8 * 1024 * 1024) return toast.error("Image trop lourde : 8 Mo maximum.")
+    setEnvoiPhoto(true)
+    try {
+      const p = await envoyerPhotoProfil(fichier)
+      setProfil(p)
+      toast.success(fichier ? "Photo de profil enregistrée." : "Photo retirée.")
+      window.dispatchEvent(new Event("focus")) // l'en-tête affiche la nouvelle photo
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "La photo n'a pas été enregistrée.")
+    } finally {
+      setEnvoiPhoto(false)
+      if (champPhoto.current) champPhoto.current.value = ""
+    }
   }
 
   const manquants = [!profil.telephone && "téléphone", !profil.genre && "genre", !profil.date_naissance && "date de naissance"].filter(Boolean)
@@ -95,6 +115,59 @@ export function ProfilParticipant() {
           </p>
         </div>
       )}
+
+      {/* photo de profil */}
+      <section className="flex flex-wrap items-center gap-5 rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8">
+        <div className="relative">
+          <AvatarParticipant prenom={profil.prenom} nom={profil.nom} avatar={profil.avatar} className="h-24 w-24 text-2xl" />
+          <button
+            type="button"
+            onClick={() => champPhoto.current?.click()}
+            disabled={envoiPhoto}
+            aria-label={profil.avatar ? "Changer la photo de profil" : "Ajouter une photo de profil"}
+            className="absolute -right-1 -bottom-1 grid h-9 w-9 place-items-center rounded-full bg-gw-nuit text-white ring-4 ring-white transition-transform hover:scale-105"
+          >
+            {envoiPhoto ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Camera className="h-4 w-4" aria-hidden />}
+          </button>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-titre text-xl font-semibold text-gw-nuit">
+            {profil.prenom} {profil.nom}
+          </p>
+          <p className="mt-0.5 text-sm text-gw-texte-doux">JPEG, PNG ou WebP, 8 Mo maximum. Elle sera recadrée en carré.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => champPhoto.current?.click()}
+              disabled={envoiPhoto}
+              className="inline-flex items-center gap-1.5 rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-nuit hover:bg-gw-lavande/50 disabled:opacity-50"
+            >
+              <Camera className="h-4 w-4" aria-hidden /> {profil.avatar ? "Changer la photo" : "Ajouter une photo"}
+            </button>
+            {profil.avatar && (
+              <button
+                type="button"
+                onClick={() => changerPhoto(null)}
+                disabled={envoiPhoto}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-gw-rose-action hover:bg-gw-rose-pale disabled:opacity-50"
+              >
+                <Trash2 className="h-4 w-4" aria-hidden /> Retirer
+              </button>
+            )}
+          </div>
+        </div>
+        <input
+          ref={champPhoto}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="sr-only"
+          tabIndex={-1}
+          onChange={(e) => {
+            const f = e.target.files?.[0]
+            if (f) changerPhoto(f)
+          }}
+        />
+      </section>
 
       <form onSubmit={enregistrer} className="space-y-7 rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8">
         {/* e-mail : identifiant de connexion, non modifiable ici */}

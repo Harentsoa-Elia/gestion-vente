@@ -67,7 +67,6 @@ class ParticipantUpdate(BaseModel):
     adresse: Optional[str] = None
     date_naissance: Optional[date] = None
     genre: Optional[Genre] = None
-    avatar: Optional[str] = None
     mot_de_passe: Optional[str] = Field(None, min_length=6)
 
     @field_validator("telephone")
