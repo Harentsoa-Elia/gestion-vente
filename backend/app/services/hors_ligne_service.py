@@ -10,7 +10,7 @@ from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.roles import est_admin
-from app.models.billet_hors_ligne import TYPES_LOT, BilletHorsLigne, LotHorsLigne
+from app.models.billet_hors_ligne import TYPES_LOT, BilletHorsLigne, LotHorsLigne, Revendeur
 from app.models.categorie import Categorie
 from app.models.categorie_billet import CategorieBillet
 from app.models.evenement import Evenement
@@ -55,8 +55,8 @@ class HorsLigneService:
     async def generer(self, auth_data: dict, saisie) -> LotHorsLigne:
         if saisie.type not in TYPES_LOT:
             raise ErreurHorsLigne("Type de lot inconnu.")
-        if saisie.type == "depot" and not (saisie.revendeur_nom or "").strip():
-            raise ErreurHorsLigne("Indiquez le nom de l'entreprise partenaire qui vendra les billets.")
+        if saisie.type == "depot" and not saisie.revendeur_id and not (saisie.revendeur_nom or "").strip():
+            raise ErreurHorsLigne("Choisissez le revendeur, ou indiquez le nom de la nouvelle entreprise partenaire.")
         if not 1 <= saisie.quantite <= QUANTITE_MAX_LOT:
             raise ErreurHorsLigne(f"Un lot compte de 1 à {QUANTITE_MAX_LOT} billets.")
 
@@ -83,13 +83,18 @@ class HorsLigneService:
         except ErreurBilletterie as e:
             raise ErreurHorsLigne(str(e))
 
+        revendeur = None
+        if saisie.type == "depot":
+            revendeur = await self._revendeur_du_lot(evenement.organisateur_id, saisie)
+
         lot = LotHorsLigne(
             type=saisie.type,
             evenement_id=evenement.id,
             categorie_billet_id=categorie.id,
             organisateur_id=evenement.organisateur_id,
-            revendeur_nom=(saisie.revendeur_nom or "").strip() or None,
-            revendeur_contact=(saisie.revendeur_contact or "").strip() or None,
+            revendeur_id=revendeur.id if revendeur else None,
+            revendeur_nom=revendeur.nom if revendeur else None,
+            revendeur_contact=revendeur.contact if revendeur else None,
             quantite=saisie.quantite,
             prix_unitaire=0.0 if saisie.type == "invitation" else float(categorie.prix),
             frais_unitaire=FRAIS_PAR_BILLET,
@@ -104,6 +109,84 @@ class HorsLigneService:
         await self.db.commit()
         await self.db.refresh(lot)
         return lot
+
+    # ---------- revendeurs ----------
+
+    async def _revendeur_du_lot(self, organisateur_id: int, saisie) -> Revendeur:
+        """Revendeur choisi dans la liste, sinon retrouvé par son nom, sinon créé."""
+        if saisie.revendeur_id:
+            revendeur = await self.db.get(Revendeur, saisie.revendeur_id)
+            if not revendeur or revendeur.organisateur_id != organisateur_id:
+                raise ErreurHorsLigne("Revendeur introuvable.")
+            return revendeur
+        nom = " ".join((saisie.revendeur_nom or "").split())[:120]
+        contact = (saisie.revendeur_contact or "").strip() or None
+        revendeur = (
+            await self.db.execute(
+                select(Revendeur).where(Revendeur.organisateur_id == organisateur_id, func.lower(Revendeur.nom) == nom.lower())
+            )
+        ).scalar_one_or_none()
+        if revendeur is None:
+            revendeur = Revendeur(organisateur_id=organisateur_id, nom=nom, contact=contact)
+            self.db.add(revendeur)
+            await self.db.flush()
+        elif contact and contact != revendeur.contact:
+            revendeur.contact = contact
+        return revendeur
+
+    async def revendeurs(self, auth_data: dict) -> List[dict]:
+        """Fiche de chaque revendeur : lots confiés, billets vendus, rendus, encore en dépôt, argent dû."""
+        requete = select(Revendeur).order_by(Revendeur.nom)
+        if not est_admin(auth_data):
+            requete = requete.where(Revendeur.organisateur_id == auth_data.get("user_id"))
+        revendeurs = (await self.db.execute(requete)).scalars().all()
+        lots = [l for l in (await self.lots(auth_data))["lots"] if l["revendeur_id"]]
+        fiches = []
+        for r in revendeurs:
+            siens = [l for l in lots if l["revendeur_id"] == r.id]
+            en_cours = [l for l in siens if l["statut"] == "en_cours"]
+            fiches.append(
+                {
+                    "id": r.id,
+                    "nom": r.nom,
+                    "contact": r.contact,
+                    "date_creation": r.date_creation,
+                    "lots": len(siens),
+                    "lots_en_cours": len(en_cours),
+                    "lots_a_regler": sum(1 for l in en_cours if l["seuil_atteint"]),
+                    "billets_confies": sum(l["quantite"] for l in siens),
+                    "vendus": sum(l["vendus"] for l in siens),
+                    "rendus": sum(l["annules"] for l in siens),
+                    "en_depot": sum(l["quantite"] - l["annules"] - l["vendus"] for l in en_cours),
+                    "a_encaisser": sum(l["montant_attendu"] for l in en_cours),
+                    "deja_regle": sum(l["montant_regle"] or 0 for l in siens if l["statut"] == "regle"),
+                    "dernier_lot": max((l["date_creation"] for l in siens), default=None),
+                }
+            )
+        return fiches
+
+    async def modifier_revendeur(self, auth_data: dict, revendeur_id: int, nom: Optional[str], contact: Optional[str]) -> dict:
+        revendeur = await self.db.get(Revendeur, revendeur_id)
+        if not revendeur or (not est_admin(auth_data) and revendeur.organisateur_id != auth_data.get("user_id")):
+            raise ErreurHorsLigne("Revendeur introuvable.")
+        if nom is not None:
+            nom = " ".join(nom.split())[:120]
+            if not nom:
+                raise ErreurHorsLigne("Le nom du revendeur est obligatoire.")
+            doublon = (
+                await self.db.execute(
+                    select(Revendeur.id).where(
+                        Revendeur.organisateur_id == revendeur.organisateur_id, func.lower(Revendeur.nom) == nom.lower(), Revendeur.id != revendeur.id
+                    )
+                )
+            ).scalar()
+            if doublon:
+                raise ErreurHorsLigne("Vous avez déjà un revendeur à ce nom.")
+            revendeur.nom = nom
+        if contact is not None:
+            revendeur.contact = contact.strip() or None
+        await self.db.commit()
+        return next(f for f in await self.revendeurs(auth_data) if f["id"] == revendeur_id)
 
     # ---------- consultation ----------
 
@@ -170,6 +253,7 @@ class HorsLigneService:
             "evenement_titre": e.titre,
             "evenement_date": e.date_debut,
             "categorie_nom": c.nom,
+            "revendeur_id": lot.revendeur_id,
             "revendeur_nom": lot.revendeur_nom,
             "revendeur_contact": lot.revendeur_contact,
             "quantite": lot.quantite,

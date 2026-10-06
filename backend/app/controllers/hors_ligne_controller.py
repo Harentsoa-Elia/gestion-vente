@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.auth_bearer import JWTBearer
 from app.auth.roles import exiger_admin, role_du_compte
 from app.database import get_db
-from app.schemas.hors_ligne import EvenementLot, Facturation, GenerationLot, LotDetail, LotsOrganisateur, Reglement, VendusDeclares
+from app.schemas.hors_ligne import RevendeurFiche, RevendeurModification, EvenementLot, Facturation, GenerationLot, LotDetail, LotsOrganisateur, Reglement, VendusDeclares
 from app.services.hors_ligne_service import ErreurHorsLigne, HorsLigneService
 
 router = APIRouter(tags=["billets hors ligne"])
@@ -23,7 +23,7 @@ def erreur(e: ErreurHorsLigne) -> HTTPException:
     message = str(e)
     if message.startswith("SEUIL_NON_ATTEINT"):
         return HTTPException(status_code=409, detail=message)
-    if message in ("Lot introuvable.", "Événement introuvable."):
+    if message in ("Lot introuvable.", "Événement introuvable.", "Revendeur introuvable."):
         return HTTPException(status_code=404, detail=message)
     if "ne vous appartient pas" in message or "que pour vos événements" in message:
         return HTTPException(status_code=403, detail=message)
@@ -94,3 +94,18 @@ async def reglement(lot_id: int, saisie: Reglement = Body(...), auth_data: dict 
 async def facturation(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
     exiger_admin(auth_data)
     return await HorsLigneService(db).facturation()
+
+
+@router.get("/organisateur/hors-ligne/revendeurs", response_model=list[RevendeurFiche], summary="Revendeurs du dépôt-vente et leur bilan")
+async def revendeurs(auth_data: dict = Depends(equipe), db: AsyncSession = Depends(get_db)):
+    return await HorsLigneService(db).revendeurs(auth_data)
+
+
+@router.patch("/organisateur/hors-ligne/revendeurs/{revendeur_id}", response_model=RevendeurFiche, summary="Modifier le nom ou le contact d'un revendeur")
+async def modifier_revendeur(
+    revendeur_id: int, saisie: RevendeurModification = Body(...), auth_data: dict = Depends(equipe), db: AsyncSession = Depends(get_db)
+):
+    try:
+        return await HorsLigneService(db).modifier_revendeur(auth_data, revendeur_id, saisie.nom, saisie.contact)
+    except ErreurHorsLigne as e:
+        raise erreur(e)

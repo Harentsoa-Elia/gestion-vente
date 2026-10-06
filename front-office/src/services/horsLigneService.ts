@@ -8,6 +8,7 @@ import type {
   GenerationLot,
   LotDetail,
   LotsOrganisateur,
+  RevendeurFiche,
 } from "../types"
 
 /* Billets hors ligne (organisateur), impression, fonds des billets et facturation (administrateur). */
@@ -48,6 +49,11 @@ export const reglerLot = (id: number, numerosInvendus: string[], forcer = false)
     method: "POST",
     body: JSON.stringify({ numeros_invendus: numerosInvendus, forcer }),
   })
+
+export const fetchRevendeurs = () => appel<RevendeurFiche[]>("/organisateur/hors-ligne/revendeurs")
+
+export const modifierRevendeur = (id: number, champs: { nom?: string; contact?: string }) =>
+  appel<RevendeurFiche>(`/organisateur/hors-ligne/revendeurs/${id}`, { method: "PATCH", body: JSON.stringify(champs) })
 
 export const fetchFacturation = () => appel<Facturation>("/admin/facturation")
 

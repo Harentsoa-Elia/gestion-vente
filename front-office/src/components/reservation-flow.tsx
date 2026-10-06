@@ -44,7 +44,7 @@ import { CarteBillet } from "@/components/billetterie/carte-billet"
 
 /*
  * Réservation en trois étapes :
- *  1. Billets : tarif et nombre de billets (1 à 10) -> les places sont gardées 15 minutes ;
+ *  1. Billets : tarif et nombre de billets (sans limite autre que les places restantes) -> les places sont gardées 15 minutes ;
  *  2. Paiement : Mobile Money SIMULÉ (MVola, Orange Money, Airtel Money) : aucun opérateur
  *     n'est contacté, le numéro est seulement contrôlé ;
  *  3. Billets : QR codes à l'écran, PDF, et envoi par e-mail.
@@ -127,20 +127,68 @@ function Compteur({ expireLe }: { expireLe: number }) {
   )
 }
 
+/** Au-delà, la confirmation renvoie vers « Mes billets » plutôt que d'afficher tous les QR codes. */
+const BILLETS_AFFICHES = 10
+
+/** Raccourcis proposés sous le compteur (seulement ceux qui tiennent dans les places restantes). */
+const RACCOURCIS = [1, 2, 5, 10, 20, 50, 100]
+
 function ChoixQuantite({ valeur, max, onChange }: { valeur: number; max: number; onChange: (n: number) => void }) {
+  // saisie libre : on garde le texte tapé (même vide) et on ne corrige qu'à la sortie du champ
+  const [texte, setTexte] = useState(String(valeur))
+  useEffect(() => setTexte(String(valeur)), [valeur])
   const bouton =
-    "grid h-9 w-9 place-items-center rounded-full bg-white text-gw-nuit ring-1 ring-gw-bordure hover:ring-gw-violet disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-gw-violet"
+    "grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-gw-nuit ring-1 ring-gw-bordure hover:ring-gw-violet disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-gw-violet"
+  const valider = (t: string) => {
+    const n = Math.floor(Number(t))
+    if (Number.isFinite(n) && n >= 1) onChange(Math.min(max, n))
+    else setTexte(String(valeur))
+  }
+  const raccourcis = RACCOURCIS.filter((n) => n <= max)
   return (
-    <div className="flex items-center gap-3" role="group" aria-label="Nombre de billets">
-      <button type="button" className={bouton} onClick={() => onChange(valeur - 1)} disabled={valeur <= 1} aria-label="Un billet de moins">
-        <Minus className="h-4 w-4" aria-hidden />
-      </button>
-      <span className="font-titre w-6 text-center text-xl font-bold text-gw-nuit tabular-nums" aria-live="polite">
-        {valeur}
-      </span>
-      <button type="button" className={bouton} onClick={() => onChange(valeur + 1)} disabled={valeur >= max} aria-label="Un billet de plus">
-        <Plus className="h-4 w-4" aria-hidden />
-      </button>
+    <div className="flex flex-col items-end gap-2">
+      <div className="flex items-center gap-2" role="group" aria-label="Nombre de billets">
+        <button type="button" className={bouton} onClick={() => onChange(valeur - 1)} disabled={valeur <= 1} aria-label="Un billet de moins">
+          <Minus className="h-4 w-4" aria-hidden />
+        </button>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={max}
+          value={texte}
+          onChange={(e) => {
+            setTexte(e.target.value)
+            const n = Math.floor(Number(e.target.value))
+            if (e.target.value !== "" && Number.isFinite(n) && n >= 1) onChange(Math.min(max, n))
+          }}
+          onBlur={(e) => valider(e.target.value)}
+          aria-label="Nombre de billets (saisie libre)"
+          className="font-titre h-10 w-20 [appearance:textfield] rounded-xl bg-white text-center text-xl font-bold text-gw-nuit tabular-nums ring-1 ring-gw-bordure focus:ring-2 focus:ring-gw-violet focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
+        <button type="button" className={bouton} onClick={() => onChange(valeur + 1)} disabled={valeur >= max} aria-label="Un billet de plus">
+          <Plus className="h-4 w-4" aria-hidden />
+        </button>
+      </div>
+      {raccourcis.length > 1 && (
+        <div className="flex flex-wrap justify-end gap-1.5" aria-label="Choix rapide">
+          {raccourcis.map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => onChange(n)}
+              aria-pressed={valeur === n}
+              className={
+                valeur === n
+                  ? "rounded-full bg-gw-nuit px-3 py-1 text-xs font-semibold text-white"
+                  : "rounded-full bg-white px-3 py-1 text-xs font-semibold text-gw-nuit ring-1 ring-gw-bordure hover:ring-gw-violet"
+              }
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -454,7 +502,10 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                           {choisi && (
                             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-gw-bordure pt-4">
                               <span className="text-sm text-gw-texte">
-                                Nombre de billets <span className="text-gw-texte-doux">(maximum {maxQuantite})</span>
+                                Nombre de billets{" "}
+                                <span className="text-gw-texte-doux">
+                                  ({t.restantes == null ? "sans limite" : `${t.restantes.toLocaleString("fr-FR")} place${t.restantes > 1 ? "s" : ""} restante${t.restantes > 1 ? "s" : ""}`})
+                                </span>
                               </span>
                               <ChoixQuantite valeur={quantite} max={maxQuantite} onChange={(n) => setQuantite(Math.max(1, Math.min(maxQuantite, n)))} />
                             </div>
@@ -648,15 +699,39 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                 <Ticket className="h-5 w-5 text-gw-violet" aria-hidden /> {pluriel(resultat.billets.length, "billet")}
               </h3>
               <div className="mt-4 space-y-6">
-                {resultat.billets.map((b, i) => (
+                {resultat.billets.slice(0, BILLETS_AFFICHES).map((b, i) => (
                   <CarteBillet key={b.reservation_id} billet={b} numeroDansLot={{ index: i + 1, total: resultat.billets.length }} />
                 ))}
               </div>
+
+              {resultat.billets.length > BILLETS_AFFICHES && (
+                <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-gw-texte ring-1 ring-gw-bordure">
+                  … et {resultat.billets.length - BILLETS_AFFICHES} autres billets, tous dans votre e-mail et dans « Mes billets ».
+                </p>
+              )}
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/participants/mes-reservations" className={boutonPrincipal}>
                   Voir tous mes billets
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    // nouvel achat dans la même session : pas besoin de se reconnecter
+                    setResultat(null)
+                    setLot(null)
+                    setMode(null)
+                    setTelephone("")
+                    setTelephoneTouche(false)
+                    setQuantite(1)
+                    router.replace(`/evenements/${evenementId}/reserver`)
+                    fetchTarifs(evenementId).then(setTarifs).catch(() => undefined)
+                    allerA("billets")
+                  }}
+                  className="inline-flex h-12 items-center gap-2 rounded-full px-6 font-semibold text-gw-nuit ring-1 ring-gw-bordure hover:bg-white"
+                >
+                  <Plus className="h-4 w-4" aria-hidden /> Acheter d&apos;autres billets
+                </button>
                 <Link
                   href={`/evenements/${evenementId}`}
                   className="inline-flex h-12 items-center rounded-full px-6 font-semibold text-gw-nuit ring-1 ring-gw-bordure hover:bg-white"

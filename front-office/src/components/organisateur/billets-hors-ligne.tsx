@@ -4,10 +4,20 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { AlertTriangle, Gift, Handshake, Loader2, Plus, Printer, Store, Ticket, type LucideIcon } from "lucide-react"
-import type { EvenementLot, LotDetail, LotResume, LotsOrganisateur, ModePaiement, TypeLot } from "@/types"
+import { AlertTriangle, Gift, Handshake, Layers, Loader2, Pencil, Phone, Plus, Printer, Store, Ticket, Users, X, type LucideIcon } from "lucide-react"
+import type { EvenementLot, LotDetail, LotResume, LotsOrganisateur, ModePaiement, RevendeurFiche, TypeLot } from "@/types"
 import { cn } from "@/utils"
-import { ErreurApi, declarerVendus, fetchEvenementsLot, fetchLot, fetchLots, genererLot, reglerLot } from "@/services/horsLigneService"
+import {
+  ErreurApi,
+  declarerVendus,
+  fetchEvenementsLot,
+  fetchLot,
+  fetchLots,
+  fetchRevendeurs,
+  genererLot,
+  modifierRevendeur,
+  reglerLot,
+} from "@/services/horsLigneService"
 import { OPERATEURS, ariary, erreurTelephone, formaterTelephone, normaliserTelephone } from "@/lib/billetterie"
 import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui"
 
@@ -17,6 +27,8 @@ import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui
  *    rend l'argent des billets vendus et les invendus, en principe une fois 80 % du lot vendu.
  *  - Guichet : billets que l'organisateur vend lui-même sur place.
  *  - Invitations : billets offerts.
+ * Chaque revendeur a sa fiche : il peut recevoir autant de lots que nécessaire, et la fiche réunit
+ * ses billets confiés, vendus, rendus et l'argent qu'il doit encore.
  * La plateforme facture un frais fixe par billet, payé par Mobile Money (simulé) avant la génération.
  * Les billets ont un QR code chiffré et se contrôlent à l'entrée comme les billets achetés en ligne ;
  * un billet rendu invendu est annulé et refusé à l'entrée.
@@ -66,14 +78,21 @@ export function BilletsHorsLigne() {
   const router = useRouter()
   const [donnees, setDonnees] = useState<LotsOrganisateur | null>(null)
   const [erreur, setErreur] = useState("")
-  const [generation, setGeneration] = useState(false)
+  const [revendeurs, setRevendeurs] = useState<RevendeurFiche[] | null>(null)
+  const [vue, setVue] = useState<"lots" | "revendeurs">("lots")
+  const [revendeurFiltre, setRevendeurFiltre] = useState<number | null>(null)
+  const [edition, setEdition] = useState<RevendeurFiche | null>(null)
+  /** null = fermée ; sinon le revendeur présélectionné (ou rien) */
+  const [generation, setGeneration] = useState<{ revendeurId?: number } | null>(null)
   const [ventes, setVentes] = useState<LotResume | null>(null)
   const [reglement, setReglement] = useState<LotResume | null>(null)
   const [filtre, setFiltre] = useState<TypeLot | "tous">("tous")
 
   const charger = useCallback(async () => {
     try {
-      setDonnees(await fetchLots())
+      const [lots, revs] = await Promise.all([fetchLots(), fetchRevendeurs()])
+      setDonnees(lots)
+      setRevendeurs(revs)
     } catch (e) {
       setErreur(e instanceof Error ? e.message : "Chargement impossible.")
     }
@@ -83,10 +102,16 @@ export function BilletsHorsLigne() {
     charger()
   }, [charger])
 
-  const lots = useMemo(() => (donnees?.lots ?? []).filter((l) => filtre === "tous" || l.type === filtre), [donnees, filtre])
+  const lots = useMemo(
+    () =>
+      (donnees?.lots ?? []).filter(
+        (l) => (filtre === "tous" || l.type === filtre) && (revendeurFiltre === null || l.revendeur_id === revendeurFiltre),
+      ),
+    [donnees, filtre, revendeurFiltre],
+  )
 
   if (erreur) return <p className="px-4 py-16 text-center text-gw-rose-action lg:px-8">{erreur}</p>
-  if (!donnees) {
+  if (!donnees || !revendeurs) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
         <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
@@ -95,6 +120,12 @@ export function BilletsHorsLigne() {
   }
 
   const nb = (t: TypeLot) => donnees.lots.filter((l) => l.type === t).length
+  const revendeurChoisi = revendeurs.find((r) => r.id === revendeurFiltre)
+  const voirLots = (r: RevendeurFiche) => {
+    setRevendeurFiltre(r.id)
+    setFiltre("depot")
+    setVue("lots")
+  }
 
   return (
     <div className="flex flex-col gap-6 px-4 py-6 lg:px-8 lg:py-8">
@@ -106,7 +137,7 @@ export function BilletsHorsLigne() {
             l&apos;entrée comme les billets achetés sur le site.
           </p>
         </div>
-        <Bouton onClick={() => setGeneration(true)}>
+        <Bouton onClick={() => setGeneration({})}>
           <Plus className="h-4 w-4" aria-hidden />
           Générer des billets
         </Bouton>
@@ -118,58 +149,124 @@ export function BilletsHorsLigne() {
         <Indicateur libelle="Frais par billet généré" valeur={montant(donnees.frais_unitaire)} aide={`Dépôt-vente : règlement à ${donnees.seuil_pourcentage} % vendus`} />
       </div>
 
-      {donnees.lots.length > 0 && (
-        <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filtrer par type">
-          {(["tous", "depot", "guichet", "invitation"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={filtre === t}
-              onClick={() => setFiltre(t)}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
-                filtre === t
-                  ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit"
-                  : "bg-white text-gw-texte ring-1 ring-gw-bordure hover:ring-gw-violet dark:bg-white/5 dark:text-white/80 dark:ring-white/10",
-              )}
-            >
-              {t === "tous" ? "Tous" : TYPES_LOT[t].libelle}
-              <span className="ml-1.5 text-xs opacity-70">{t === "tous" ? donnees.lots.length : nb(t)}</span>
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-1 border-b border-gw-bordure dark:border-gw-bordure-sombre" role="tablist" aria-label="Vue">
+        {([
+          ["lots", "Lots de billets", Layers, donnees.lots.length],
+          ["revendeurs", "Revendeurs", Users, revendeurs.length],
+        ] as const).map(([v, libelle, Icone, total]) => (
+          <button
+            key={v}
+            type="button"
+            role="tab"
+            aria-selected={vue === v}
+            onClick={() => setVue(v)}
+            className={cn(
+              "-mb-px flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors",
+              vue === v
+                ? "border-gw-rose-action text-gw-nuit dark:text-white"
+                : "border-transparent text-gw-texte-doux hover:text-gw-nuit dark:text-white/60 dark:hover:text-white",
+            )}
+          >
+            <Icone className="h-4 w-4" aria-hidden />
+            {libelle}
+            <span className="rounded-full bg-gw-fond px-2 py-0.5 text-xs dark:bg-white/10">{total}</span>
+          </button>
+        ))}
+      </div>
 
-      {donnees.lots.length === 0 ? (
-        <div className="gw-carte flex flex-col items-center gap-3 px-6 py-14 text-center">
-          <Ticket className="h-8 w-8 text-gw-violet dark:text-gw-lavande" aria-hidden />
-          <p className="font-titre text-lg font-semibold">Aucun billet hors ligne pour l&apos;instant</p>
-          <p className="max-w-md text-sm text-gw-texte-doux dark:text-white/60">
-            Générez un premier lot pour un revendeur partenaire, pour votre guichet ou pour vos invités.
-          </p>
-          <Bouton className="mt-2" onClick={() => setGeneration(true)}>
-            <Plus className="h-4 w-4" aria-hidden /> Générer des billets
-          </Bouton>
-        </div>
+      {vue === "revendeurs" ? (
+        <ListeRevendeurs
+          revendeurs={revendeurs}
+          onVoirLots={voirLots}
+          onNouveauLot={(r) => setGeneration({ revendeurId: r.id })}
+          onModifier={setEdition}
+          onPremier={() => setGeneration({})}
+        />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-2">
-          {lots.map((l) => (
-            <CarteLot key={l.id} lot={l} seuilPct={donnees.seuil_pourcentage} onVentes={() => setVentes(l)} onReglement={() => setReglement(l)} />
-          ))}
-        </div>
+        <>
+          {donnees.lots.length > 0 && (
+            <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filtrer par type">
+              {(["tous", "depot", "guichet", "invitation"] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  role="tab"
+                  aria-selected={filtre === t}
+                  onClick={() => {
+                    setFiltre(t)
+                    if (t === "guichet" || t === "invitation") setRevendeurFiltre(null)
+                  }}
+                  className={cn(
+                    "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
+                    filtre === t
+                      ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit"
+                      : "bg-white text-gw-texte ring-1 ring-gw-bordure hover:ring-gw-violet dark:bg-white/5 dark:text-white/80 dark:ring-white/10",
+                  )}
+                >
+                  {t === "tous" ? "Tous" : TYPES_LOT[t].libelle}
+                  <span className="ml-1.5 text-xs opacity-70">{t === "tous" ? donnees.lots.length : nb(t)}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {revendeurChoisi && (
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-gw-lavande/30 px-4 py-3 text-sm dark:bg-gw-violet/15">
+              <Handshake className="h-4 w-4 text-gw-violet dark:text-gw-lavande" aria-hidden />
+              <span>
+                Lots confiés à <span className="font-semibold">{revendeurChoisi.nom}</span> : {lots.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setRevendeurFiltre(null)}
+                className="ml-auto inline-flex items-center gap-1 rounded-full px-2 py-1 font-semibold text-gw-violet hover:bg-white dark:text-gw-lavande dark:hover:bg-white/10"
+              >
+                <X className="h-3.5 w-3.5" aria-hidden /> Tous les lots
+              </button>
+            </div>
+          )}
+
+          {donnees.lots.length === 0 ? (
+            <div className="gw-carte flex flex-col items-center gap-3 px-6 py-14 text-center">
+              <Ticket className="h-8 w-8 text-gw-violet dark:text-gw-lavande" aria-hidden />
+              <p className="font-titre text-lg font-semibold">Aucun billet hors ligne pour l&apos;instant</p>
+              <p className="max-w-md text-sm text-gw-texte-doux dark:text-white/60">
+                Générez un premier lot pour un revendeur partenaire, pour votre guichet ou pour vos invités.
+              </p>
+              <Bouton className="mt-2" onClick={() => setGeneration({})}>
+                <Plus className="h-4 w-4" aria-hidden /> Générer des billets
+              </Bouton>
+            </div>
+          ) : (
+            <div className="grid gap-4 xl:grid-cols-2">
+              {lots.map((l) => (
+                <CarteLot key={l.id} lot={l} seuilPct={donnees.seuil_pourcentage} onVentes={() => setVentes(l)} onReglement={() => setReglement(l)} />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <ModaleGeneration
-        ouverte={generation}
+        ouverte={generation !== null}
+        revendeurInitial={generation?.revendeurId}
+        revendeurs={revendeurs}
         fraisUnitaire={donnees.frais_unitaire}
-        onFermer={() => setGeneration(false)}
+        onFermer={() => setGeneration(null)}
         onGenere={async (lot) => {
-          setGeneration(false)
+          setGeneration(null)
           await charger()
           toast.success(`${lot.quantite} billets générés (lot n° ${lot.id}).`, {
             action: { label: "Imprimer", onClick: () => router.push(`/organisateur/impression?lot=${lot.id}`) },
           })
+        }}
+      />
+      <ModaleRevendeur
+        revendeur={edition}
+        onFermer={() => setEdition(null)}
+        onEnregistre={async () => {
+          setEdition(null)
+          await charger()
         }}
       />
       <ModaleVentes lot={ventes} onFermer={() => setVentes(null)} onEnregistre={async () => { setVentes(null); await charger() }} />
@@ -185,6 +282,199 @@ function Indicateur({ libelle, valeur, aide }: { libelle: string; valeur: string
       <p className="font-titre mt-1 text-2xl font-semibold tabular-nums">{valeur}</p>
       <p className="mt-0.5 text-xs text-gw-texte-pale dark:text-white/45">{aide}</p>
     </div>
+  )
+}
+
+/* ---------- revendeurs : une fiche par entreprise partenaire ---------- */
+
+function ListeRevendeurs({
+  revendeurs,
+  onVoirLots,
+  onNouveauLot,
+  onModifier,
+  onPremier,
+}: {
+  revendeurs: RevendeurFiche[]
+  onVoirLots: (r: RevendeurFiche) => void
+  onNouveauLot: (r: RevendeurFiche) => void
+  onModifier: (r: RevendeurFiche) => void
+  onPremier: () => void
+}) {
+  if (revendeurs.length === 0) {
+    return (
+      <div className="gw-carte flex flex-col items-center gap-3 px-6 py-14 text-center">
+        <Handshake className="h-8 w-8 text-gw-violet dark:text-gw-lavande" aria-hidden />
+        <p className="font-titre text-lg font-semibold">Aucun revendeur pour l&apos;instant</p>
+        <p className="max-w-md text-sm text-gw-texte-doux dark:text-white/60">
+          Un revendeur est créé au premier lot « Dépôt-vente » que vous lui confiez. Vous pourrez ensuite lui donner autant
+          de lots que vous voulez et suivre tout ce qu&apos;il vous doit ici.
+        </p>
+        <Bouton className="mt-2" onClick={onPremier}>
+          <Plus className="h-4 w-4" aria-hidden /> Confier un premier lot
+        </Bouton>
+      </div>
+    )
+  }
+  const totalDu = revendeurs.reduce((t, r) => t + r.a_encaisser, 0)
+  const totalDepot = revendeurs.reduce((t, r) => t + r.en_depot, 0)
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-sm text-gw-texte-doux dark:text-white/65">
+        {revendeurs.length} revendeur{revendeurs.length > 1 ? "s" : ""} · {entier.format(totalDepot)} billet{totalDepot > 1 ? "s" : ""} en dépôt ·{" "}
+        <span className="font-semibold text-gw-nuit dark:text-white">{montant(totalDu)}</span> à encaisser
+      </p>
+      <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+        {revendeurs.map((r) => (
+          <CarteRevendeur key={r.id} revendeur={r} onVoirLots={() => onVoirLots(r)} onNouveauLot={() => onNouveauLot(r)} onModifier={() => onModifier(r)} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CarteRevendeur({
+  revendeur: r,
+  onVoirLots,
+  onNouveauLot,
+  onModifier,
+}: {
+  revendeur: RevendeurFiche
+  onVoirLots: () => void
+  onNouveauLot: () => void
+  onModifier: () => void
+}) {
+  const initiales = r.nom
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((m) => m[0]!.toUpperCase())
+    .join("")
+  return (
+    <article className="gw-carte flex flex-col gap-4 p-5">
+      <div className="flex items-start gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gw-lavande/60 font-titre text-sm font-bold text-gw-indigo dark:bg-gw-violet/25 dark:text-gw-lavande" aria-hidden>
+          {initiales}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-titre truncate text-lg leading-snug font-semibold">{r.nom}</h2>
+          <p className="flex items-center gap-1 truncate text-sm text-gw-texte-doux dark:text-white/60">
+            {r.contact ? (
+              <>
+                <Phone className="h-3.5 w-3.5 shrink-0" aria-hidden /> {r.contact}
+              </>
+            ) : (
+              "Aucun contact"
+            )}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onModifier}
+          aria-label={`Modifier ${r.nom}`}
+          title="Modifier le nom ou le contact"
+          className="rounded-full p-2 text-gw-texte-doux hover:bg-gw-fond hover:text-gw-violet dark:text-white/55 dark:hover:bg-white/10"
+        >
+          <Pencil className="h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="flex flex-wrap gap-2 text-xs font-semibold">
+        <span className="rounded-full bg-gw-fond px-2.5 py-0.5 dark:bg-white/10">
+          {r.lots} lot{r.lots > 1 ? "s" : ""}
+          {r.lots_en_cours > 0 && ` · ${r.lots_en_cours} en cours`}
+        </span>
+        {r.lots_a_regler > 0 && (
+          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-200 dark:ring-emerald-400/30">
+            {r.lots_a_regler} lot{r.lots_a_regler > 1 ? "s" : ""} à régler
+          </span>
+        )}
+      </div>
+
+      <dl className="grid grid-cols-4 gap-2 rounded-2xl bg-gw-fond p-3 text-center text-xs dark:bg-white/5">
+        {(
+          [
+            ["Confiés", r.billets_confies],
+            ["Vendus", r.vendus],
+            ["En dépôt", r.en_depot],
+            ["Rendus", r.rendus],
+          ] as const
+        ).map(([libelle, valeur]) => (
+          <div key={libelle}>
+            <dt className="text-gw-texte-doux dark:text-white/55">{libelle}</dt>
+            <dd className="font-titre text-base font-semibold tabular-nums">{entier.format(valeur)}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <p className="text-gw-texte-doux dark:text-white/60">À encaisser</p>
+          <p className="font-titre text-lg font-semibold tabular-nums">{montant(r.a_encaisser)}</p>
+        </div>
+        <div>
+          <p className="text-gw-texte-doux dark:text-white/60">Déjà réglé</p>
+          <p className="font-titre text-lg font-semibold tabular-nums">{montant(r.deja_regle)}</p>
+        </div>
+      </div>
+
+      <div className="mt-auto flex flex-wrap gap-2">
+        <Bouton onClick={onNouveauLot}>
+          <Plus className="h-4 w-4" aria-hidden /> Nouveau lot
+        </Bouton>
+        <Bouton variante="secondaire" onClick={onVoirLots}>
+          Voir ses lots
+        </Bouton>
+      </div>
+      {r.dernier_lot && <p className="-mt-2 text-xs text-gw-texte-pale dark:text-white/45">Dernier lot le {dateCourte(r.dernier_lot)}</p>}
+    </article>
+  )
+}
+
+function ModaleRevendeur({ revendeur, onFermer, onEnregistre }: { revendeur: RevendeurFiche | null; onFermer: () => void; onEnregistre: () => void }) {
+  const [nom, setNom] = useState("")
+  const [contact, setContact] = useState("")
+  const [envoi, setEnvoi] = useState(false)
+  useEffect(() => {
+    if (revendeur) {
+      setNom(revendeur.nom)
+      setContact(revendeur.contact ?? "")
+    }
+  }, [revendeur])
+  const enregistrer = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!revendeur) return
+    if (!nom.trim()) return toast.error("Le nom du revendeur est obligatoire.")
+    setEnvoi(true)
+    try {
+      await modifierRevendeur(revendeur.id, { nom: nom.trim(), contact: contact.trim() })
+      toast.success("Revendeur mis à jour.")
+      onEnregistre()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Enregistrement impossible.")
+    } finally {
+      setEnvoi(false)
+    }
+  }
+  return (
+    <Modale ouverte={revendeur !== null} titre="Modifier le revendeur" onFermer={onFermer}>
+      <form onSubmit={enregistrer} className="space-y-4">
+        <Champ libelle="Entreprise partenaire" requis>
+          {(id) => <input id={id} className={classeChamp} value={nom} onChange={(e) => setNom(e.target.value)} maxLength={120} />}
+        </Champ>
+        <Champ libelle="Contact" aide="Téléphone ou e-mail (facultatif)">
+          {(id) => <input id={id} className={classeChamp} value={contact} onChange={(e) => setContact(e.target.value)} maxLength={120} placeholder="034 12 345 67" />}
+        </Champ>
+        <p className="text-xs text-gw-texte-pale dark:text-white/45">Les lots déjà générés gardent le nom imprimé au moment de leur création.</p>
+        <div className="flex justify-end gap-2">
+          <Bouton type="button" variante="discret" onClick={onFermer}>
+            Annuler
+          </Bouton>
+          <Bouton type="submit" chargement={envoi}>
+            Enregistrer
+          </Bouton>
+        </div>
+      </form>
+    </Modale>
   )
 }
 
@@ -300,13 +590,19 @@ function CarteLot({ lot, seuilPct, onVentes, onReglement }: { lot: LotResume; se
 
 /* ---------- génération : choix, frais, paiement ---------- */
 
+const NOUVEAU = "nouveau"
+
 function ModaleGeneration({
   ouverte,
+  revendeurInitial,
+  revendeurs,
   fraisUnitaire,
   onFermer,
   onGenere,
 }: {
   ouverte: boolean
+  revendeurInitial?: number
+  revendeurs: RevendeurFiche[]
   fraisUnitaire: number
   onFermer: () => void
   onGenere: (lot: LotDetail) => void
@@ -316,6 +612,8 @@ function ModaleGeneration({
   const [evenementId, setEvenementId] = useState<number | null>(null)
   const [tarifId, setTarifId] = useState<number | null>(null)
   const [quantite, setQuantite] = useState("10")
+  /** id du revendeur choisi dans la liste, ou NOUVEAU pour en créer un */
+  const [choixRevendeur, setChoixRevendeur] = useState<string>(NOUVEAU)
   const [revendeur, setRevendeur] = useState("")
   const [contact, setContact] = useState("")
   const [mode, setMode] = useState<ModePaiement>("mvola")
@@ -327,6 +625,12 @@ function ModaleGeneration({
     if (!ouverte) return
     setErreur("")
     setTelephone("")
+    if (revendeurInitial) {
+      setType("depot")
+      setChoixRevendeur(String(revendeurInitial))
+    } else {
+      setChoixRevendeur((c) => (c !== NOUVEAU && revendeurs.some((r) => String(r.id) === c) ? c : revendeurs[0] ? String(revendeurs[0].id) : NOUVEAU))
+    }
     fetchEvenementsLot()
       .then((evs) => {
         setEvenements(evs)
@@ -334,11 +638,13 @@ function ModaleGeneration({
         setEvenementId((id) => (id && evs.some((e) => e.id === id) ? id : premier?.id ?? null))
       })
       .catch((e) => setErreur(e instanceof Error ? e.message : "Chargement impossible."))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ouverte])
 
   const evenement = evenements?.find((e) => e.id === evenementId)
   useEffect(() => {
-    if (evenement && !evenement.tarifs.some((t) => t.id === tarifId)) setTarifId(evenement.tarifs[0]?.id ?? null)
+    if (evenement && !evenement.tarifs.some((t) => t.id === tarifId && t.restantes !== 0))
+      setTarifId((evenement.tarifs.find((t) => t.restantes !== 0) ?? evenement.tarifs[0])?.id ?? null)
   }, [evenement, tarifId])
   const tarif = evenement?.tarifs.find((t) => t.id === tarifId)
 
@@ -346,13 +652,15 @@ function ModaleGeneration({
   const max = Math.min(500, tarif?.restantes ?? 500)
   const frais = n * fraisUnitaire
   const erreurTel = telephone ? erreurTelephone(mode, telephone) : null
+  const nouveauRevendeur = choixRevendeur === NOUVEAU
+  const revendeurExistant = revendeurs.find((r) => String(r.id) === choixRevendeur)
 
   const soumettre = async (e: FormEvent) => {
     e.preventDefault()
     setErreur("")
     if (!evenement || !tarif) return setErreur("Choisissez un événement et un tarif.")
     if (n < 1 || n > max) return setErreur(`La quantité va de 1 à ${max}.`)
-    if (type === "depot" && !revendeur.trim()) return setErreur("Indiquez l'entreprise partenaire.")
+    if (type === "depot" && nouveauRevendeur && !revendeur.trim()) return setErreur("Indiquez l'entreprise partenaire.")
     const errTel = erreurTelephone(mode, telephone)
     if (errTel) return setErreur(errTel)
     setEnvoi(true)
@@ -362,8 +670,9 @@ function ModaleGeneration({
         evenement_id: evenement.id,
         categorie_billet_id: tarif.id,
         quantite: n,
-        revendeur_nom: type === "depot" ? revendeur.trim() : undefined,
-        revendeur_contact: type === "depot" ? contact.trim() || undefined : undefined,
+        revendeur_id: type === "depot" && !nouveauRevendeur ? revendeurExistant?.id : undefined,
+        revendeur_nom: type === "depot" && nouveauRevendeur ? revendeur.trim() : undefined,
+        revendeur_contact: type === "depot" && nouveauRevendeur ? contact.trim() || undefined : undefined,
         mode_paiement: mode,
         telephone: normaliserTelephone(telephone),
       })
@@ -444,11 +753,33 @@ function ModaleGeneration({
               )}
             </Champ>
             {type === "depot" && (
-              <Champ libelle="Entreprise partenaire" requis>
+              <Champ
+                libelle="Revendeur"
+                requis
+                aide={
+                  revendeurExistant
+                    ? `${revendeurExistant.lots} lot${revendeurExistant.lots > 1 ? "s" : ""} déjà confié${revendeurExistant.lots > 1 ? "s" : ""} · ${entier.format(revendeurExistant.en_depot)} billets en dépôt`
+                    : "Il aura sa fiche dans l'onglet Revendeurs."
+                }
+              >
+                {(id) => (
+                  <select id={id} className={classeChamp} value={choixRevendeur} onChange={(e) => setChoixRevendeur(e.target.value)}>
+                    {revendeurs.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.nom}
+                      </option>
+                    ))}
+                    <option value={NOUVEAU}>+ Nouveau revendeur…</option>
+                  </select>
+                )}
+              </Champ>
+            )}
+            {type === "depot" && nouveauRevendeur && (
+              <Champ libelle="Nom de l'entreprise partenaire" requis>
                 {(id) => <input id={id} className={classeChamp} value={revendeur} onChange={(e) => setRevendeur(e.target.value)} placeholder="Ex. Librairie Mixte" maxLength={120} />}
               </Champ>
             )}
-            {type === "depot" && (
+            {type === "depot" && nouveauRevendeur && (
               <Champ libelle="Contact du revendeur" aide="Téléphone ou e-mail (facultatif)">
                 {(id) => <input id={id} className={classeChamp} value={contact} onChange={(e) => setContact(e.target.value)} placeholder="034 12 345 67" maxLength={120} />}
               </Champ>

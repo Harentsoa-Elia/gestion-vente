@@ -9,11 +9,12 @@ ModePaiement = Literal["mvola", "orange_money", "airtel_money"]
 class ReservationLot(BaseModel):
     evenement_id: int
     categorie_billet_id: int
-    quantite: int = Field(1, ge=1, le=10, description="Nombre de billets (1 à 10)")
+    # pas de limite métier : seulement les places restantes du tarif (garde-fou technique : 1 000 par achat)
+    quantite: int = Field(1, ge=1, le=1000, description="Nombre de billets (limité par les places restantes)")
 
 
 class PaiementLot(BaseModel):
-    reservation_ids: List[int] = Field(..., min_length=1, max_length=10)
+    reservation_ids: List[int] = Field(..., min_length=1, max_length=1000)
     mode_paiement: ModePaiement
     telephone: str = Field(..., min_length=9, max_length=20, description="Numéro Mobile Money (paiement simulé)")
 

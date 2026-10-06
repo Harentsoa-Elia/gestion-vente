@@ -37,12 +37,16 @@ def infos_pdf(billets: List[dict], participant: Participant) -> List[InfosBillet
     ]
 
 
+QR_DANS_EMAIL = 10
+
+
 def envoyer_billets(participant_email: str, prenom: str, billets: List[InfosBillet]) -> None:
     """Tâche de fond : e-mail avec les QR codes (images inline) et le PDF en pièce jointe."""
     if not billets:
         return
     premier = billets[0]
-    images = [(f"qr-{b.numero}@guichetweb", qr_png(b.qr, 8)) for b in billets]
+    # au-delà de 10 billets, les QR codes ne sont pas recopiés dans le corps de l'e-mail : ils sont dans le PDF joint
+    images = [(f"qr-{b.numero}@guichetweb", qr_png(b.qr, 8)) for b in billets[:QR_DANS_EMAIL]]
     sujet, texte, html = email_billets(
         prenom,
         premier.evenement,
@@ -50,6 +54,7 @@ def envoyer_billets(participant_email: str, prenom: str, billets: List[InfosBill
         premier.lieu,
         [(b.numero, f"{b.categorie} - {int(b.prix):,} Ar".replace(",", " "), cid) for b, (cid, _) in zip(billets, images)],
         lien_site("/participants/mes-reservations"),
+        total=len(billets),
     )
     pdf = generer_pdf_billets(billets)
     envoyer_email_sans_erreur(
@@ -67,7 +72,7 @@ async def tarifs(evenement_id: int, db: AsyncSession = Depends(get_db)):
     return await BilletterieService(db).tarifs(evenement_id)
 
 
-@router.post("/reservations/lot", response_model=LotReserve, status_code=201, summary="Réserver 1 à 10 billets (non payés, gardés 15 min)")
+@router.post("/reservations/lot", response_model=LotReserve, status_code=201, summary="Réserver des billets (non payés, gardés 15 min ; autant que de places restantes)")
 async def reserver_lot(
     saisie: ReservationLot = Body(...),
     auth_data: dict = Depends(ParticipantBearer()),

@@ -12,7 +12,8 @@ class GenerationLot(BaseModel):
     evenement_id: int
     categorie_billet_id: int
     quantite: int = Field(..., ge=1, le=500)
-    revendeur_nom: Optional[str] = Field(None, max_length=120, description="Entreprise partenaire (dépôt-vente)")
+    revendeur_id: Optional[int] = Field(None, description="Revendeur déjà enregistré (dépôt-vente)")
+    revendeur_nom: Optional[str] = Field(None, max_length=120, description="Nouvelle entreprise partenaire (dépôt-vente)")
     revendeur_contact: Optional[str] = Field(None, max_length=120, description="Téléphone ou e-mail du revendeur")
     # paiement des frais de la plateforme (Mobile Money simulé)
     mode_paiement: ModePaiement
@@ -53,6 +54,7 @@ class LotResume(BaseModel):
     evenement_titre: str
     evenement_date: datetime
     categorie_nom: str
+    revendeur_id: Optional[int] = None
     revendeur_nom: Optional[str] = None
     revendeur_contact: Optional[str] = None
     quantite: int
@@ -112,3 +114,25 @@ class Facturation(BaseModel):
     par_type: Dict[str, int]
     organisateurs: List[FacturationOrganisateur]
     lots_recents: List[LotResume]
+
+
+class RevendeurFiche(BaseModel):
+    id: int
+    nom: str
+    contact: Optional[str] = None
+    date_creation: datetime
+    lots: int
+    lots_en_cours: int
+    lots_a_regler: int  # lots en cours dont 80 % des billets sont vendus
+    billets_confies: int
+    vendus: int
+    rendus: int  # invendus rendus et annulés
+    en_depot: int  # pas encore vendus, chez le revendeur
+    a_encaisser: float  # billets vendus des lots pas encore réglés
+    deja_regle: float
+    dernier_lot: Optional[datetime] = None
+
+
+class RevendeurModification(BaseModel):
+    nom: Optional[str] = Field(None, max_length=120)
+    contact: Optional[str] = Field(None, max_length=120)

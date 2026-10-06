@@ -21,7 +21,8 @@ export const OPERATEURS: {
 
 export const operateur = (mode: string | null | undefined) => OPERATEURS.find((o) => o.mode === mode)
 
-export const QUANTITE_MAX = 10
+/** Plafond technique d'une commande (le vrai plafond, ce sont les places restantes du tarif). */
+export const QUANTITE_MAX = 1000
 
 /** '+261 34 12 345 67' -> '0341234567' */
 export function normaliserTelephone(valeur: string) {

@@ -11,13 +11,28 @@ La plateforme facture l'organisateur à la génération : frais fixe par billet,
 Chaque billet a son QR code chiffré et se contrôle à l'entrée comme un billet acheté en ligne ;
 un billet rendu invendu est annulé et refusé à l'entrée.
 """
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.database import Base
 
 TYPES_LOT = ("depot", "guichet", "invitation")
+
+
+class Revendeur(Base):
+    """Entreprise partenaire d'un organisateur pour le dépôt-vente : elle peut recevoir autant de lots que nécessaire."""
+
+    __tablename__ = "revendeurs"
+    __table_args__ = (UniqueConstraint("organisateur_id", "nom", name="uq_revendeurs_organisateur_nom"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    organisateur_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    nom = Column(String(120), nullable=False)
+    contact = Column(String(120), nullable=True)
+    date_creation = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    lots = relationship("LotHorsLigne", back_populates="revendeur")
 
 
 class LotHorsLigne(Base):
@@ -28,6 +43,8 @@ class LotHorsLigne(Base):
     evenement_id = Column(Integer, ForeignKey("evenements.id"), nullable=False, index=True)
     categorie_billet_id = Column(Integer, ForeignKey("categories_billet.id"), nullable=False)
     organisateur_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    # dépôt-vente : revendeur (nom et contact recopiés sur le lot, tels qu'au moment de la génération)
+    revendeur_id = Column(Integer, ForeignKey("revendeurs.id"), nullable=True, index=True)
     revendeur_nom = Column(String, nullable=True)
     revendeur_contact = Column(String, nullable=True)
     quantite = Column(Integer, nullable=False)
@@ -47,6 +64,7 @@ class LotHorsLigne(Base):
     montant_regle = Column(Float, nullable=True)
 
     billets = relationship("BilletHorsLigne", back_populates="lot", cascade="all, delete-orphan", order_by="BilletHorsLigne.id")
+    revendeur = relationship("Revendeur", back_populates="lots")
 
 
 class BilletHorsLigne(Base):

@@ -14,7 +14,7 @@ from .participant import Participant
 from .categorie_billet import CategorieBillet
 from .notification import Notification
 from .code_email import CodeEmail
-from .billet_hors_ligne import LotHorsLigne, BilletHorsLigne
+from .billet_hors_ligne import Revendeur, LotHorsLigne, BilletHorsLigne
 
 __all__ = [
     'User',
@@ -32,6 +32,7 @@ __all__ = [
     'CategorieBillet',
     'Notification',
     'CodeEmail',
+    'Revendeur',
     'LotHorsLigne',
     'BilletHorsLigne',
 ]

@@ -19,6 +19,7 @@ export interface LotResume {
   evenement_titre: string
   evenement_date: string
   categorie_nom: string
+  revendeur_id: number | null
   revendeur_nom: string | null
   revendeur_contact: string | null
   quantite: number
@@ -60,10 +61,33 @@ export interface GenerationLot {
   evenement_id: number
   categorie_billet_id: number
   quantite: number
+  /** revendeur déjà enregistré ; sinon revendeur_nom crée la fiche */
+  revendeur_id?: number
   revendeur_nom?: string
   revendeur_contact?: string
   mode_paiement: ModePaiement
   telephone: string
+}
+
+/** Fiche d'un revendeur partenaire : tous ses lots de dépôt-vente réunis. */
+export interface RevendeurFiche {
+  id: number
+  nom: string
+  contact: string | null
+  date_creation: string
+  lots: number
+  lots_en_cours: number
+  /** lots en cours dont le seuil de règlement est atteint */
+  lots_a_regler: number
+  billets_confies: number
+  vendus: number
+  /** invendus rendus (annulés) */
+  rendus: number
+  /** encore chez le revendeur */
+  en_depot: number
+  a_encaisser: number
+  deja_regle: number
+  dernier_lot: string | null
 }
 
 export interface Facturation {
