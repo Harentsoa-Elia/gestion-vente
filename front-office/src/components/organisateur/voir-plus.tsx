@@ -1,71 +1,107 @@
 "use client"
 
 import { useEffect, useState, type ReactNode } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { cn } from "@/utils"
 
 /*
- * Longues listes de l'espace organisateur : seules les premières lignes s'affichent (5 par défaut),
- * le reste se déplie avec « Voir plus ». Utilisation :
+ * Longues listes de l'espace organisateur : pagination de 5 lignes par page.
+ * La liste garde toujours la même hauteur (pas de défilement) ; on change de page avec
+ * les flèches ‹ › ou les numéros. Utilisation :
  *
  *   const { visibles, bouton } = useVoirPlus(reservations)
  *   ... visibles.map(...) ...
- *   {bouton}
+ *   {bouton}            // la barre de pagination (rien s'il n'y a qu'une page)
  *
- * La liste se replie quand son contenu change (autre filtre, autre événement…).
+ * On revient à la première page quand la liste change (autre filtre, recherche, événement…).
  */
 
 export const LIGNES_VISIBLES = 5
 
-export function useVoirPlus<T>(liste: T[], nombre = LIGNES_VISIBLES) {
-  const [ouvert, setOuvert] = useState(false)
-  // nouvelle liste (filtre, recherche, autre événement) : on revient aux premières lignes
-  useEffect(() => setOuvert(false), [liste.length, nombre])
+export function useVoirPlus<T>(liste: T[], parPage = LIGNES_VISIBLES) {
+  const [page, setPage] = useState(1)
+  const pages = Math.max(1, Math.ceil(liste.length / parPage))
+  // nouvelle liste : retour à la première page
+  useEffect(() => setPage(1), [liste.length, parPage])
+  const courante = Math.min(page, pages)
 
-  const visibles = ouvert ? liste : liste.slice(0, nombre)
+  const debut = (courante - 1) * parPage
+  const visibles = liste.slice(debut, debut + parPage)
   const bouton = (
-    <BoutonVoirPlus total={liste.length} visibles={visibles.length} ouvert={ouvert} onBasculer={() => setOuvert((o) => !o)} />
+    <Pagination page={courante} pages={pages} total={liste.length} debut={debut} affiches={visibles.length} onPage={setPage} />
   )
-  return { visibles, bouton, ouvert }
+  return { visibles, bouton, page: courante }
 }
 
-export function BoutonVoirPlus({
+/** Numéros affichés : 1 … 4 5 6 … 141 (toujours la première, la dernière et les voisines). */
+function numeros(page: number, pages: number): (number | "…")[] {
+  if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1)
+  const liste: (number | "…")[] = [1]
+  const de = Math.max(2, Math.min(page - 1, pages - 4))
+  const a = Math.min(pages - 1, Math.max(page + 1, 5))
+  if (de > 2) liste.push("…")
+  for (let n = de; n <= a; n++) liste.push(n)
+  if (a < pages - 1) liste.push("…")
+  liste.push(pages)
+  return liste
+}
+
+export function Pagination({
+  page,
+  pages,
   total,
-  visibles,
-  ouvert,
-  onBasculer,
+  debut,
+  affiches,
+  onPage,
 }: {
+  page: number
+  pages: number
   total: number
-  visibles: number
-  ouvert: boolean
-  onBasculer: () => void
+  debut: number
+  affiches: number
+  onPage: (page: number) => void
 }) {
-  // rien à déplier : pas de bouton
-  if (total <= visibles && !ouvert) return null
-  const reste = total - visibles
+  // une seule page : pas de barre
+  if (pages <= 1) return null
+  const fleche =
+    "flex h-8 w-8 items-center justify-center rounded-full text-gw-nuit transition-colors hover:bg-gw-lavande/40 disabled:pointer-events-none disabled:opacity-30 dark:text-white dark:hover:bg-white/10"
   return (
-    <div className="mt-3 flex flex-col items-center gap-1.5">
-      {!ouvert && (
-        <p className="text-xs text-gw-texte-doux dark:text-white/50">
-          {visibles} sur {total} affichés
-        </p>
-      )}
-      <button
-        type="button"
-        onClick={onBasculer}
-        aria-expanded={ouvert}
-        className="inline-flex items-center gap-1.5 rounded-full border border-gw-bordure bg-white px-4 py-1.5 text-sm font-semibold text-gw-violet transition-colors hover:border-gw-violet hover:bg-gw-lavande/30 focus-visible:outline-2 focus-visible:outline-gw-violet dark:border-white/15 dark:bg-white/5 dark:text-gw-lavande dark:hover:bg-white/10"
-      >
-        {ouvert ? (
-          <>
-            Voir moins <ChevronUp className="h-4 w-4" aria-hidden />
-          </>
-        ) : (
-          <>
-            Voir plus <span className="font-normal opacity-75">({reste})</span> <ChevronDown className="h-4 w-4" aria-hidden />
-          </>
+    <nav aria-label="Pagination" className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gw-bordure pt-3 dark:border-white/10">
+      <p className="text-xs text-gw-texte-doux tabular-nums dark:text-white/55">
+        {debut + 1}–{debut + affiches} sur {total.toLocaleString("fr-FR")}
+      </p>
+      <div className="flex items-center gap-0.5">
+        <button type="button" className={fleche} onClick={() => onPage(page - 1)} disabled={page <= 1} aria-label="Page précédente">
+          <ChevronLeft className="h-4 w-4" aria-hidden />
+        </button>
+        {numeros(page, pages).map((n, i) =>
+          n === "…" ? (
+            <span key={`e${i}`} className="w-6 text-center text-xs text-gw-texte-doux dark:text-white/45" aria-hidden>
+              …
+            </span>
+          ) : (
+            <button
+              key={n}
+              type="button"
+              onClick={() => onPage(n)}
+              aria-label={`Page ${n}`}
+              aria-current={n === page ? "page" : undefined}
+              className={cn(
+                "h-8 min-w-8 rounded-full px-2 text-xs font-semibold tabular-nums transition-colors",
+                n === page
+                  ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit"
+                  : "text-gw-texte hover:bg-gw-lavande/40 dark:text-white/75 dark:hover:bg-white/10",
+              )}
+            >
+              {n}
+            </button>
+          ),
         )}
-      </button>
-    </div>
+        <button type="button" className={fleche} onClick={() => onPage(page + 1)} disabled={page >= pages} aria-label="Page suivante">
+          <ChevronRight className="h-4 w-4" aria-hidden />
+        </button>
+      </div>
+    </nav>
   )
 }
 
