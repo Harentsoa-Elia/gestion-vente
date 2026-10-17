@@ -8,7 +8,7 @@ import {
   CalendarRange,
   ExternalLink,
   LayoutDashboard,
-  Library,
+  Database,
   LogOut,
   Menu,
   Printer,
@@ -63,7 +63,7 @@ const NAV_ADMIN: NavItem[] = [
   { href: "/admin", label: "Vue d'ensemble", icon: LayoutDashboard, disponible: true },
   { href: "/admin/evenements", label: "Événements à valider", icon: ShieldCheck, disponible: true },
   { href: "/admin/utilisateurs", label: "Utilisateurs", icon: Users, disponible: true },
-  { href: "/admin/referentiel", label: "Référentiel", icon: Library, disponible: true },
+  { href: "/admin/referentiel", label: "Référentiel", icon: Database, disponible: true },
   { href: "/admin/facturation", label: "Facturation", icon: Receipt, disponible: true },
 ]
 
