@@ -30,7 +30,8 @@ import { useVoirPlus } from "@/components/organisateur/voir-plus"
  *  - Invitations : billets offerts.
  * Chaque revendeur a sa fiche : il peut recevoir autant de lots que nécessaire, et la fiche réunit
  * ses billets confiés, vendus, rendus et l'argent qu'il doit encore.
- * La plateforme facture un frais fixe par billet, payé par Mobile Money (simulé) avant la génération.
+ * La plateforme facture un frais par billet, réglé par l'administrateur et payé par Mobile Money (simulé)
+ * avant la génération ; à 0 Ar, la génération est gratuite et l'étape de paiement disparaît.
  * Les billets ont un QR code chiffré et se contrôlent à l'entrée comme les billets achetés en ligne ;
  * un billet rendu invendu est annulé et refusé à l'entrée.
  */
@@ -110,7 +111,7 @@ export function BilletsHorsLigne() {
       ),
     [donnees, filtre, revendeurFiltre],
   )
-  // cartes en 2 colonnes : 4 lots (2 rangées), le reste derrière « Voir plus »
+  // cartes en 2 colonnes : 4 lots par page (2 rangées)
   const { visibles: lotsVisibles, bouton: boutonVoirPlusLots } = useVoirPlus(lots, 4)
 
   if (erreur) return <p className="px-4 py-16 text-center text-gw-rose-action lg:px-8">{erreur}</p>
@@ -149,7 +150,7 @@ export function BilletsHorsLigne() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Indicateur libelle="Billets générés" valeur={entier.format(donnees.billets_generes)} aide={`${donnees.lots.length} lot${donnees.lots.length > 1 ? "s" : ""}`} />
         <Indicateur libelle="Frais payés à la plateforme" valeur={montant(donnees.frais_payes)} aide="Total depuis le début" />
-        <Indicateur libelle="Frais par billet généré" valeur={montant(donnees.frais_unitaire)} aide={`Dépôt-vente : règlement à ${donnees.seuil_pourcentage} % vendus`} />
+        <Indicateur libelle="Frais par billet généré" valeur={donnees.frais_unitaire > 0 ? montant(donnees.frais_unitaire) : "Gratuit"} aide={`Dépôt-vente : règlement à ${donnees.seuil_pourcentage} % vendus`} />
       </div>
 
       <div className="flex gap-1 border-b border-gw-bordure dark:border-gw-bordure-sombre" role="tablist" aria-label="Vue">
@@ -306,7 +307,7 @@ function ListeRevendeurs({
   onModifier: (r: RevendeurFiche) => void
   onPremier: () => void
 }) {
-  // cartes en 3 colonnes : 6 revendeurs (2 rangées), le reste derrière « Voir plus »
+  // cartes en 3 colonnes : 6 revendeurs par page (2 rangées)
   const { visibles, bouton } = useVoirPlus(revendeurs, 6)
   if (revendeurs.length === 0) {
     return (
@@ -660,6 +661,7 @@ function ModaleGeneration({
   const n = Math.max(0, Math.floor(Number(quantite) || 0))
   const max = Math.min(500, tarif?.restantes ?? 500)
   const frais = n * fraisUnitaire
+  const gratuit = fraisUnitaire <= 0
   const erreurTel = telephone ? erreurTelephone(mode, telephone) : null
   const nouveauRevendeur = choixRevendeur === NOUVEAU
   const revendeurExistant = revendeurs.find((r) => String(r.id) === choixRevendeur)
@@ -670,8 +672,10 @@ function ModaleGeneration({
     if (!evenement || !tarif) return setErreur("Choisissez un événement et un tarif.")
     if (n < 1 || n > max) return setErreur(`La quantité va de 1 à ${max}.`)
     if (type === "depot" && nouveauRevendeur && !revendeur.trim()) return setErreur("Indiquez l'entreprise partenaire.")
-    const errTel = erreurTelephone(mode, telephone)
-    if (errTel) return setErreur(errTel)
+    if (!gratuit) {
+      const errTel = erreurTelephone(mode, telephone)
+      if (errTel) return setErreur(errTel)
+    }
     setEnvoi(true)
     try {
       const lot = await genererLot({
@@ -682,8 +686,7 @@ function ModaleGeneration({
         revendeur_id: type === "depot" && !nouveauRevendeur ? revendeurExistant?.id : undefined,
         revendeur_nom: type === "depot" && nouveauRevendeur ? revendeur.trim() : undefined,
         revendeur_contact: type === "depot" && nouveauRevendeur ? contact.trim() || undefined : undefined,
-        mode_paiement: mode,
-        telephone: normaliserTelephone(telephone),
+        ...(gratuit ? {} : { mode_paiement: mode, telephone: normaliserTelephone(telephone) }),
       })
       onGenere(lot)
     } catch (e) {
@@ -798,9 +801,9 @@ function ModaleGeneration({
           <div className="rounded-2xl bg-gw-fond p-4 text-sm dark:bg-white/5">
             <div className="flex justify-between gap-3">
               <span className="text-gw-texte-doux dark:text-white/60">
-                Frais de la plateforme : {entier.format(n)} × {montant(fraisUnitaire)}
+                {gratuit ? "Frais de la plateforme : génération gratuite" : `Frais de la plateforme : ${entier.format(n)} × ${montant(fraisUnitaire)}`}
               </span>
-              <span className="font-titre text-lg font-semibold tabular-nums">{montant(frais)}</span>
+              <span className="font-titre text-lg font-semibold tabular-nums">{gratuit ? "0 Ar" : montant(frais)}</span>
             </div>
             {tarif && type !== "invitation" && n > 0 && (
               <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/55">
@@ -810,6 +813,7 @@ function ModaleGeneration({
             )}
           </div>
 
+          {!gratuit && (
           <fieldset>
             <legend className="mb-2 text-sm font-medium">Payer les frais par Mobile Money</legend>
             <div className="flex flex-wrap gap-2">
@@ -840,6 +844,7 @@ function ModaleGeneration({
             {erreurTel && telephone.replace(/\D/g, "").length >= 10 && <p className="mt-1 text-xs text-gw-rose-action">{erreurTel}</p>}
             <p className="mt-1 text-xs text-gw-texte-pale dark:text-white/45">Paiement simulé : aucun montant n&apos;est réellement débité.</p>
           </fieldset>
+          )}
 
           {erreur && <p className="rounded-xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action dark:bg-gw-rose/15 dark:text-pink-200">{erreur}</p>}
 
@@ -848,7 +853,7 @@ function ModaleGeneration({
               Annuler
             </Bouton>
             <Bouton type="submit" chargement={envoi} disabled={!tarif || n < 1}>
-              Payer {montant(frais)} et générer
+              {gratuit ? "Générer les billets" : `Payer ${montant(frais)} et générer`}
             </Bouton>
           </div>
         </form>

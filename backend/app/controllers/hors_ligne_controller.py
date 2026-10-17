@@ -8,8 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.auth_bearer import JWTBearer
 from app.auth.roles import exiger_admin, role_du_compte
 from app.database import get_db
-from app.schemas.hors_ligne import RevendeurFiche, RevendeurModification, EvenementLot, Facturation, GenerationLot, LotDetail, LotsOrganisateur, Reglement, VendusDeclares
-from app.services.hors_ligne_service import ErreurHorsLigne, HorsLigneService
+from app.schemas.hors_ligne import RevendeurFiche, RevendeurModification, EvenementLot, Facturation, GenerationLot, LotDetail, LotsOrganisateur, ModificationFrais, ParametresHorsLigne, Reglement, VendusDeclares
+from app.services.hors_ligne_service import SEUIL_REGLEMENT, ErreurHorsLigne, HorsLigneService
+from app.services.parametres_service import FRAIS_MAX, ParametresService
 
 router = APIRouter(tags=["billets hors ligne"])
 
@@ -111,6 +112,30 @@ async def reglement(lot_id: int, saisie: Reglement = Body(...), auth_data: dict 
         return await HorsLigneService(db).regler(auth_data, lot_id, saisie.numeros_invendus, saisie.forcer)
     except ErreurHorsLigne as e:
         raise erreur(e)
+
+
+def parametres_reponse(ligne) -> dict:
+    return {
+        "frais_par_billet": float(ligne.frais_billet_hors_ligne),
+        "frais_max": FRAIS_MAX,
+        "seuil_pourcentage": int(SEUIL_REGLEMENT * 100),
+        "date_modification": ligne.date_modification,
+    }
+
+
+@router.get("/hors-ligne/parametres", response_model=ParametresHorsLigne, summary="Frais en vigueur pour la génération des billets hors ligne")
+async def parametres(auth_data: dict = Depends(equipe), db: AsyncSession = Depends(get_db)):
+    return parametres_reponse(await ParametresService(db).lire())
+
+
+@router.put("/admin/parametres/frais-hors-ligne", response_model=ParametresHorsLigne, summary="Régler le frais par billet hors ligne (administrateur)")
+async def modifier_frais(saisie: ModificationFrais = Body(...), auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
+    exiger_admin(auth_data)
+    try:
+        ligne = await ParametresService(db).modifier_frais(saisie.frais_par_billet, auth_data.get("user_id"))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return parametres_reponse(ligne)
 
 
 @router.get("/admin/facturation", response_model=Facturation, summary="Facturation : billets hors ligne générés et frais payés par organisateur")

@@ -15,9 +15,9 @@ class GenerationLot(BaseModel):
     revendeur_id: Optional[int] = Field(None, description="Revendeur déjà enregistré (dépôt-vente)")
     revendeur_nom: Optional[str] = Field(None, max_length=120, description="Nouvelle entreprise partenaire (dépôt-vente)")
     revendeur_contact: Optional[str] = Field(None, max_length=120, description="Téléphone ou e-mail du revendeur")
-    # paiement des frais de la plateforme (Mobile Money simulé)
-    mode_paiement: ModePaiement
-    telephone: str = Field(..., min_length=9, max_length=20)
+    # paiement des frais de la plateforme (Mobile Money simulé) ; inutile si l'administrateur a mis le frais à 0
+    mode_paiement: Optional[ModePaiement] = None
+    telephone: Optional[str] = Field(None, min_length=9, max_length=20)
 
 
 class TarifLot(BaseModel):
@@ -109,6 +109,7 @@ class FacturationOrganisateur(BaseModel):
 
 class Facturation(BaseModel):
     frais_unitaire: float
+    frais_modifie_le: Optional[datetime] = None
     billets_generes: int
     frais_payes: float
     par_type: Dict[str, int]
@@ -136,3 +137,14 @@ class RevendeurFiche(BaseModel):
 class RevendeurModification(BaseModel):
     nom: Optional[str] = Field(None, max_length=120)
     contact: Optional[str] = Field(None, max_length=120)
+
+
+class ParametresHorsLigne(BaseModel):
+    frais_par_billet: float
+    frais_max: float
+    seuil_pourcentage: int
+    date_modification: Optional[datetime] = None
+
+
+class ModificationFrais(BaseModel):
+    frais_par_billet: float = Field(..., ge=0, le=10000, description="Frais par billet hors ligne généré, en ariary (0 = gratuit)")

@@ -1,7 +1,6 @@
 """Billets hors ligne : génération par lots (dépôt-vente, guichet, invitations), facturation
 de la plateforme, suivi du dépôt-vente et règlement. Voir app/models/billet_hors_ligne.py."""
 import math
-import os
 import uuid
 from datetime import datetime, timezone
 from typing import List, Optional
@@ -19,9 +18,10 @@ from app.models.user import User
 from app.services.billetterie_service import BilletterieService, ErreurBilletterie, verifier_telephone
 from app.utils.billet_pdf import InfosBillet, generer_pdf_billets, generer_planche_billets
 from app.utils.crypto import encrypt_data
+from app.services.parametres_service import ParametresService
 
-# frais fixe facturé par la plateforme pour chaque billet généré (en ariary)
-FRAIS_PAR_BILLET = float(os.getenv("FRAIS_BILLET_HORS_LIGNE", "500"))
+# le frais facturé par la plateforme pour chaque billet généré est réglé par l'administrateur
+# (voir app/services/parametres_service.py) ; chaque lot garde le frais en vigueur à sa génération.
 # dépôt-vente : le revendeur règle une fois 80 % du lot vendu
 SEUIL_REGLEMENT = 0.8
 QUANTITE_MAX_LOT = 500
@@ -77,11 +77,15 @@ class HorsLigneService:
             if saisie.quantite > restantes:
                 raise ErreurHorsLigne(f"Il ne reste que {max(restantes, 0)} places « {categorie.nom} ».")
 
-        # paiement des frais de la plateforme (Mobile Money simulé)
-        try:
-            verifier_telephone(saisie.mode_paiement, saisie.telephone)
-        except ErreurBilletterie as e:
-            raise ErreurHorsLigne(str(e))
+        # paiement des frais de la plateforme (Mobile Money simulé) ; rien à payer si le frais est à 0
+        frais = await ParametresService(self.db).frais_billet_hors_ligne()
+        if frais > 0:
+            if not saisie.mode_paiement or not saisie.telephone:
+                raise ErreurHorsLigne("Choisissez l'opérateur et saisissez le numéro Mobile Money pour payer les frais.")
+            try:
+                verifier_telephone(saisie.mode_paiement, saisie.telephone)
+            except ErreurBilletterie as e:
+                raise ErreurHorsLigne(str(e))
 
         revendeur = None
         if saisie.type == "depot":
@@ -97,10 +101,10 @@ class HorsLigneService:
             revendeur_contact=revendeur.contact if revendeur else None,
             quantite=saisie.quantite,
             prix_unitaire=0.0 if saisie.type == "invitation" else float(categorie.prix),
-            frais_unitaire=FRAIS_PAR_BILLET,
-            montant_frais=FRAIS_PAR_BILLET * saisie.quantite,
-            mode_paiement_frais=saisie.mode_paiement,
-            reference_paiement=f"SIM-{uuid.uuid4().hex[:8].upper()}",
+            frais_unitaire=frais,
+            montant_frais=frais * saisie.quantite,
+            mode_paiement_frais=saisie.mode_paiement if frais > 0 else "gratuit",
+            reference_paiement=f"SIM-{uuid.uuid4().hex[:8].upper()}" if frais > 0 else "GRATUIT",
         )
         for _ in range(saisie.quantite):
             numero = nouveau_numero()
@@ -292,7 +296,7 @@ class HorsLigneService:
         fonds = await self._fonds_types([e.categorie_id for _, e, _ in lignes])
         lots = [self._resume(lot, e, c, *compteurs.get(lot.id, (0, 0)), fonds.get(e.categorie_id)) for lot, e, c in lignes]
         return {
-            "frais_unitaire": FRAIS_PAR_BILLET,
+            "frais_unitaire": await ParametresService(self.db).frais_billet_hors_ligne(),
             "seuil_pourcentage": int(SEUIL_REGLEMENT * 100),
             "billets_generes": sum(l["quantite"] for l in lots),
             "frais_payes": sum(l["montant_frais"] for l in lots),
@@ -450,8 +454,10 @@ class HorsLigneService:
             for uid, nom, email, nb, billets, frais, dernier in lignes
         ]
         recents = (await self.lots({"role": "admin"}))["lots"][:15]
+        parametres = await ParametresService(self.db).lire()
         return {
-            "frais_unitaire": FRAIS_PAR_BILLET,
+            "frais_unitaire": float(parametres.frais_billet_hors_ligne),
+            "frais_modifie_le": parametres.date_modification,
             "billets_generes": sum(o["billets_generes"] for o in organisateurs),
             "frais_payes": sum(o["frais_payes"] for o in organisateurs),
             "par_type": {t: int(n) for t, n in par_type},

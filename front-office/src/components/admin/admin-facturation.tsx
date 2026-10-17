@@ -1,15 +1,18 @@
 "use client"
 
 import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
-import { useEffect, useState } from "react"
-import { Loader2, Receipt } from "lucide-react"
+import { useEffect, useState, type FormEvent } from "react"
+import { toast } from "sonner"
+import { Loader2, Pencil, Receipt } from "lucide-react"
 import type { Facturation, TypeLot } from "@/types"
-import { fetchFacturation } from "@/services/horsLigneService"
+import { fetchFacturation, modifierFraisHorsLigne } from "@/services/horsLigneService"
 import { BadgeType, TYPES_LOT } from "@/components/organisateur/billets-hors-ligne"
 
 /*
  * Facturation (administrateur) : billets hors ligne générés par chaque organisateur
- * et frais payés à la plateforme (frais fixe par billet, payé avant la génération).
+ * et frais payés à la plateforme (frais par billet, payé avant la génération).
+ * L'administrateur règle ce frais (0 Ar = génération gratuite) ; chaque lot garde le frais en vigueur
+ * le jour de sa génération, donc un changement ne modifie pas les lots déjà générés.
  */
 
 const entier = new Intl.NumberFormat("fr-FR")
@@ -41,9 +44,15 @@ export function AdminFacturation() {
         <h1 className="font-titre text-2xl font-semibold">Facturation</h1>
         <p className="mt-1 max-w-2xl text-sm text-gw-texte-doux dark:text-white/65">
           Billets hors ligne générés par les organisateurs (dépôt-vente, guichet, invitations) et frais payés à la
-          plateforme : {montant(donnees.frais_unitaire)} par billet, réglés par Mobile Money avant la génération.
+          plateforme, réglés par Mobile Money avant la génération.
         </p>
       </div>
+
+      <ReglageFrais
+        frais={donnees.frais_unitaire}
+        modifieLe={donnees.frais_modifie_le}
+        onModifie={(frais, le) => setDonnees({ ...donnees, frais_unitaire: frais, frais_modifie_le: le })}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="gw-carte p-5">
@@ -156,5 +165,87 @@ export function AdminFacturation() {
         </section>
       )}
     </div>
+  )
+}
+
+/** Carte de réglage du frais par billet hors ligne (administrateur). */
+function ReglageFrais({
+  frais,
+  modifieLe,
+  onModifie,
+}: {
+  frais: number
+  modifieLe: string | null
+  onModifie: (frais: number, le: string | null) => void
+}) {
+  const [edition, setEdition] = useState(false)
+  const [valeur, setValeur] = useState(String(frais))
+  const [envoi, setEnvoi] = useState(false)
+  const [erreur, setErreur] = useState("")
+
+  const enregistrer = async (e: FormEvent) => {
+    e.preventDefault()
+    setErreur("")
+    const n = Number(valeur.replace(",", "."))
+    if (!Number.isFinite(n) || n < 0 || n > 10000) return setErreur("Indiquez un montant entre 0 et 10 000 Ar.")
+    setEnvoi(true)
+    try {
+      const p = await modifierFraisHorsLigne(Math.round(n))
+      onModifie(p.frais_par_billet, p.date_modification)
+      setEdition(false)
+      toast.success(p.frais_par_billet > 0 ? `Nouveau frais : ${montant(p.frais_par_billet)} par billet.` : "Génération des billets hors ligne désormais gratuite.")
+    } catch (e) {
+      setErreur(e instanceof Error ? e.message : "Enregistrement impossible.")
+    } finally {
+      setEnvoi(false)
+    }
+  }
+
+  return (
+    <section className="gw-carte flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6" aria-labelledby="titre-frais">
+      <div>
+        <h2 id="titre-frais" className="text-sm text-gw-texte-doux dark:text-white/60">
+          Frais par billet hors ligne généré
+        </h2>
+        <p className="font-titre mt-1 text-2xl font-semibold tabular-nums">{frais > 0 ? montant(frais) : "Gratuit"}</p>
+        <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/55">
+          {modifieLe ? `Modifié le ${date(modifieLe)}. ` : ""}Le changement s&apos;applique aux prochains lots ; les lots déjà générés gardent leur frais.
+        </p>
+      </div>
+      {edition ? (
+        <form onSubmit={enregistrer} className="flex flex-col gap-2 sm:items-end">
+          <div className="flex items-center gap-2">
+            <label htmlFor="frais-billet" className="sr-only">
+              Frais par billet en ariary
+            </label>
+            <input
+              id="frais-billet"
+              inputMode="numeric"
+              autoFocus
+              value={valeur}
+              onChange={(e) => setValeur(e.target.value.replace(/[^\d.,]/g, ""))}
+              className="w-32 rounded-xl border border-gw-bordure bg-white px-3 py-2 text-right text-sm tabular-nums dark:border-white/15 dark:bg-white/5"
+            />
+            <span className="text-sm text-gw-texte-doux dark:text-white/60">Ar</span>
+            <button type="button" onClick={() => { setEdition(false); setErreur("") }} className="rounded-full px-3 py-2 text-sm font-semibold text-gw-texte-doux hover:bg-gw-fond dark:text-white/65 dark:hover:bg-white/10">
+              Annuler
+            </button>
+            <button type="submit" disabled={envoi} className="inline-flex items-center gap-2 rounded-full bg-gw-rose-action px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+              {envoi && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />} Enregistrer
+            </button>
+          </div>
+          <p className="text-xs text-gw-texte-pale dark:text-white/45">0 Ar = génération gratuite (aucun paiement demandé).</p>
+          {erreur && <p className="text-xs text-gw-rose-action">{erreur}</p>}
+        </form>
+      ) : (
+        <button
+          type="button"
+          onClick={() => { setValeur(String(Math.round(frais))); setEdition(true) }}
+          className="inline-flex items-center gap-2 self-start rounded-full border border-gw-bordure px-4 py-2 text-sm font-semibold text-gw-violet hover:bg-gw-lavande/30 sm:self-center dark:border-white/15 dark:text-gw-lavande dark:hover:bg-white/10"
+        >
+          <Pencil className="h-4 w-4" aria-hidden /> Modifier le frais
+        </button>
+      )}
+    </section>
   )
 }

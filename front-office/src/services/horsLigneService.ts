@@ -8,6 +8,7 @@ import type {
   GenerationLot,
   LotDetail,
   LotsOrganisateur,
+  ParametresHorsLigne,
   RevendeurFiche,
 } from "../types"
 
@@ -56,6 +57,12 @@ export const modifierRevendeur = (id: number, champs: { nom?: string; contact?: 
   appel<RevendeurFiche>(`/organisateur/hors-ligne/revendeurs/${id}`, { method: "PATCH", body: JSON.stringify(champs) })
 
 export const fetchFacturation = () => appel<Facturation>("/admin/facturation")
+
+/** Frais par billet hors ligne en vigueur (lecture : équipe ; modification : administrateur). */
+export const fetchParametresHorsLigne = () => appel<ParametresHorsLigne>("/hors-ligne/parametres")
+
+export const modifierFraisHorsLigne = (frais: number) =>
+  appel<ParametresHorsLigne>("/admin/parametres/frais-hors-ligne", { method: "PUT", body: JSON.stringify({ frais_par_billet: frais }) })
 
 /* ---------- impression ---------- */
 

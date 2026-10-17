@@ -16,6 +16,7 @@ from .notification import Notification
 from .code_email import CodeEmail
 from .billet_hors_ligne import Revendeur, LotHorsLigne, BilletHorsLigne
 from .jeton_rafraichissement import JetonRafraichissement
+from .parametre_plateforme import ParametresPlateforme
 
 __all__ = [
     'User',
@@ -37,4 +38,5 @@ __all__ = [
     'LotHorsLigne',
     'BilletHorsLigne',
     'JetonRafraichissement',
+    'ParametresPlateforme',
 ]

@@ -65,8 +65,17 @@ export interface GenerationLot {
   revendeur_id?: number
   revendeur_nom?: string
   revendeur_contact?: string
-  mode_paiement: ModePaiement
-  telephone: string
+  /** paiement des frais : inutile quand l'administrateur a mis le frais à 0 */
+  mode_paiement?: ModePaiement
+  telephone?: string
+}
+
+/** Frais en vigueur, réglés par l'administrateur. */
+export interface ParametresHorsLigne {
+  frais_par_billet: number
+  frais_max: number
+  seuil_pourcentage: number
+  date_modification: string | null
 }
 
 /** Fiche d'un revendeur partenaire : tous ses lots de dépôt-vente réunis. */
@@ -92,6 +101,7 @@ export interface RevendeurFiche {
 
 export interface Facturation {
   frais_unitaire: number
+  frais_modifie_le: string | null
   billets_generes: number
   frais_payes: number
   par_type: Partial<Record<TypeLot, number>>
