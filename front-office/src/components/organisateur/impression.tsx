@@ -24,7 +24,7 @@ import { BadgeType } from "@/components/organisateur/billets-hors-ligne"
 type Selection = "tous" | "plage" | "un"
 
 const FORMATS: { id: FormatImpression; titre: string; aide: string; icone: typeof LayoutGrid }[] = [
-  { id: "planche", titre: "Planche A4 à découper", aide: "18 billets par page (63 × 44 mm), avec traits de coupe. Idéal pour le guichet et les revendeurs.", icone: LayoutGrid },
+  { id: "planche", titre: "Planche A4 à découper", aide: "Jusqu’à 18 billets par page A4 (63 × 44 mm), avec traits de coupe. Idéal pour le guichet et les revendeurs.", icone: LayoutGrid },
   { id: "a5", titre: "Un billet par page (A5)", aide: "Grand format, comme le billet envoyé par e-mail. Idéal pour les invitations.", icone: FileText },
 ]
 
