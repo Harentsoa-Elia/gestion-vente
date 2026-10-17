@@ -1,11 +1,11 @@
 import Link from "next/link"
 import type { CSSProperties } from "react"
-import { QrCode, Vote, BarChart3 } from "lucide-react"
+import { QrCode, Vote, TrendingUp } from "lucide-react"
 
 const ATOUTS = [
   { icone: Vote, titre: "Vote du public", texte: "Testez vos artistes et vos lieux avant de fixer la date" },
   { icone: QrCode, titre: "Billets QR code", texte: "Contrôle des entrées depuis un téléphone" },
-  { icone: BarChart3, titre: "Suivi des ventes", texte: "Réservations et paiements en temps réel" },
+  { icone: TrendingUp, titre: "Suivi des ventes", texte: "Réservations et paiements en temps réel" },
 ]
 
 /** Bandeau "Need assistance" du modèle, adressé aux organisateurs (comme "Create events" sur Eventbrite). */

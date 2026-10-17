@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, type CSSProperties, type FormEvent, type ReactNode } from "react"
-import { ArrowRight, CalendarDays, History, MapPin, Search, Shapes, Sparkles, Vote } from "lucide-react"
+import { ArrowRight, CalendarDays, History, MapPin, Search, Music, Tags, Vote } from "lucide-react"
 import type { Categorie, Lieu } from "@/types"
 import { cn } from "@/utils"
 import { PERIODES, type Periode } from "@/lib/evenements"
@@ -77,7 +77,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
 
   return (
     <section aria-labelledby="hero-titre" className="relative">
-      {/* fond : photos en fondu enchaîné (le fond 'scène' reste visible pendant le chargement) */}
+      {/* fond : photos en fondu enchaîné (le fond « scène » reste visible pendant le chargement) */}
       <div className="scene relative overflow-hidden" style={{ "--accent": "var(--color-gw-rose)" } as CSSProperties}>
         <FondDiaporama {...diaporama} />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#16122E]/90 via-[#16122E]/55 to-[#16122E]/10" />
@@ -85,7 +85,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
         <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-40 sm:px-6 sm:pt-20 sm:pb-48 lg:pb-52">
 
           <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-            <Sparkles className="h-4 w-4 text-[#F59BC7]" aria-hidden />
+            <Music className="h-4 w-4 text-[#F59BC7]" aria-hidden />
             Concerts, cabarets, sport et soirées
           </p>
 
@@ -176,7 +176,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
                 id="recherche-q"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Artiste, titre de l'événement..."
+                placeholder="Artiste, titre de l'événement…"
                 className={styleSaisie}
               />
             </Champ>
@@ -205,7 +205,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
                 ))}
               </select>
             </Champ>
-            <Champ icone={Shapes} libelle="Catégorie" htmlFor="recherche-categorie">
+            <Champ icone={Tags} libelle="Catégorie" htmlFor="recherche-categorie">
               <select
                 id="recherche-categorie"
                 value={categorie}

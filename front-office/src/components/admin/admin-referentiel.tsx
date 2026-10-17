@@ -3,7 +3,7 @@
 import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react"
 import { toast } from "sonner"
-import { Loader2, MapPin, Mic2, Pencil, Plus, Search, Shapes, Trash2, type LucideIcon } from "lucide-react"
+import { Loader2, MapPin, Mic2, Pencil, Plus, Search, Tags, Trash2, type LucideIcon } from "lucide-react"
 import type { Artiste, Categorie, ElementReferentiel, Lieu, Referentiel, TableReferentiel } from "@/types"
 import { cn } from "@/utils"
 import { enregistrerElementReferentiel, fetchReferentielAdmin, supprimerElementReferentiel } from "@/services/administrationService"
@@ -20,7 +20,7 @@ import { definirFondType } from "@/services/horsLigneService"
  */
 
 const ONGLETS: { cle: TableReferentiel; libelle: string; singulier: string; icone: LucideIcon }[] = [
-  { cle: "categories", libelle: "Types d'événement", singulier: "type d'événement", icone: Shapes },
+  { cle: "categories", libelle: "Types d'événement", singulier: "type d'événement", icone: Tags },
   { cle: "lieux", libelle: "Lieux", singulier: "lieu", icone: MapPin },
   { cle: "artistes", libelle: "Artistes", singulier: "artiste", icone: Mic2 },
 ]

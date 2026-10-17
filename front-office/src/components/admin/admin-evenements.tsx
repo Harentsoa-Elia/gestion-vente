@@ -13,7 +13,7 @@ import {
   Inbox,
   MapPin,
   Mic2,
-  Shapes,
+  Tags,
   Ticket,
   UserRound,
   XCircle,
@@ -56,7 +56,7 @@ const FILTRES: { id: Filtre; libelle: string }[] = [
 const TYPES: { type: PropositionType; titre: string; singulier: string; pluriel: string; icone: LucideIcon }[] = [
   { type: "LIEU", titre: "Lieux", singulier: "lieu", pluriel: "lieux", icone: MapPin },
   { type: "ARTISTE", titre: "Artistes", singulier: "artiste", pluriel: "artistes", icone: Mic2 },
-  { type: "CATEGORIE", titre: "Types d'événement", singulier: "type d'événement", pluriel: "types d'événement", icone: Shapes },
+  { type: "CATEGORIE", titre: "Types d'événement", singulier: "type d'événement", pluriel: "types d'événement", icone: Tags },
 ]
 
 const MOTIFS_RAPIDES = [

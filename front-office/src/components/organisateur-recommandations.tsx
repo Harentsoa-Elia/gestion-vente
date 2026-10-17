@@ -15,7 +15,7 @@ import {
   MessageCircle,
   Mic2,
   RefreshCw,
-  Shapes,
+  Tags,
   Sparkles,
   Star,
   ThumbsUp,
@@ -48,7 +48,7 @@ const entier = new Intl.NumberFormat("fr-FR")
 const TYPES: { type: PropositionType; titre: string; pluriel: string; icone: LucideIcon; cle: "lieu_id" | "artiste_id" | "categorie_id" }[] = [
   { type: "LIEU", titre: "Lieu", pluriel: "lieux", icone: MapPin, cle: "lieu_id" },
   { type: "ARTISTE", titre: "Artiste", pluriel: "artistes", icone: Mic2, cle: "artiste_id" },
-  { type: "CATEGORIE", titre: "Type d'événement", pluriel: "types d'événement", icone: Shapes, cle: "categorie_id" },
+  { type: "CATEGORIE", titre: "Type d'événement", pluriel: "types d'événement", icone: Tags, cle: "categorie_id" },
 ]
 
 const POIDS: { libelle: string; poids: number; icone: React.ReactNode }[] = [

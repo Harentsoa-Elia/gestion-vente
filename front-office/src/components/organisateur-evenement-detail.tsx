@@ -15,7 +15,7 @@ import {
   Pencil,
   Plus,
   Send,
-  Shapes,
+  Tags,
   Sparkles,
   Ticket,
   Trash2,
@@ -75,7 +75,7 @@ const TYPES: {
 }[] = [
   { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?", recherche: "Rechercher un lieu, une ville ou une région…" },
   { type: "ARTISTE", titre: "Artistes", icone: Mic2, cle: "artiste_id", aide: "Qui programmer ?", recherche: "Rechercher un artiste ou un genre…" },
-  { type: "CATEGORIE", titre: "Types d'événement", icone: Shapes, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement…" },
+  { type: "CATEGORIE", titre: "Types d'événement", icone: Tags, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement…" },
 ]
 
 const entier = new Intl.NumberFormat("fr-FR")

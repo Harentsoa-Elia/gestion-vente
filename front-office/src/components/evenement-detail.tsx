@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, CalendarDays, Clock, Eye, MapPin, Mic2, Shapes, ShieldCheck, Ticket, Users, Vote, type LucideIcon } from "lucide-react"
+import { ArrowLeft, CalendarDays, Clock, Eye, MapPin, Mic2, Tags, ShieldCheck, Ticket, Users, Vote, type LucideIcon } from "lucide-react"
 import { fetchEvenementById } from "@/services/evenementService"
 import { fetchTarifs } from "@/services/billetterieService"
 import { fetchPropositionsAvecScores } from "@/services/propositionService"
@@ -16,7 +16,7 @@ import { BoiteReactions } from "@/components/accueil/boite-reactions"
 
 /*
  * Page publique d'un événement : affiche, informations pratiques, tarifs avec les places
- * restantes et bouton 'Réserver' ; plus bas, les propositions ouvertes au vote du public.
+ * restantes et bouton « Réserver » ; plus bas, les propositions ouvertes au vote du public.
  */
 
 type EtatBilletterie =
@@ -101,7 +101,7 @@ function CarteBilletterie({ evenement, tarifs, etat }: { evenement: Evenement; t
 const TYPES_PROPOSITION: Record<PropositionType, { libelle: string; icone: LucideIcon }> = {
   ARTISTE: { libelle: "Artiste", icone: Mic2 },
   LIEU: { libelle: "Lieu", icone: MapPin },
-  CATEGORIE: { libelle: "Type d'événement", icone: Shapes },
+  CATEGORIE: { libelle: "Type d'événement", icone: Tags },
 }
 
 function CarteProposition({ proposition, part }: { proposition: PropositionAvecScore; part: number }) {
@@ -133,7 +133,7 @@ function CarteProposition({ proposition, part }: { proposition: PropositionAvecS
       </div>
       <div className="p-4">
         <p className="mb-3 text-sm text-white/75">
-          <span className="font-semibold text-white">{score.toLocaleString("fr-FR")} points</span>  réagissez pour la soutenir
+          <span className="font-semibold text-white">{score.toLocaleString("fr-FR")} points</span> · réagissez pour la soutenir
         </p>
         <BoiteReactions propositionId={proposition.id} libelle={proposition.libelle} onScore={(d) => setScore((v) => v + d)} />
       </div>
