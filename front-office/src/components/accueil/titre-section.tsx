@@ -1,19 +1,22 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, type LucideIcon } from "lucide-react"
 import type { ReactNode } from "react"
 
-/** Titre de section du modèle : titre, petite vague rose, lien "voir tout" à droite. */
+/** Titre de section : titre suivi d'une petite icône rose propre à la section, lien "voir tout" à droite. */
 export function TitreSection({
   id,
   titre,
   description,
   lien,
+  icone: Icone,
   children,
 }: {
   id: string
   titre: string
   description?: string
   lien?: { href: string; libelle: string }
+  /** icône affichée après le titre */
+  icone: LucideIcon
   children?: ReactNode
 }) {
   return (
@@ -22,15 +25,9 @@ export function TitreSection({
         <div>
           <h2 id={id} className="font-titre flex items-center gap-3 text-3xl font-bold tracking-[-0.02em] text-gw-nuit">
             {titre}
-            <svg aria-hidden viewBox="0 0 40 10" className="h-2.5 w-10 text-gw-rose">
-              <path
-                d="M1 5 Q 5.5 0 10 5 T 19 5 T 28 5 T 37 5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-              />
-            </svg>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gw-rose-pale text-gw-rose-action">
+              <Icone className="h-[18px] w-[18px]" strokeWidth={2.2} aria-hidden />
+            </span>
           </h2>
           {description && <p className="mt-2 max-w-xl text-gw-texte-doux">{description}</p>}
         </div>

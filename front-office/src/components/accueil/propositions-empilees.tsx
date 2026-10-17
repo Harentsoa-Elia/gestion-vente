@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import Link from "next/link"
-import { MapPin, Mic2, Tags, Vote, type LucideIcon } from "lucide-react"
+import { MapPin, MessageCircleHeart, Mic2, Tags, Vote, type LucideIcon } from "lucide-react"
 import type { PropositionType } from "@/types"
 import { cn } from "@/utils"
 import type { PropositionEnVote } from "@/lib/use-propositions"
@@ -200,6 +200,7 @@ export function PropositionsEmpilees({
           <TitreSection
             id="avis-titre"
             titre="Donnez votre avis"
+            icone={MessageCircleHeart}
             description="Les organisateurs hésitent entre plusieurs artistes, lieux ou événements. Réagissez : vos réactions pèsent dans leur décision."
           />
           <DecorationVote />

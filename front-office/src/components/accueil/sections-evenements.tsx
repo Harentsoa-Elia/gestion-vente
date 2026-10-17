@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { CalendarX } from "lucide-react"
+import { CalendarHeart, CalendarX, History } from "lucide-react"
 import type { Catalogue } from "@/lib/use-catalogue"
 import { dansPeriode, PERIODES, type Periode } from "@/lib/evenements"
 import { GrilleEvenements } from "@/components/evenements/grille-evenements"
@@ -23,6 +23,7 @@ export function EvenementsAVenir({ catalogue }: { catalogue: Catalogue }) {
       <TitreSection
         id="a-venir-titre"
         titre="Événements à venir"
+        icone={CalendarHeart}
         lien={{ href: "/evenements", libelle: "Voir tous les événements" }}
       >
         <FiltrePeriode valeur={periode} onChange={setPeriode} />
@@ -79,6 +80,7 @@ export function EvenementsPasses({ catalogue }: { catalogue: Catalogue }) {
       <TitreSection
         id="passes-titre"
         titre="Événements passés"
+        icone={History}
         description="Ils ont eu lieu sur la plateforme. Retrouvez leurs informations et vos billets."
         lien={{ href: "/evenements?onglet=passes", libelle: "Voir les archives" }}
       />
