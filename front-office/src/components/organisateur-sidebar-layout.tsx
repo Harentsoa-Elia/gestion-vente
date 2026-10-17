@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
   BarChart3,
-  CalendarRange,
+  PartyPopper,
   ExternalLink,
   LayoutDashboard,
   Database,
@@ -18,7 +18,7 @@ import {
   Moon,
   Lightbulb,
   Sun,
-  Ticket,
+  ClipboardCheck,
   Users,
   Vote,
   Banknote,
@@ -48,8 +48,8 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/dashboard", label: "Tableau de bord", icon: LayoutDashboard, disponible: true },
-  { href: "/organisateur/evenements", label: "Mes événements", icon: CalendarRange, disponible: true },
-  { href: "/organisateur/reservations", label: "Réservations", icon: Ticket, disponible: true },
+  { href: "/organisateur/evenements", label: "Mes événements", icon: PartyPopper, disponible: true },
+  { href: "/organisateur/reservations", label: "Réservations", icon: ClipboardCheck, disponible: true },
   { href: "/organisateur/billets-hors-ligne", label: "Billets hors ligne", icon: Tickets, disponible: true },
   { href: "/organisateur/impression", label: "Impression", icon: Printer, disponible: true },
   { href: "/organisateur/participants", label: "Participants", icon: Users, disponible: true },
