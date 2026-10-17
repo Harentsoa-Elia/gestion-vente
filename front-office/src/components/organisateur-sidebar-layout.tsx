@@ -13,15 +13,15 @@ import {
   Menu,
   Printer,
   Receipt,
-  TicketPlus,
+  Tickets,
   ShieldCheck,
   Moon,
-  Sparkles,
+  Lightbulb,
   Sun,
   Ticket,
   Users,
   Vote,
-  Wallet,
+  Banknote,
   X,
 } from "lucide-react"
 import { logout } from "@/services/auth.service"
@@ -50,12 +50,12 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/organisateur/dashboard", label: "Tableau de bord", icon: LayoutDashboard, disponible: true },
   { href: "/organisateur/evenements", label: "Mes événements", icon: CalendarRange, disponible: true },
   { href: "/organisateur/reservations", label: "Réservations", icon: Ticket, disponible: true },
-  { href: "/organisateur/billets-hors-ligne", label: "Billets hors ligne", icon: TicketPlus, disponible: true },
+  { href: "/organisateur/billets-hors-ligne", label: "Billets hors ligne", icon: Tickets, disponible: true },
   { href: "/organisateur/impression", label: "Impression", icon: Printer, disponible: true },
   { href: "/organisateur/participants", label: "Participants", icon: Users, disponible: true },
-  { href: "/organisateur/paiements", label: "Paiements", icon: Wallet, disponible: true },
+  { href: "/organisateur/paiements", label: "Paiements", icon: Banknote, disponible: true },
   { href: "/organisateur/statistiques", label: "Statistiques", icon: BarChart3, disponible: true },
-  { href: "/organisateur/intelligence-decisionnelle", label: "Recommandations", icon: Sparkles, disponible: true },
+  { href: "/organisateur/intelligence-decisionnelle", label: "Recommandations", icon: Lightbulb, disponible: true },
 ]
 
 /** Espace administrateur : supervision, validation des événements, comptes, référentiel. */
