@@ -1,6 +1,6 @@
 "use client"
 
-import { cloneElement, isValidElement, useEffect, useState } from "react"
+import { cloneElement, isValidElement, useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -27,6 +27,8 @@ import {
 import { logout } from "@/services/auth.service"
 import { useConfirmationDeconnexion } from "@/components/confirmation-deconnexion"
 import { Logo } from "@/components/marque/logo"
+import { AvatarEquipe, ModaleProfilEquipe, libelleRole, useCompteEquipe, useOuvertureProfil } from "@/components/profil-equipe"
+import type { AuthUser } from "@/types"
 import { cn } from "@/utils"
 
 /*
@@ -81,7 +83,11 @@ function BarreLaterale({
   onBasculerTheme,
   onDeconnexion,
   onNaviguer,
+  compte,
+  onProfil,
 }: {
+  compte: AuthUser | null
+  onProfil: () => void
   espace: EspaceStaff
   pathname: string
   darkMode: boolean
@@ -164,6 +170,19 @@ function BarreLaterale({
         </Link>
         )}
 
+        {/* profil du compte connecté : photo, nom et rôle ; ouvre la fenêtre « Mon profil » */}
+        <button
+          type="button"
+          onClick={onProfil}
+          className="flex w-full items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors hover:bg-white/10"
+        >
+          <AvatarEquipe compte={compte} className="h-10 w-10 text-sm ring-2 ring-white/60" />
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-semibold">{compte?.fullname ?? "Mon profil"}</span>
+            <span className="block text-xs text-white/70">{libelleRole(compte?.role ?? (espace === "admin" ? "admin" : "organisateur"))}</span>
+          </span>
+        </button>
+
         <button
           type="button"
           role="switch"
@@ -204,6 +223,14 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
   const [darkMode, setDarkMode] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [tiroirOuvert, setTiroirOuvert] = useState(false)
+  // profil du compte connecté (photo) : hooks déclarés avant tout « return » anticipé
+  const compte = useCompteEquipe()
+  const [profilOuvert, setProfilOuvert] = useState(false)
+  const ouvrirProfil = useCallback(() => {
+    setTiroirOuvert(false)
+    setProfilOuvert(true)
+  }, [])
+  useOuvertureProfil(ouvrirProfil)
 
   useEffect(() => {
     setDarkMode(localStorage.getItem("organisateur_dark_mode") === "true")
@@ -257,6 +284,8 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
 
   const barre = (
     <BarreLaterale
+      compte={compte}
+      onProfil={ouvrirProfil}
       espace={espace}
       pathname={pathname}
       darkMode={darkMode}
@@ -313,6 +342,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
         </main>
       </div>
       {confirmationDeconnexion}
+      <ModaleProfilEquipe ouverte={profilOuvert} onFermer={() => setProfilOuvert(false)} compte={compte} />
     </div>
   )
 }

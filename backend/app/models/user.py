@@ -8,10 +8,12 @@ class User(Base):
     fullname = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
-    # 'admin' ou 'organisateur' (voir app/auth/roles.py)
+    # « admin » ou « organisateur » (voir app/auth/roles.py)
     role = Column(String(20), nullable=False, server_default="organisateur", default="organisateur")
     # compte suspendu par l'administrateur : la connexion est refusée
     actif = Column(Boolean, nullable=False, server_default="true", default=True)
+    # photo de profil (chemin sous /media/profils), facultative
+    avatar = Column(String, nullable=True)
 
     __table_args__ = (
         CheckConstraint("role IN ('admin', 'organisateur')", name="ck_users_role_valeurs"),

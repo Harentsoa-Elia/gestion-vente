@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, ChevronRight, Sparkles, Ticket, TicketPlus, TrendingUp } from "lucide-react"
+import { ArrowRight, ChevronRight, Sparkles, Ticket, TicketPlus, TrendingUp, UserPen } from "lucide-react"
 import {
   Area,
   AreaChart,
@@ -14,6 +14,7 @@ import {
 } from "recharts"
 import { fetchDashboardOrganisateur, fetchEvenementsPopulaires } from "@/services/dashboardService"
 import { fetchUserData } from "@/services/auth.service"
+import { AvatarEquipe, ouvrirProfilEquipe } from "@/components/profil-equipe"
 import { fetchAllEvenements } from "@/services/evenementService"
 import type { AuthUser, DashboardOrganisateur, Evenement, EvenementPopulaire } from "@/types"
 import { NotificationBell } from "@/components/notification-bell"
@@ -184,6 +185,13 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
   const [populaires, setPopulaires] = useState<EvenementPopulaire[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // la photo changée depuis la fenêtre « Mon profil » s'affiche aussitôt
+  useEffect(() => {
+    const maj = (e: Event) => setUser((e as CustomEvent<AuthUser>).detail)
+    window.addEventListener("gw-compte-equipe", maj)
+    return () => window.removeEventListener("gw-compte-equipe", maj)
+  }, [])
 
   useEffect(() => {
     Promise.allSettled([fetchDashboardOrganisateur(), fetchUserData(), fetchAllEvenements(), fetchEvenementsPopulaires()])
@@ -469,27 +477,20 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
             <NotificationBell boutonClassName="text-gw-nuit hover:bg-gw-fond dark:text-white dark:hover:bg-white/10" />
           </div>
           <div className="mt-4 flex items-center gap-4">
-            <span className="font-titre flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-lg font-semibold text-white">
-              {(user?.fullname ?? "?")
-                .split(" ")
-                .filter(Boolean)
-                .map((m) => m[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase()}
-            </span>
+            <AvatarEquipe compte={user} className="h-14 w-14 text-lg" />
             <div className="min-w-0">
               <p className="truncate font-semibold">{user?.fullname ?? "Organisateur"}</p>
               {user?.email && <p className="truncate text-xs text-gw-texte-doux dark:text-white/60">{user.email}</p>}
               <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/60">Organisateur</p>
             </div>
           </div>
-          <Link
-            href="/organisateur/reservations"
-            className="mt-4 flex items-center justify-center gap-2 rounded-full bg-gw-rose-action px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gw-rose-action-fonce"
+          <button
+            type="button"
+            onClick={ouvrirProfilEquipe}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gw-rose-action px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gw-rose-action-fonce"
           >
-            Voir mes réservations
-          </Link>
+            <UserPen className="h-4 w-4" aria-hidden /> Modifier mon profil
+          </button>
         </section>
 
         <CalendrierAgenda evenements={evenements} />

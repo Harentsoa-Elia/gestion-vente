@@ -27,6 +27,8 @@ export interface CompteEquipe {
   email: string
   role: "admin" | "organisateur"
   actif: boolean
+  /** photo de profil */
+  avatar?: string | null
   evenements: number
   evenements_valides: number
   evenements_en_attente: number

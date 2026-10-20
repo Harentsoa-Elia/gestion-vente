@@ -193,6 +193,7 @@ class AdministrationService:
             {
                 "id": u.id,
                 "fullname": u.fullname,
+                "avatar": u.avatar,
                 "email": u.email,
                 "role": u.role,
                 "actif": u.actif is not False,

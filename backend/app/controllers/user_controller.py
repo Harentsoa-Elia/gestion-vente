@@ -106,4 +106,5 @@ async def get_me(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depe
         "email": user.email,
         "fullname": user.fullname,
         "role": user.role,
+        "avatar": user.avatar,
     }

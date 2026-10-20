@@ -31,6 +31,7 @@ class Organisateur(BaseModel):
     email: str
     role: str
     actif: bool
+    avatar: Optional[str] = None  # photo de profil
     evenements: int
     evenements_valides: int
     evenements_en_attente: int

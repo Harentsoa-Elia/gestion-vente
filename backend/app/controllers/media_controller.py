@@ -13,12 +13,13 @@ from app.auth.auth_bearer import JWTBearer, ParticipantBearer
 from app.controllers.evenement_controller import check_access
 from app.controllers.proposition_controller import check_evenement_access
 from app.database import get_db
-from app.auth.roles import exiger_admin
+from app.auth.roles import exiger_admin, role_du_compte
 from app.models.categorie import Categorie
 from app.models.categorie_billet import CategorieBillet
 from app.models.evenement import Evenement
 from app.models.participant import Participant
 from app.models.proposition import Proposition
+from app.models.user import User
 from app.schemas.categorie import CategorieResponse
 from app.schemas.categorie_billet import CategorieBilletResponse
 from app.schemas.evenement import EvenementResponse
@@ -228,3 +229,42 @@ async def retirer_photo_profil(auth_data: dict = Depends(ParticipantBearer()), d
     await db.refresh(participant)
     supprimer_image(ancienne)
     return participant
+
+
+# ---------- photo de profil de l'équipe (organisateur ou administrateur) ----------
+
+
+def profil_equipe(user: User) -> dict:
+    return {"id": user.id, "email": user.email, "fullname": user.fullname, "role": user.role, "avatar": user.avatar}
+
+
+async def compte_equipe(auth_data: dict, db: AsyncSession) -> User:
+    if role_du_compte(auth_data) is None:
+        raise HTTPException(status_code=403, detail="Réservé à l'équipe (organisateur ou administrateur).")
+    user = await db.get(User, auth_data.get("user_id"))
+    if not user:
+        raise HTTPException(status_code=404, detail="Compte introuvable.")
+    return user
+
+
+@router.put("/users/me/photo", summary="Ajouter ou remplacer sa photo de profil (organisateur ou administrateur)")
+async def definir_photo_equipe(request: Request, auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
+    user = await compte_equipe(auth_data, db)
+    url = await enregistrer(await lire_image(request), "profils", COTE_PHOTO_PROFIL)
+    ancienne = user.avatar
+    user.avatar = url
+    await db.commit()
+    await db.refresh(user)
+    supprimer_image(ancienne)
+    return profil_equipe(user)
+
+
+@router.delete("/users/me/photo", summary="Retirer sa photo de profil (organisateur ou administrateur)")
+async def retirer_photo_equipe(auth_data: dict = Depends(JWTBearer()), db: AsyncSession = Depends(get_db)):
+    user = await compte_equipe(auth_data, db)
+    ancienne = user.avatar
+    user.avatar = None
+    await db.commit()
+    await db.refresh(user)
+    supprimer_image(ancienne)
+    return profil_equipe(user)

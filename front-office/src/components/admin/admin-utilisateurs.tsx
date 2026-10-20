@@ -365,7 +365,7 @@ export function AdminUtilisateurs() {
                   <tr key={u.id} onClick={() => setDetailEquipeId(u.id)} className={ligneCliquable(detailEquipeId === u.id)}>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-3">
-                        <AvatarParticipant prenom={prenom ?? ""} nom={reste.join(" ")} className="h-9 w-9 text-xs" />
+                        <AvatarParticipant prenom={prenom ?? ""} nom={reste.join(" ")} avatar={u.avatar} className="h-9 w-9 text-xs" />
                         <p className="min-w-0 truncate font-semibold">
                           {u.fullname} {soiMeme && <span className="text-xs font-normal text-gw-texte-doux dark:text-white/55">(vous)</span>}
                         </p>
@@ -630,7 +630,7 @@ function PanneauEquipe({
       ouvert
       onFermer={onFermer}
       titre={u.fullname + (soiMeme ? " (vous)" : "")}
-      visuel={<AvatarParticipant prenom={prenom ?? ""} nom={reste.join(" ")} className="h-16 w-16 text-lg" />}
+      visuel={<AvatarParticipant prenom={prenom ?? ""} nom={reste.join(" ")} avatar={u.avatar} className="h-16 w-16 text-lg" />}
       badge={
         <>
           <BadgeRole role={u.role} />
