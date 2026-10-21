@@ -1,6 +1,7 @@
 "use client"
 
 import { cloneElement, isValidElement, useCallback, useEffect, useState } from "react"
+import { changerThemeAnime, centreDe } from "@/lib/transition-theme"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -91,7 +92,7 @@ function BarreLaterale({
   espace: EspaceStaff
   pathname: string
   darkMode: boolean
-  onBasculerTheme: () => void
+  onBasculerTheme: (e?: React.MouseEvent<HTMLButtonElement>) => void
   onDeconnexion: () => void
   onNaviguer?: () => void
 }) {
@@ -194,13 +195,15 @@ function BarreLaterale({
             {darkMode ? <Moon className="h-4 w-4" aria-hidden /> : <Sun className="h-4 w-4" aria-hidden />}
             Mode sombre
           </span>
-          <span className={cn("relative h-5 w-9 rounded-full transition-colors", darkMode ? "bg-gw-surface" : "bg-white/30")}>
+          <span aria-hidden className={cn("relative flex h-6 w-11 items-center rounded-full p-0.5 transition-colors duration-500", darkMode ? "bg-gw-nuit ring-1 ring-white/20" : "bg-white/30")}>
             <span
               className={cn(
-                "absolute top-0.5 h-4 w-4 rounded-full transition-all",
-                darkMode ? "left-[18px] bg-gw-violet" : "left-0.5 bg-gw-surface",
+                "flex h-5 w-5 items-center justify-center rounded-full shadow transition-all duration-500",
+                darkMode ? "translate-x-5 rotate-[360deg] bg-gw-violet text-white" : "translate-x-0 bg-white text-gw-rose-action",
               )}
-            />
+            >
+              {darkMode ? <Moon className="h-3 w-3" /> : <Sun className="h-3 w-3" />}
+            </span>
           </span>
         </button>
 
@@ -263,10 +266,12 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
     return () => window.removeEventListener("keydown", echap)
   }, [tiroirOuvert])
 
-  const basculerTheme = () => {
+  const basculerTheme = (e?: React.MouseEvent<HTMLButtonElement>) => {
     const suivant = !darkMode
-    setDarkMode(suivant)
-    localStorage.setItem("organisateur_dark_mode", String(suivant))
+    changerThemeAnime(() => {
+      setDarkMode(suivant)
+      localStorage.setItem("organisateur_dark_mode", String(suivant))
+    }, e ? centreDe(e.currentTarget) : undefined)
   }
 
   // "Se déconnecter ?" : rien ne se passe tant que l'utilisateur n'a pas confirmé

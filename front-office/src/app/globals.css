@@ -224,3 +224,14 @@ body {
   height: auto !important;
 }
 
+
+/* Changement de thème animé (voir lib/transition-theme.ts) : l'ancienne et la nouvelle vue ne se fondent pas,
+   la nouvelle s'ouvre en cercle au-dessus de l'ancienne. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}

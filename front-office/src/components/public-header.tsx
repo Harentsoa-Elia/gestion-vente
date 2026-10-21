@@ -15,10 +15,10 @@ import {
   LayoutDashboard,
   Megaphone,
   HelpCircle,
-  Moon,
-  Sun,
 } from "lucide-react"
 import { useModeNuit } from "@/lib/mode-nuit"
+import { changerThemeAnime, centreDe } from "@/lib/transition-theme"
+import { InterrupteurTheme } from "@/components/interrupteur-theme"
 import { Logo } from "@/components/marque/logo"
 import {
   getParticipantToken,
@@ -219,16 +219,7 @@ export function PublicHeader() {
             <Search className="h-5 w-5" />
           </button>
 
-          <button
-            type="button"
-            onClick={basculer}
-            aria-label={nuit ? "Passer en mode jour" : "Passer en mode nuit"}
-            title={nuit ? "Mode jour" : "Mode nuit"}
-            aria-pressed={nuit}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-gw-encre hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet"
-          >
-            {nuit ? <Sun className="h-5 w-5" aria-hidden /> : <Moon className="h-5 w-5" aria-hidden />}
-          </button>
+          <InterrupteurTheme nuit={nuit} onBasculer={(e) => changerThemeAnime(basculer, centreDe(e.currentTarget))} />
 
           <button
             ref={boutonMenuRef}
