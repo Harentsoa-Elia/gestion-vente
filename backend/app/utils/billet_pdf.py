@@ -20,10 +20,11 @@ from app.utils.fuseau import FUSEAU_MADAGASCAR as FUSEAU
 MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
 JOURS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
 
+# charte graphique : violet, rose et blanc ; textes en violet très foncé
 VIOLET = (108, 92, 231)
 ROSE = (201, 42, 122)
-NUIT = (30, 26, 60)
-DOUX = (110, 105, 135)
+NUIT = (42, 26, 94)
+DOUX = (107, 95, 153)
 FOND = (246, 244, 252)
 LAVANDE = (217, 210, 255)
 
@@ -87,7 +88,7 @@ def qr_png(valeur: str, taille_module: int = 10) -> bytes:
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=taille_module, border=2)
     qr.add_data(valeur)
     qr.make(fit=True)
-    image = qr.make_image(fill_color="#1E1A3C", back_color="white")
+    image = qr.make_image(fill_color="#2A1A5E", back_color="white")
     tampon = BytesIO()
     image.save(tampon, format="PNG")
     return tampon.getvalue()

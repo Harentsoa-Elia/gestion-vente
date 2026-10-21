@@ -27,8 +27,8 @@ function formatAr(montant: number) {
 }
 
 const STATUT_STYLES: Record<string, string> = {
-  confirmee: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  en_attente: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  confirmee: "bg-gw-lavande text-gw-violet-fonce dark:bg-gw-violet-fonce/30 dark:text-gw-violet",
+  en_attente: "bg-gw-rose-pale text-gw-rose-action-fonce dark:bg-gw-rose-action-fonce/30 dark:text-gw-rose",
 }
 
 const STATUT_LABELS: Record<string, string> = {
@@ -77,22 +77,22 @@ export function OrganisateurReservations() {
   const { visibles: reservationsFiltreesVisibles, bouton: boutonVoirPlus } = useVoirPlus(reservationsFiltrees)
 
   if (loadingEvenements) {
-    return <p className="text-center py-16 text-muted-foreground dark:text-gray-400">Chargement...</p>
+    return <p className="text-center py-16 text-muted-foreground dark:text-gw-texte-pale">Chargement...</p>
   }
 
   if (error) {
-    return <p className="text-center py-16 text-red-600">{error}</p>
+    return <p className="text-center py-16 text-gw-rose-action">{error}</p>
   }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">Réservations</h1>
-        <p className="text-muted-foreground dark:text-gray-400">Consultez les réservations de vos événements</p>
+        <h1 className="text-2xl font-bold text-[#2A1A5E] dark:text-white">Réservations</h1>
+        <p className="text-muted-foreground dark:text-gw-texte-pale">Consultez les réservations de vos événements</p>
       </div>
 
       {evenements.length === 0 ? (
-        <p className="text-sm text-muted-foreground dark:text-gray-400">
+        <p className="text-sm text-muted-foreground dark:text-gw-texte-pale">
           Vous n'avez pas encore créé d'événement.
         </p>
       ) : (
@@ -101,7 +101,7 @@ export function OrganisateurReservations() {
             <select
               value={evenementId ?? ""}
               onChange={(e) => setEvenementId(Number(e.target.value))}
-              className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"
+              className="px-3 py-2 rounded-lg border border-gw-bordure dark:border-gw-nuit dark:bg-[#2B1F5C] dark:text-white text-sm"
             >
               {evenements.map((e) => (
                 <option key={e.id} value={e.id}>
@@ -111,18 +111,18 @@ export function OrganisateurReservations() {
             </select>
 
             <div className="relative flex-1 max-w-xs">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gw-texte-pale" />
               <input
                 type="text"
                 placeholder="Rechercher un participant..."
                 value={recherche}
                 onChange={(e) => setRecherche(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"
+                className="w-full pl-9 pr-3 py-2 rounded-lg border border-gw-bordure dark:border-gw-nuit dark:bg-[#2B1F5C] dark:text-white text-sm"
               />
             </div>
           </div>
 
-          <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700">
+          <Card className="rounded-2xl dark:bg-[#2B1F5C] dark:border-gw-nuit">
             <CardHeader>
               <CardTitle className="text-base dark:text-white">
                 {reservationsFiltrees.length} réservation{reservationsFiltrees.length > 1 ? "s" : ""}
@@ -130,11 +130,11 @@ export function OrganisateurReservations() {
             </CardHeader>
             <CardContent>
               {loadingReservations ? (
-                <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
+                <p className="text-sm text-muted-foreground dark:text-gw-texte-pale text-center py-10">
                   Chargement des réservations...
                 </p>
               ) : reservationsFiltrees.length === 0 ? (
-                <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
+                <p className="text-sm text-muted-foreground dark:text-gw-texte-pale text-center py-10">
                   Aucune réservation pour cet événement.
                 </p>
               ) : (
@@ -142,7 +142,7 @@ export function OrganisateurReservations() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                      <tr className="text-left text-muted-foreground dark:text-gw-texte-pale border-b border-gw-bordure dark:border-gw-nuit">
                         <th className="pb-2 pr-4 font-medium">Participant</th>
                         <th className="pb-2 pr-4 font-medium">Tarif</th>
                         <th className="pb-2 pr-4 font-medium">Statut</th>
@@ -157,14 +157,14 @@ export function OrganisateurReservations() {
                           <td className="py-3 pr-4">
                             <div className="flex items-center gap-3">
                               <AvatarParticipant prenom={r.participant.prenom} nom={r.participant.nom} avatar={r.participant.avatar} className="h-9 w-9 text-xs" />
-                              <p className="min-w-0 truncate font-medium text-[#0F172A] dark:text-white">
+                              <p className="min-w-0 truncate font-medium text-[#2A1A5E] dark:text-white">
                                 {r.participant.prenom} {r.participant.nom}
                               </p>
                             </div>
                           </td>
-                          <td className="py-3 pr-4 text-[#0F172A] dark:text-gray-200">{r.categorie_billet.nom}</td>
+                          <td className="py-3 pr-4 text-[#2A1A5E] dark:text-gw-texte-pale">{r.categorie_billet.nom}</td>
                           <td className="py-3 pr-4">
-                            <span className={`text-xs px-2 py-1 rounded-full ${STATUT_STYLES[r.statut] ?? "bg-gray-100 text-gray-600"}`}>
+                            <span className={`text-xs px-2 py-1 rounded-full ${STATUT_STYLES[r.statut] ?? "bg-gw-fond text-gw-texte"}`}>
                               {STATUT_LABELS[r.statut] ?? r.statut}
                             </span>
                           </td>
@@ -195,7 +195,7 @@ export function OrganisateurReservations() {
         }
         badge={
           detail && (
-            <span className={`text-xs px-2 py-1 rounded-full ${STATUT_STYLES[detail.statut] ?? "bg-gray-100 text-gray-600"}`}>
+            <span className={`text-xs px-2 py-1 rounded-full ${STATUT_STYLES[detail.statut] ?? "bg-gw-fond text-gw-texte"}`}>
               {STATUT_LABELS[detail.statut] ?? detail.statut}
             </span>
           )

@@ -297,7 +297,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
               ) : (
                 <>
                   {tendanceChangee && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3 text-sm text-amber-900 dark:border-amber-400/40 dark:bg-amber-400/10 dark:text-amber-100">
+                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gw-rose bg-gw-rose-pale px-5 py-3 text-sm text-gw-rose-action-fonce dark:border-gw-rose/40 dark:bg-gw-rose/10 dark:text-gw-rose-pale">
                       <span className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
                         Les réactions du public ont changé le classement depuis le dernier calcul.

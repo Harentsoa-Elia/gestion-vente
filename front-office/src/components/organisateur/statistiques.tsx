@@ -96,12 +96,12 @@ function InfoBulle({ active, payload, mesure }: { active?: boolean; payload?: { 
   if (!active || !payload?.length) return null
   const p = payload[0].payload
   return (
-    <div className="rounded-xl bg-white px-3 py-2 text-xs shadow-lg ring-1 ring-gw-bordure dark:bg-gw-carte-sombre dark:ring-white/10">
-      <p className="font-semibold text-gw-nuit first-letter:uppercase dark:text-white">{jourLong(p.date)}</p>
-      <p className={cn("mt-1", mesure === "billets" ? "font-semibold text-gw-nuit dark:text-white" : "text-gw-texte-doux dark:text-white/60")}>
+    <div className="rounded-xl bg-gw-surface px-3 py-2 text-xs shadow-lg ring-1 ring-gw-bordure dark:bg-gw-carte-sombre dark:ring-white/10">
+      <p className="font-semibold text-gw-encre first-letter:uppercase dark:text-white">{jourLong(p.date)}</p>
+      <p className={cn("mt-1", mesure === "billets" ? "font-semibold text-gw-encre dark:text-white" : "text-gw-texte-doux dark:text-white/60")}>
         {entier.format(p.billets)} billet{p.billets > 1 ? "s" : ""}
       </p>
-      <p className={cn(mesure === "montant" ? "font-semibold text-gw-nuit dark:text-white" : "text-gw-texte-doux dark:text-white/60")}>{ariary(p.montant)}</p>
+      <p className={cn(mesure === "montant" ? "font-semibold text-gw-encre dark:text-white" : "text-gw-texte-doux dark:text-white/60")}>{ariary(p.montant)}</p>
     </div>
   )
 }
@@ -286,7 +286,7 @@ export function Statistiques() {
                       role="tab"
                       aria-selected={mesure === m}
                       onClick={() => setMesure(m)}
-                      className={cn("rounded-full px-3 py-1.5", mesure === m ? "bg-white text-gw-nuit shadow-sm dark:bg-gw-nuit dark:text-white" : "text-gw-texte-doux dark:text-white/60")}
+                      className={cn("rounded-full px-3 py-1.5", mesure === m ? "bg-gw-surface text-gw-encre shadow-sm dark:bg-gw-nuit dark:text-white" : "text-gw-texte-doux dark:text-white/60")}
                     >
                       {m === "billets" ? "Billets" : "Montant"}
                     </button>
@@ -477,7 +477,7 @@ export function Statistiques() {
                         </button>
                         <span className="shrink-0 text-xs text-gw-texte-doux tabular-nums dark:text-white/60">
                           {`${entier.format(e.vendus)} vendus${e.capacite ? ` · ${entier.format(e.capacite)} places` : ""} · `}
-                          <strong className="text-gw-nuit dark:text-white">{e.taux_remplissage != null ? `${entier.format(e.taux_remplissage)} %` : "capacité ?"}</strong>
+                          <strong className="text-gw-encre dark:text-white">{e.taux_remplissage != null ? `${entier.format(e.taux_remplissage)} %` : "capacité ?"}</strong>
                         </span>
                       </div>
                       <Jauge valeur={e.taux_remplissage ?? 0} />

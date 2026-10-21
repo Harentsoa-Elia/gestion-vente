@@ -99,8 +99,8 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
               className={cn(
                 "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
                 actif
-                  ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit"
-                  : "bg-white text-gw-texte hover:bg-gw-lavande/50 dark:bg-white/5 dark:text-white/75 dark:hover:bg-white/10",
+                  ? "bg-gw-nuit text-white dark:bg-gw-surface dark:text-gw-encre"
+                  : "bg-gw-surface text-gw-texte hover:bg-gw-lavande/50 dark:bg-white/5 dark:text-white/75 dark:hover:bg-white/10",
               )}
             >
               {f === "tous" ? "Tous" : STATUTS[f].libelle}
@@ -115,7 +115,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
       {chargement ? (
         <div className="space-y-3" aria-busy>
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-3xl bg-white/70 dark:bg-white/5" />
+            <div key={i} className="h-24 animate-pulse rounded-3xl bg-gw-surface/70 dark:bg-white/5" />
           ))}
         </div>
       ) : erreur ? (

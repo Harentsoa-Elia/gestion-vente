@@ -86,8 +86,8 @@ export function FondDiaporama({ courant, precedent, mouvementReduit }: Pick<Diap
         />
       ))}
       {/* teinte guichetweb pour garder le texte lisible, quelle que soit la photo */}
-      <div className="absolute inset-0 bg-[#16122E]/45 mix-blend-multiply" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,18,46,0.35)_0%,rgba(22,18,46,0)_35%,rgba(22,18,46,0.55)_100%)]" />
+      <div className="absolute inset-0 bg-[#1D1245]/45 mix-blend-multiply" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(29,18,69,0.35)_0%,rgba(29,18,69,0)_35%,rgba(29,18,69,0.55)_100%)]" />
     </div>
   )
 }

@@ -120,27 +120,27 @@ def envoyer_email_sans_erreur(destinataire: str, sujet: str, texte: str, html: O
 def _gabarit_html(titre: str, intro: str, code: str, pied: str) -> str:
     chiffres = "".join(
         f'<td style="width:34px;height:46px;border-radius:9px;background:#F6F4FC;border:2px solid #D9D2FF;'
-        f'color:#1E1A3C;font-size:24px;font-weight:700;font-family:Arial,sans-serif;text-align:center">{escape(c)}</td>'
+        f'color:#2A1A5E;font-size:24px;font-weight:700;font-family:Arial,sans-serif;text-align:center">{escape(c)}</td>'
         for c in code
     )
     return f"""\
 <!doctype html>
-<html lang="fr"><body style="margin:0;background:#F6F4FC;font-family:Arial,Helvetica,sans-serif;color:#1E1A3C">
+<html lang="fr"><body style="margin:0;background:#F6F4FC;font-family:Arial,Helvetica,sans-serif;color:#2A1A5E">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border-radius:20px;overflow:hidden">
-        <tr><td style="background:#1E1A3C;background-image:linear-gradient(135deg,#1E1A3C,#6C5CE7 60%,#C92A7A);padding:22px 28px">
+        <tr><td style="background:#2A1A5E;background-image:linear-gradient(135deg,#2A1A5E,#6C5CE7 60%,#C92A7A);padding:22px 28px">
           <span style="font-size:24px;font-weight:800;color:#FFFFFF;letter-spacing:-0.5px">guichetweb</span>
         </td></tr>
         <tr><td style="padding:28px">
-          <h1 style="margin:0 0 12px;font-size:22px;color:#1E1A3C">{escape(titre)}</h1>
-          <p style="margin:0 0 22px;font-size:15px;line-height:1.5;color:#4A4566">{escape(intro)}</p>
+          <h1 style="margin:0 0 12px;font-size:22px;color:#2A1A5E">{escape(titre)}</h1>
+          <p style="margin:0 0 22px;font-size:15px;line-height:1.5;color:#4A3D7A">{escape(intro)}</p>
           <!-- tableau : les 6 chiffres restent sur une ligne même sur un petit écran -->
           <table role="presentation" cellpadding="0" cellspacing="4" align="center" style="margin:0 auto 22px"><tr>{chiffres}</tr></table>
-          <p style="margin:0;font-size:13px;line-height:1.5;color:#6E6987">{escape(pied)}</p>
+          <p style="margin:0;font-size:13px;line-height:1.5;color:#6B5F99">{escape(pied)}</p>
         </td></tr>
       </table>
-      <p style="margin:16px 0 0;font-size:12px;color:#6E6987">guichetweb, billetterie événementielle</p>
+      <p style="margin:16px 0 0;font-size:12px;color:#6B5F99">guichetweb, billetterie événementielle</p>
     </td></tr>
   </table>
 </body></html>"""
@@ -172,12 +172,12 @@ def lien_site(chemin: str) -> str:
 
 def _gabarit_message(titre: str, paragraphes: list, bouton: Optional[tuple] = None, encadre: Optional[str] = None) -> str:
     corps = "".join(
-        f'<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#4A4566">{escape(p)}</p>' for p in paragraphes
+        f'<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#4A3D7A">{escape(p)}</p>' for p in paragraphes
     )
     if encadre:
         corps += (
             '<div style="margin:4px 0 18px;padding:14px 16px;border-radius:12px;background:#FDE8F2;'
-            f'color:#8A1D55;font-size:14px;line-height:1.5"><strong>Motif :</strong> {escape(encadre)}</div>'
+            f'color:#AE1F68;font-size:14px;line-height:1.5"><strong>Motif :</strong> {escape(encadre)}</div>'
         )
     if bouton:
         libelle, url = bouton
@@ -188,19 +188,19 @@ def _gabarit_message(titre: str, paragraphes: list, bouton: Optional[tuple] = No
         )
     return f"""\
 <!doctype html>
-<html lang="fr"><body style="margin:0;background:#F6F4FC;font-family:Arial,Helvetica,sans-serif;color:#1E1A3C">
+<html lang="fr"><body style="margin:0;background:#F6F4FC;font-family:Arial,Helvetica,sans-serif;color:#2A1A5E">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border-radius:20px;overflow:hidden">
-        <tr><td style="background:#1E1A3C;background-image:linear-gradient(135deg,#1E1A3C,#6C5CE7 60%,#C92A7A);padding:22px 28px">
+        <tr><td style="background:#2A1A5E;background-image:linear-gradient(135deg,#2A1A5E,#6C5CE7 60%,#C92A7A);padding:22px 28px">
           <span style="font-size:24px;font-weight:800;color:#FFFFFF;letter-spacing:-0.5px">guichetweb</span>
         </td></tr>
         <tr><td style="padding:28px">
-          <h1 style="margin:0 0 14px;font-size:22px;color:#1E1A3C">{escape(titre)}</h1>
+          <h1 style="margin:0 0 14px;font-size:22px;color:#2A1A5E">{escape(titre)}</h1>
           {corps}
         </td></tr>
       </table>
-      <p style="margin:16px 0 0;font-size:12px;color:#6E6987">guichetweb, billetterie événementielle</p>
+      <p style="margin:16px 0 0;font-size:12px;color:#6B5F99">guichetweb, billetterie événementielle</p>
     </td></tr>
   </table>
 </body></html>"""
@@ -242,13 +242,13 @@ def email_billets(prenom: str, evenement: str, date_texte: str, lieu: Optional[s
     blocs = "".join(
         f'<div style="margin:0 0 14px;padding:16px;border-radius:14px;background:#F6F4FC;text-align:center">'
         f'<img src="cid:{escape(cid)}" width="170" height="170" alt="QR code du billet {escape(numero)}" style="display:block;margin:0 auto 8px;border-radius:8px;background:#fff">'
-        f'<div style="font-size:14px;font-weight:700;color:#1E1A3C">{escape(numero)}</div>'
-        f'<div style="font-size:13px;color:#6E6987">{escape(categorie)}</div></div>'
+        f'<div style="font-size:14px;font-weight:700;color:#2A1A5E">{escape(numero)}</div>'
+        f'<div style="font-size:13px;color:#6B5F99">{escape(categorie)}</div></div>'
         for numero, categorie, cid in billets
     )
     if n > len(billets):
         blocs += (
-            f'<p style="margin:0 0 14px;font-size:14px;color:#4A4566">... et {n - len(billets)} autres billets : '
+            f'<p style="margin:0 0 14px;font-size:14px;color:#4A3D7A">... et {n - len(billets)} autres billets : '
             "tous les QR codes sont dans le PDF joint et dans 'Mes billets'.</p>"
         )
     html = _gabarit_message("Votre billet est prêt" if n == 1 else "Vos billets sont prêts", intro, ("Voir mes billets", lien))

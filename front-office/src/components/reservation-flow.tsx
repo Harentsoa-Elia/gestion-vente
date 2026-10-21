@@ -83,17 +83,17 @@ function Etapes({ courante }: { courante: Etape }) {
             <span
               className={cn(
                 "grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-bold",
-                faite && "bg-emerald-600 text-white",
+                faite && "bg-gw-violet text-white",
                 active && "bg-gw-nuit text-white ring-4 ring-gw-lavande",
-                !faite && !active && "bg-white text-gw-texte-pale ring-1 ring-gw-bordure",
+                !faite && !active && "bg-gw-surface text-gw-texte-pale ring-1 ring-gw-bordure",
               )}
             >
               {faite ? <Check className="h-4 w-4" aria-hidden /> : i + 1}
             </span>
-            <span className={cn("text-sm font-semibold", active ? "text-gw-nuit" : "text-gw-texte-doux", !active && "hidden sm:inline")}>
+            <span className={cn("text-sm font-semibold", active ? "text-gw-encre" : "text-gw-texte-doux", !active && "hidden sm:inline")}>
               {e.libelle}
             </span>
-            {i < ETAPES.length - 1 && <span aria-hidden className={cn("h-0.5 flex-1 rounded", faite ? "bg-emerald-600" : "bg-gw-bordure")} />}
+            {i < ETAPES.length - 1 && <span aria-hidden className={cn("h-0.5 flex-1 rounded", faite ? "bg-gw-violet" : "bg-gw-bordure")} />}
           </li>
         )
       })}
@@ -111,13 +111,13 @@ function Compteur({ expireLe }: { expireLe: number }) {
   const sec = Math.floor((reste % 60000) / 1000)
   if (reste === 0)
     return (
-      <p className="flex items-start gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      <p className="flex items-start gap-2 rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">
         <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
         Le délai de 15 minutes est dépassé : vos places ne sont plus garanties. Vous pouvez tout de même payer s&apos;il en reste.
       </p>
     )
   return (
-    <p className={cn("flex items-center gap-2 rounded-2xl px-4 py-3 text-sm", min < 3 ? "bg-amber-50 text-amber-900" : "bg-gw-fond text-gw-texte")}>
+    <p className={cn("flex items-center gap-2 rounded-2xl px-4 py-3 text-sm", min < 3 ? "bg-gw-rose-pale text-gw-rose-action-fonce" : "bg-gw-fond text-gw-texte")}>
       <Clock className="h-4 w-4 shrink-0" aria-hidden />
       Vos places sont gardées encore
       <strong className="font-mono text-base tabular-nums" aria-live="off">
@@ -138,7 +138,7 @@ function ChoixQuantite({ valeur, max, onChange }: { valeur: number; max: number;
   const [texte, setTexte] = useState(String(valeur))
   useEffect(() => setTexte(String(valeur)), [valeur])
   const bouton =
-    "grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-gw-nuit ring-1 ring-gw-bordure hover:ring-gw-violet disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-gw-violet"
+    "grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gw-surface text-gw-encre ring-1 ring-gw-bordure hover:ring-gw-violet disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-gw-violet"
   const valider = (t: string) => {
     const n = Math.floor(Number(t))
     if (Number.isFinite(n) && n >= 1) onChange(Math.min(max, n))
@@ -164,7 +164,7 @@ function ChoixQuantite({ valeur, max, onChange }: { valeur: number; max: number;
           }}
           onBlur={(e) => valider(e.target.value)}
           aria-label="Nombre de billets (saisie libre)"
-          className="font-titre h-10 w-20 [appearance:textfield] rounded-xl bg-white text-center text-xl font-bold text-gw-nuit tabular-nums ring-1 ring-gw-bordure focus:ring-2 focus:ring-gw-violet focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="font-titre h-10 w-20 [appearance:textfield] rounded-xl bg-gw-surface text-center text-xl font-bold text-gw-encre tabular-nums ring-1 ring-gw-bordure focus:ring-2 focus:ring-gw-violet focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
         <button type="button" className={bouton} onClick={() => onChange(valeur + 1)} disabled={valeur >= max} aria-label="Un billet de plus">
           <Plus className="h-4 w-4" aria-hidden />
@@ -181,7 +181,7 @@ function ChoixQuantite({ valeur, max, onChange }: { valeur: number; max: number;
               className={
                 valeur === n
                   ? "rounded-full bg-gw-nuit px-3 py-1 text-xs font-semibold text-white"
-                  : "rounded-full bg-white px-3 py-1 text-xs font-semibold text-gw-nuit ring-1 ring-gw-bordure hover:ring-gw-violet"
+                  : "rounded-full bg-gw-surface px-3 py-1 text-xs font-semibold text-gw-encre ring-1 ring-gw-bordure hover:ring-gw-violet"
               }
             >
               {n}
@@ -198,7 +198,7 @@ function Recapitulatif({ evenement, lieu, lignes }: { evenement: Evenement; lieu
   const affiche = urlMedia(evenement.image_url) ?? imageTestEvenement(evenement)
   const total = lignes?.reduce((s, l) => s + l.montant, 0)
   return (
-    <div className="overflow-hidden rounded-3xl bg-white ring-1 ring-gw-bordure">
+    <div className="overflow-hidden rounded-3xl bg-gw-surface ring-1 ring-gw-bordure">
       <div className="aspect-[2/1] bg-gw-nuit">
         {!erreurImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -208,7 +208,7 @@ function Recapitulatif({ evenement, lieu, lignes }: { evenement: Evenement; lieu
         )}
       </div>
       <div className="p-5">
-        <p className="font-titre text-lg leading-snug font-bold text-gw-nuit">{evenement.titre}</p>
+        <p className="font-titre text-lg leading-snug font-bold text-gw-encre">{evenement.titre}</p>
         <p className="mt-2 flex items-start gap-2 text-sm text-gw-texte">
           <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-gw-violet" aria-hidden />
           <span>{dateEvenement(evenement.date_debut)}</span>
@@ -224,12 +224,12 @@ function Recapitulatif({ evenement, lieu, lignes }: { evenement: Evenement; lieu
             {lignes.map((l) => (
               <div key={l.libelle} className="flex justify-between gap-3">
                 <dt className="text-gw-texte">{l.libelle}</dt>
-                <dd className="font-semibold text-gw-nuit">{ariary(l.montant)}</dd>
+                <dd className="font-semibold text-gw-encre">{ariary(l.montant)}</dd>
               </div>
             ))}
             <div className="flex justify-between gap-3 border-t border-gw-bordure pt-2.5 text-base">
-              <dt className="font-semibold text-gw-nuit">Total</dt>
-              <dd className="font-titre text-xl font-bold text-gw-nuit">{ariary(total ?? 0)}</dd>
+              <dt className="font-semibold text-gw-encre">Total</dt>
+              <dd className="font-titre text-xl font-bold text-gw-encre">{ariary(total ?? 0)}</dd>
             </div>
           </dl>
         )}
@@ -407,7 +407,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
   if (erreurChargement || !evenement) {
     return (
       <div className="py-24 text-center">
-        <p className="font-titre text-2xl font-bold text-gw-nuit">{erreurChargement}</p>
+        <p className="font-titre text-2xl font-bold text-gw-encre">{erreurChargement}</p>
         <Link href="/evenements" className="mt-4 inline-block font-semibold text-gw-violet">
           Voir les événements
         </Link>
@@ -420,10 +420,10 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
 
   return (
     <div ref={haut} className="scroll-mt-24">
-      <Link href={`/evenements/${evenementId}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-gw-texte-doux hover:text-gw-nuit">
+      <Link href={`/evenements/${evenementId}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-gw-texte-doux hover:text-gw-encre">
         <ArrowLeft className="h-4 w-4" aria-hidden /> Retour à l&apos;événement
       </Link>
-      <h1 className="font-titre mt-3 text-3xl font-bold tracking-[-0.02em] text-gw-nuit sm:text-4xl">
+      <h1 className="font-titre mt-3 text-3xl font-bold tracking-[-0.02em] text-gw-encre sm:text-4xl">
         {etape === "confirmation" ? "Vos billets" : "Réserver mes billets"}
       </h1>
       <div className="mt-6 max-w-xl">
@@ -434,8 +434,8 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
         <div className="min-w-0">
           {/* --- 1. Billets --- */}
           {etape === "billets" && emailVerifie === false && (
-            <section className="rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8">
-              <p className="mb-6 flex items-start gap-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <section className="rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8">
+              <p className="mb-6 flex items-start gap-3 rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">
                 <MailWarning className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
                 Avant de réserver, confirmez votre adresse e-mail : c&apos;est là que vous recevrez vos billets et leurs QR codes.
               </p>
@@ -444,8 +444,8 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
           )}
 
           {etape === "billets" && emailVerifie !== false && (
-            <section className="rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8" aria-labelledby="titre-tarifs">
-              <h2 id="titre-tarifs" className="font-titre text-xl font-bold text-gw-nuit">
+            <section className="rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8" aria-labelledby="titre-tarifs">
+              <h2 id="titre-tarifs" className="font-titre text-xl font-bold text-gw-encre">
                 Choisissez vos billets
               </h2>
 
@@ -485,10 +485,10 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                               aria-hidden
                               className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-full ring-2", choisi ? "bg-gw-violet ring-gw-violet" : "ring-gw-texte-pale")}
                             >
-                              {choisi && <span className="h-2 w-2 rounded-full bg-white" />}
+                              {choisi && <span className="h-2 w-2 rounded-full bg-gw-surface" />}
                             </span>
                             <span className="min-w-0 flex-1">
-                              <span className="block font-semibold text-gw-nuit">{t.nom}</span>
+                              <span className="block font-semibold text-gw-encre">{t.nom}</span>
                               <span className={cn("text-xs", t.restantes != null && t.restantes <= 20 ? "font-semibold text-gw-rose-action" : "text-gw-texte-doux")}>
                                 {complet
                                   ? "Complet"
@@ -499,7 +499,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                                       : `${t.restantes.toLocaleString("fr-FR")} places restantes`}
                               </span>
                             </span>
-                            <span className="font-titre text-lg font-bold text-gw-nuit">{ariary(t.prix)}</span>
+                            <span className="font-titre text-lg font-bold text-gw-encre">{ariary(t.prix)}</span>
                           </button>
                           {choisi && (
                             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-gw-bordure pt-4">
@@ -518,7 +518,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                   </div>
 
                   {erreur && (
-                    <p role="alert" className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <p role="alert" className="mt-4 rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">
                       {erreur}
                     </p>
                   )}
@@ -539,8 +539,8 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
 
           {/* --- 2. Paiement --- */}
           {etape === "paiement" && lot && (
-            <section className="relative rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8" aria-labelledby="titre-paiement">
-              <h2 id="titre-paiement" className="font-titre text-xl font-bold text-gw-nuit">
+            <section className="relative rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8" aria-labelledby="titre-paiement">
+              <h2 id="titre-paiement" className="font-titre text-xl font-bold text-gw-encre">
                 Payer par Mobile Money
               </h2>
               <div className="mt-4">
@@ -548,7 +548,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
               </div>
 
               <fieldset className="mt-6">
-                <legend className="mb-3 text-sm font-semibold text-gw-nuit">Opérateur</legend>
+                <legend className="mb-3 text-sm font-semibold text-gw-encre">Opérateur</legend>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {OPERATEURS.map((o) => {
                     const choisi = mode === o.mode
@@ -579,7 +579,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                             .join("")}
                         </span>
                         <span className="min-w-0">
-                          <span className="block text-sm font-semibold text-gw-nuit">{o.nom}</span>
+                          <span className="block text-sm font-semibold text-gw-encre">{o.nom}</span>
                           <span className="text-xs text-gw-texte-doux">{o.prefixes.join(" · ")}</span>
                         </span>
                         {choisi && <CheckCircle2 className="ml-auto h-5 w-5 shrink-0 text-gw-violet" aria-hidden />}
@@ -591,12 +591,12 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
 
               {mode && op && (
                 <div className="mt-6">
-                  <label htmlFor="telephone" className="text-sm font-semibold text-gw-nuit">
+                  <label htmlFor="telephone" className="text-sm font-semibold text-gw-encre">
                     Numéro {op.nom}
                   </label>
                   <div
                     className={cn(
-                      "mt-2 flex h-12 items-center overflow-hidden rounded-2xl bg-gw-fond ring-1 focus-within:bg-white focus-within:ring-2",
+                      "mt-2 flex h-12 items-center overflow-hidden rounded-2xl bg-gw-fond ring-1 focus-within:bg-gw-surface focus-within:ring-2",
                       telephoneTouche && erreurTel ? "ring-gw-rose-action focus-within:ring-gw-rose-action" : "ring-gw-bordure focus-within:ring-gw-violet",
                     )}
                   >
@@ -614,7 +614,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                       onBlur={() => setTelephoneTouche(true)}
                       aria-invalid={telephoneTouche && !!erreurTel}
                       aria-describedby="aide-telephone"
-                      className="h-full min-w-0 flex-1 bg-transparent px-3 font-mono text-base tracking-wide text-gw-nuit outline-none"
+                      className="h-full min-w-0 flex-1 bg-transparent px-3 font-mono text-base tracking-wide text-gw-encre outline-none"
                     />
                   </div>
                   <p id="aide-telephone" className={cn("mt-2 text-xs", telephoneTouche && erreurTel ? "text-gw-rose-action" : "text-gw-texte-doux")}>
@@ -626,13 +626,13 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
               <p className="mt-6 flex items-start gap-2 rounded-2xl border border-dashed border-gw-lavande bg-gw-fond/60 px-4 py-3 text-xs text-gw-texte">
                 <Info className="mt-0.5 h-4 w-4 shrink-0 text-gw-violet" aria-hidden />
                 <span>
-                  <strong className="font-semibold text-gw-nuit">Paiement simulé.</strong> Aucun opérateur n&apos;est contacté et aucun montant n&apos;est débité : le
+                  <strong className="font-semibold text-gw-encre">Paiement simulé.</strong> Aucun opérateur n&apos;est contacté et aucun montant n&apos;est débité : le
                   paiement est accepté dès que le numéro correspond à l&apos;opérateur choisi.
                 </span>
               </p>
 
               {erreur && (
-                <p role="alert" className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+                <p role="alert" className="mt-4 rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">
                   {erreur}
                 </p>
               )}
@@ -649,7 +649,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
 
               {/* simulation : demande envoyée sur le téléphone */}
               {simulation && op && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-white/90 p-6 backdrop-blur-sm" role="status" aria-live="polite">
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-gw-surface/90 p-6 backdrop-blur-sm" role="status" aria-live="polite">
                   <div className="max-w-xs text-center">
                     <span
                       className="mx-auto grid h-16 w-16 place-items-center rounded-2xl text-sm font-extrabold"
@@ -658,7 +658,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                     >
                       <Smartphone className="h-7 w-7" />
                     </span>
-                    <p className="font-titre mt-4 text-lg font-bold text-gw-nuit">Validez sur votre téléphone</p>
+                    <p className="font-titre mt-4 text-lg font-bold text-gw-encre">Validez sur votre téléphone</p>
                     <p className="mt-1 text-sm text-gw-texte">
                       Demande de paiement {op.nom} de <strong>{ariary(lot.total)}</strong> envoyée au{" "}
                       <span className="font-mono whitespace-nowrap">{formaterTelephone(telephone)}</span>.
@@ -675,19 +675,19 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
           {/* --- 3. Confirmation --- */}
           {etape === "confirmation" && resultat && (
             <section aria-labelledby="titre-confirmation">
-              <div className="flex flex-col gap-5 rounded-3xl bg-emerald-50 p-6 ring-1 ring-emerald-200 sm:flex-row sm:items-center sm:p-8">
-                <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-emerald-600 text-white">
+              <div className="flex flex-col gap-5 rounded-3xl bg-gw-violet-pale p-6 ring-1 ring-gw-lavande sm:flex-row sm:items-center sm:p-8">
+                <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-gw-violet text-white">
                   <Check className="h-7 w-7" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h2 id="titre-confirmation" className="font-titre text-2xl font-bold text-emerald-950">
+                  <h2 id="titre-confirmation" className="font-titre text-2xl font-bold text-gw-violet-fonce">
                     Paiement accepté
                   </h2>
-                  <p className="mt-1 text-sm text-emerald-900">
+                  <p className="mt-1 text-sm text-gw-violet-fonce">
                     {ariary(resultat.montant_total)} payés avec {operateur(resultat.mode_paiement)?.nom} · référence{" "}
                     <span className="font-mono font-semibold">{resultat.reference}</span>
                   </p>
-                  <p className="mt-2 flex items-start gap-2 text-sm text-emerald-900">
+                  <p className="mt-2 flex items-start gap-2 text-sm text-gw-violet-fonce">
                     <MailCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                     <span>
                       {resultat.billets.length > 1 ? "Vos billets ont été envoyés" : "Votre billet a été envoyé"} à <strong>{resultat.email}</strong> (PDF
@@ -697,7 +697,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                 </div>
               </div>
 
-              <h3 className="font-titre mt-10 flex items-center gap-2 text-xl font-bold text-gw-nuit">
+              <h3 className="font-titre mt-10 flex items-center gap-2 text-xl font-bold text-gw-encre">
                 <Ticket className="h-5 w-5 text-gw-violet" aria-hidden /> {pluriel(resultat.billets.length, "billet")}
               </h3>
               <div className="mt-4 space-y-6">
@@ -707,7 +707,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
               </div>
 
               {resultat.billets.length > BILLETS_AFFICHES && (
-                <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-gw-texte ring-1 ring-gw-bordure">
+                <p className="mt-4 rounded-2xl bg-gw-surface px-4 py-3 text-sm text-gw-texte ring-1 ring-gw-bordure">
                   ... et {resultat.billets.length - BILLETS_AFFICHES} autres billets, tous dans votre e-mail et dans "Mes billets".
                 </p>
               )}
@@ -730,13 +730,13 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                     fetchTarifs(evenementId).then(setTarifs).catch(() => undefined)
                     allerA("billets")
                   }}
-                  className="inline-flex h-12 items-center gap-2 rounded-full px-6 font-semibold text-gw-nuit ring-1 ring-gw-bordure hover:bg-white"
+                  className="inline-flex h-12 items-center gap-2 rounded-full px-6 font-semibold text-gw-encre ring-1 ring-gw-bordure hover:bg-gw-surface"
                 >
                   <Plus className="h-4 w-4" aria-hidden /> Acheter d&apos;autres billets
                 </button>
                 <Link
                   href={`/evenements/${evenementId}`}
-                  className="inline-flex h-12 items-center rounded-full px-6 font-semibold text-gw-nuit ring-1 ring-gw-bordure hover:bg-white"
+                  className="inline-flex h-12 items-center rounded-full px-6 font-semibold text-gw-encre ring-1 ring-gw-bordure hover:bg-gw-surface"
                 >
                   Retour à l&apos;événement
                 </Link>

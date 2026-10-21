@@ -17,7 +17,7 @@ interface NotificationBellProps {
   boutonClassName?: string
 }
 
-export function NotificationBell({ boutonClassName = "text-white hover:bg-blue-700" }: NotificationBellProps = {}) {
+export function NotificationBell({ boutonClassName = "text-white hover:bg-gw-violet-fonce" }: NotificationBellProps = {}) {
   const [count, setCount] = useState(0)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [open, setOpen] = useState(false)
@@ -76,25 +76,25 @@ export function NotificationBell({ boutonClassName = "text-white hover:bg-blue-7
       >
         <Bell className="w-5 h-5" />
         {count > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+          <span className="absolute -top-1 -right-1 bg-gw-rose-action text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
             {count > 9 ? "9+" : count}
           </span>
         )}
       </Button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-white text-gray-900 rounded-lg shadow-xl border z-50">
+        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-gw-surface text-gw-encre rounded-lg shadow-xl border z-50">
           <div className="px-4 py-3 border-b font-semibold text-sm">Notifications</div>
           {notifications.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-gray-500">
+            <div className="px-4 py-6 text-center text-sm text-gw-texte-doux">
               Aucune notification pour le moment.
             </div>
           ) : (
             <ul className="divide-y">
               {notifications.map((n) => (
-                <li key={n.id} className="px-4 py-3 text-sm hover:bg-gray-50">
-                  <p className={n.lu ? "text-gray-600" : "text-gray-900 font-medium"}>{n.message}</p>
-                  <p className="text-xs text-gray-400 mt-1">
+                <li key={n.id} className="px-4 py-3 text-sm hover:bg-gw-fond">
+                  <p className={n.lu ? "text-gw-texte" : "text-gw-encre font-medium"}>{n.message}</p>
+                  <p className="text-xs text-gw-texte-pale mt-1">
                     {new Date(n.date_creation).toLocaleString("fr-FR")}
                   </p>
                 </li>

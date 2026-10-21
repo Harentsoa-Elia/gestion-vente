@@ -14,15 +14,15 @@ export const STATUTS: Record<StatutValidation, { libelle: string; classes: strin
   },
   en_attente_validation: {
     libelle: "En attente de validation",
-    classes: "bg-amber-50 text-amber-800 ring-1 ring-amber-200 dark:bg-amber-400/10 dark:text-amber-200 dark:ring-amber-400/30",
+    classes: "bg-gw-rose-pale text-gw-rose-action-fonce ring-1 ring-gw-rose-pale dark:bg-gw-rose/10 dark:text-gw-rose-pale dark:ring-gw-rose/30",
   },
   valide: {
     libelle: "Validé",
-    classes: "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-200 dark:ring-emerald-400/30",
+    classes: "bg-gw-violet-pale text-gw-violet-fonce ring-1 ring-gw-lavande dark:bg-gw-violet/10 dark:text-gw-lavande dark:ring-gw-violet/30",
   },
   rejete: {
     libelle: "Rejeté",
-    classes: "bg-gw-rose-pale text-gw-rose-action ring-1 ring-gw-rose/30 dark:bg-gw-rose/15 dark:text-pink-200 dark:ring-gw-rose/40",
+    classes: "bg-gw-rose-pale text-gw-rose-action ring-1 ring-gw-rose/30 dark:bg-gw-rose/15 dark:text-gw-rose-pale dark:ring-gw-rose/40",
   },
 }
 
@@ -52,7 +52,7 @@ export function Bouton({
         variante === "principal" && "bg-gw-rose-action text-white hover:bg-gw-rose-action-fonce",
         variante === "secondaire" &&
           "border border-gw-violet/40 text-gw-violet hover:bg-gw-violet hover:text-white dark:border-white/30 dark:text-white dark:hover:bg-white/10",
-        variante === "danger" && "bg-red-600 text-white hover:bg-red-700",
+        variante === "danger" && "bg-gw-rose-action text-white hover:bg-gw-rose-action-fonce",
         variante === "discret" && "text-gw-texte-doux hover:bg-gw-fond dark:text-white/70 dark:hover:bg-white/10",
         className,
       )}
@@ -66,7 +66,7 @@ export function Bouton({
 /* ---------- champs de formulaire ---------- */
 
 export const classeChamp =
-  "w-full rounded-xl border border-gw-bordure bg-white px-3.5 py-2.5 text-sm text-gw-nuit placeholder:text-gw-texte-pale focus:border-gw-violet focus:outline-none focus:ring-2 focus:ring-gw-violet/20 dark:border-gw-bordure-sombre dark:bg-gw-nuit-profond dark:text-white dark:placeholder:text-white/35"
+  "w-full rounded-xl border border-gw-bordure bg-gw-surface px-3.5 py-2.5 text-sm text-gw-encre placeholder:text-gw-texte-pale focus:border-gw-violet focus:outline-none focus:ring-2 focus:ring-gw-violet/20 dark:border-gw-bordure-sombre dark:bg-gw-nuit-profond dark:text-white dark:placeholder:text-white/35"
 
 export function Champ({
   libelle,
@@ -132,7 +132,7 @@ export function Modale({
         aria-modal="true"
         aria-labelledby={idTitre}
         className={cn(
-          "relative max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white p-6 text-gw-nuit shadow-2xl sm:rounded-3xl dark:bg-gw-carte-sombre dark:text-white",
+          "relative max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-gw-surface p-6 text-gw-encre shadow-2xl sm:rounded-3xl dark:bg-gw-carte-sombre dark:text-white",
           large ? "sm:max-w-2xl" : "sm:max-w-md",
         )}
       >

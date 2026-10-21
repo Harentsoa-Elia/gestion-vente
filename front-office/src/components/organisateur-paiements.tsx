@@ -23,8 +23,8 @@ function formatAr(montant: number) {
 }
 
 const STATUT_STYLES: Record<string, string> = {
-  paye: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  en_attente: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  paye: "bg-gw-lavande text-gw-violet-fonce dark:bg-gw-violet-fonce/30 dark:text-gw-violet",
+  en_attente: "bg-gw-rose-pale text-gw-rose-action-fonce dark:bg-gw-rose-action-fonce/30 dark:text-gw-rose",
 }
 
 const STATUT_LABELS: Record<string, string> = {
@@ -34,7 +34,7 @@ const STATUT_LABELS: Record<string, string> = {
 
 export function OrganisateurPaiements() {
   const [paiements, setPaiements] = useState<PaiementOrganisateur[]>([])
-  // 5 premières lignes, le reste derrière « Voir plus »
+  // pagination : 5 lignes par page
   const { visibles: paiementsVisibles, bouton: boutonVoirPlus } = useVoirPlus(paiements)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -46,8 +46,8 @@ export function OrganisateurPaiements() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p className="text-center py-16 text-muted-foreground dark:text-gray-400">Chargement...</p>
-  if (error) return <p className="text-center py-16 text-red-600">{error}</p>
+  if (loading) return <p className="text-center py-16 text-muted-foreground dark:text-gw-texte-pale">Chargement...</p>
+  if (error) return <p className="text-center py-16 text-gw-rose-action">{error}</p>
 
   const totalEncaisse = paiements
     .filter((p) => p.statut_paiement === "paye")
@@ -56,20 +56,20 @@ export function OrganisateurPaiements() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">Paiements</h1>
-        <p className="text-muted-foreground dark:text-gray-400">
+        <h1 className="text-2xl font-bold text-[#2A1A5E] dark:text-white">Paiements</h1>
+        <p className="text-muted-foreground dark:text-gw-texte-pale">
           Historique des paiements pour vos événements
         </p>
       </div>
 
-      <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700 max-w-xs">
+      <Card className="rounded-2xl dark:bg-[#2B1F5C] dark:border-gw-nuit max-w-xs">
         <CardContent className="p-5">
-          <p className="text-sm text-muted-foreground dark:text-gray-400">Total encaissé</p>
-          <p className="text-2xl font-bold text-[#0F172A] dark:text-white">{formatAr(totalEncaisse)}</p>
+          <p className="text-sm text-muted-foreground dark:text-gw-texte-pale">Total encaissé</p>
+          <p className="text-2xl font-bold text-[#2A1A5E] dark:text-white">{formatAr(totalEncaisse)}</p>
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700">
+      <Card className="rounded-2xl dark:bg-[#2B1F5C] dark:border-gw-nuit">
         <CardHeader>
           <CardTitle className="text-base dark:text-white">
             {paiements.length} paiement{paiements.length > 1 ? "s" : ""}
@@ -77,7 +77,7 @@ export function OrganisateurPaiements() {
         </CardHeader>
         <CardContent>
           {paiements.length === 0 ? (
-            <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
+            <p className="text-sm text-muted-foreground dark:text-gw-texte-pale text-center py-10">
               Aucun paiement pour le moment.
             </p>
           ) : (
@@ -85,7 +85,7 @@ export function OrganisateurPaiements() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                  <tr className="text-left text-muted-foreground dark:text-gw-texte-pale border-b border-gw-bordure dark:border-gw-nuit">
                     <th className="pb-2 pr-4 font-medium">Participant</th>
                     <th className="pb-2 pr-4 font-medium">Événement</th>
                     <th className="pb-2 pr-4 font-medium">Montant</th>
@@ -96,26 +96,26 @@ export function OrganisateurPaiements() {
                 </thead>
                 <tbody>
                   {paiementsVisibles.map((p) => (
-                    <tr key={p.id} className="border-b border-gray-50 dark:border-gray-800">
-                      <td className="py-3 pr-4 text-[#0F172A] dark:text-white">
+                    <tr key={p.id} className="border-b border-gw-bordure dark:border-gw-nuit">
+                      <td className="py-3 pr-4 text-[#2A1A5E] dark:text-white">
                         {p.participant_prenom} {p.participant_nom}
                       </td>
-                      <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400">
+                      <td className="py-3 pr-4 text-muted-foreground dark:text-gw-texte-pale">
                         {p.evenement_titre}
                       </td>
-                      <td className="py-3 pr-4 font-medium text-[#0F172A] dark:text-white">
+                      <td className="py-3 pr-4 font-medium text-[#2A1A5E] dark:text-white">
                         {formatAr(p.montant)}
                       </td>
-                      <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400">
+                      <td className="py-3 pr-4 text-muted-foreground dark:text-gw-texte-pale">
                         {operateur(p.mode_paiement)?.nom ?? p.mode_paiement ?? "-"}
                       </td>
-                      <td className="py-3 pr-4 text-muted-foreground dark:text-gray-400">
+                      <td className="py-3 pr-4 text-muted-foreground dark:text-gw-texte-pale">
                         {formatDate(p.date_paiement)}
                       </td>
                       <td className="py-3">
                         <span
                           className={`text-xs px-2 py-1 rounded-full ${
-                            STATUT_STYLES[p.statut_paiement] ?? "bg-gray-100 text-gray-600"
+                            STATUT_STYLES[p.statut_paiement] ?? "bg-gw-fond text-gw-texte"
                           }`}
                         >
                           {STATUT_LABELS[p.statut_paiement] ?? p.statut_paiement}

@@ -34,9 +34,9 @@ function ilYa(iso: string) {
 
 const ACTIVITE: Record<ActiviteAdmin["type"], { icone: LucideIcon; fond: string }> = {
   vente: { icone: Ticket, fond: "bg-gw-violet/12 text-gw-violet dark:bg-white/10 dark:text-gw-lavande" },
-  inscription: { icone: UserPlus, fond: "bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300" },
+  inscription: { icone: UserPlus, fond: "bg-gw-lavande text-gw-violet-fonce dark:bg-gw-violet/15 dark:text-gw-lavande" },
   evenement: { icone: CalendarPlus, fond: "bg-gw-rose-pale text-gw-rose-action dark:bg-gw-rose/15 dark:text-gw-rose" },
-  entree: { icone: ScanLine, fond: "bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300" },
+  entree: { icone: ScanLine, fond: "bg-gw-lavande text-gw-violet-fonce dark:bg-gw-violet/15 dark:text-gw-lavande" },
 }
 
 const STATUTS = [
@@ -69,9 +69,9 @@ function InfoBulle({ active, payload }: { active?: boolean; payload?: { payload:
   if (!active || !payload?.length) return null
   const p = payload[0].payload
   return (
-    <div className="rounded-xl bg-white px-3 py-2 text-xs shadow-lg ring-1 ring-gw-bordure dark:bg-gw-carte-sombre dark:ring-white/10">
-      <p className="font-semibold text-gw-nuit first-letter:uppercase dark:text-white">{jourLong(p.date)}</p>
-      <p className="mt-1 font-semibold text-gw-nuit dark:text-white">
+    <div className="rounded-xl bg-gw-surface px-3 py-2 text-xs shadow-lg ring-1 ring-gw-bordure dark:bg-gw-carte-sombre dark:ring-white/10">
+      <p className="font-semibold text-gw-encre first-letter:uppercase dark:text-white">{jourLong(p.date)}</p>
+      <p className="mt-1 font-semibold text-gw-encre dark:text-white">
         {entier.format(p.billets)} billet{p.billets > 1 ? "s" : ""}
       </p>
       <p className="text-gw-texte-doux dark:text-white/60">{ariary(p.montant)}</p>
@@ -121,7 +121,7 @@ export function VueEnsemble() {
         <button
           type="button"
           onClick={charger}
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-gw-violet hover:bg-white dark:text-gw-lavande dark:hover:bg-white/10"
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-gw-violet hover:bg-gw-surface dark:text-gw-lavande dark:hover:bg-white/10"
         >
           <RefreshCw className={cn("h-4 w-4", chargement && "animate-spin")} aria-hidden /> Actualiser
         </button>
@@ -130,7 +130,7 @@ export function VueEnsemble() {
       {aValider > 0 && (
         <Link
           href="/admin/evenements"
-          className="flex items-center gap-4 rounded-3xl bg-gw-nuit p-5 text-white transition-colors hover:bg-gw-indigo sm:p-6 dark:bg-white/10 dark:hover:bg-white/15"
+          className="flex items-center gap-4 rounded-3xl bg-gw-nuit p-5 text-white transition-colors hover:bg-gw-violet-fonce sm:p-6 dark:bg-white/10 dark:hover:bg-white/15"
         >
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gw-rose-action">
             <ShieldCheck className="h-6 w-6" aria-hidden />

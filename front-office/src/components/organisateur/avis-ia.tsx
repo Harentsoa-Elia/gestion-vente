@@ -7,9 +7,9 @@ import type { Sentiment, SentimentsEvenement } from "@/types/ia"
 import { cn } from "@/utils"
 
 const STYLES: Record<Sentiment, { libelle: string; icone: LucideIcon; barre: string; badge: string }> = {
-  positif: { libelle: "Positifs", icone: Smile, barre: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300" },
-  neutre: { libelle: "Neutres", icone: Meh, barre: "bg-slate-400", badge: "bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-white/75" },
-  negatif: { libelle: "Négatifs", icone: Frown, barre: "bg-rose-500", badge: "bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300" },
+  positif: { libelle: "Positifs", icone: Smile, barre: "bg-gw-violet", badge: "bg-gw-violet-pale text-gw-violet-fonce dark:bg-gw-violet/15 dark:text-gw-lavande" },
+  neutre: { libelle: "Neutres", icone: Meh, barre: "bg-gw-texte-pale", badge: "bg-gw-fond text-gw-encre dark:bg-white/10 dark:text-white/75" },
+  negatif: { libelle: "Négatifs", icone: Frown, barre: "bg-gw-rose-action", badge: "bg-gw-rose-pale text-gw-rose-action-fonce dark:bg-gw-rose-action/15 dark:text-gw-rose" },
 }
 const ORDRE: Sentiment[] = ["positif", "neutre", "negatif"]
 const pourcent = (x: number) => `${Math.round(x * 100)} %`
@@ -58,7 +58,7 @@ export function AvisIA({ evenementId, version }: { evenementId: number; version:
         )}
       </div>
 
-      {erreur && <p className="mt-4 text-sm text-rose-600">{erreur}</p>}
+      {erreur && <p className="mt-4 text-sm text-gw-rose-action">{erreur}</p>}
       {!donnees && !erreur && (
         <p className="mt-4 flex items-center gap-2 text-sm text-gw-texte-doux">
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Analyse des commentaires...
@@ -118,7 +118,7 @@ export function AvisIA({ evenementId, version }: { evenementId: number; version:
                     <span
                       className={cn(
                         "flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
-                        incertain ? "bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300" : st.badge,
+                        incertain ? "bg-gw-rose-pale text-gw-rose-action-fonce dark:bg-gw-rose-action/15 dark:text-gw-rose" : st.badge,
                       )}
                     >
                       <st.icone className="h-3.5 w-3.5" aria-hidden />

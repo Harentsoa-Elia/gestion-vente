@@ -34,7 +34,7 @@ export function EvenementsAVenir({ catalogue }: { catalogue: Catalogue }) {
       ) : !chargement && filtres.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-gw-lavande px-6 py-12 text-center">
           <CalendarX className="h-8 w-8 text-[#B5A8F5]" aria-hidden />
-          <p className="font-titre text-lg font-semibold text-gw-nuit">
+          <p className="font-titre text-lg font-semibold text-gw-encre">
             {periode === "tout" ? "Aucun événement à venir pour le moment" : `Rien de prévu ${libellePeriode}`}
           </p>
           <p className="max-w-md text-sm text-gw-texte-doux">

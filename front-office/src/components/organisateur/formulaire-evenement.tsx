@@ -54,7 +54,7 @@ function ChoixAffiche({ fichier, onChange }: { fichier: File | null; onChange: (
             <button type="button" onClick={() => champ.current?.click()} className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-gw-violet hover:bg-gw-fond dark:text-gw-lavande dark:hover:bg-white/10">
               <RefreshCw className="h-3.5 w-3.5" aria-hidden /> Changer
             </button>
-            <button type="button" onClick={() => onChange(null)} className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-gw-texte-doux hover:bg-gw-fond hover:text-red-600 dark:text-white/60 dark:hover:bg-white/10">
+            <button type="button" onClick={() => onChange(null)} className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-gw-texte-doux hover:bg-gw-fond hover:text-gw-rose-action dark:text-white/60 dark:hover:bg-white/10">
               <Trash2 className="h-3.5 w-3.5" aria-hidden /> Retirer
             </button>
           </span>
@@ -90,7 +90,7 @@ function ChoixAffiche({ fichier, onChange }: { fichier: File | null; onChange: (
               <ImagePlus className="h-5 w-5" aria-hidden />
             </span>
             <span>
-              <span className="block text-sm font-semibold text-gw-nuit dark:text-white">Glissez l&apos;affiche ici ou cliquez pour la choisir</span>
+              <span className="block text-sm font-semibold text-gw-encre dark:text-white">Glissez l&apos;affiche ici ou cliquez pour la choisir</span>
               <span className="text-xs text-gw-texte-doux dark:text-white/55">JPEG, PNG ou WebP · 8 Mo maximum · format paysage conseillé</span>
             </span>
           </span>
@@ -258,7 +258,7 @@ export function FormulaireEvenement({
       </Champ>
 
       {erreur && (
-        <p role="alert" className="rounded-xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action dark:bg-gw-rose/15 dark:text-pink-200">
+        <p role="alert" className="rounded-xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action dark:bg-gw-rose/15 dark:text-gw-rose-pale">
           {erreur}
         </p>
       )}

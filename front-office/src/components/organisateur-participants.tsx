@@ -40,30 +40,30 @@ export function OrganisateurParticipants() {
   // pagination : 5 lignes par page
   const { visibles: participantsFiltresVisibles, bouton: boutonVoirPlus } = useVoirPlus(participantsFiltres)
 
-  if (loading) return <p className="text-center py-16 text-muted-foreground dark:text-gray-400">Chargement...</p>
-  if (error) return <p className="text-center py-16 text-red-600">{error}</p>
+  if (loading) return <p className="text-center py-16 text-muted-foreground dark:text-gw-texte-pale">Chargement...</p>
+  if (error) return <p className="text-center py-16 text-gw-rose-action">{error}</p>
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">Participants</h1>
-        <p className="text-muted-foreground dark:text-gray-400">
+        <h1 className="text-2xl font-bold text-[#2A1A5E] dark:text-white">Participants</h1>
+        <p className="text-muted-foreground dark:text-gw-texte-pale">
           Les personnes ayant réservé pour vos événements
         </p>
       </div>
 
       <div className="relative max-w-xs">
-        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gw-texte-pale" />
         <input
           type="text"
           placeholder="Rechercher un participant..."
           value={recherche}
           onChange={(e) => setRecherche(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"
+          className="w-full pl-9 pr-3 py-2 rounded-lg border border-gw-bordure dark:border-gw-nuit dark:bg-[#2B1F5C] dark:text-white text-sm"
         />
       </div>
 
-      <Card className="rounded-2xl dark:bg-[#1E293B] dark:border-gray-700">
+      <Card className="rounded-2xl dark:bg-[#2B1F5C] dark:border-gw-nuit">
         <CardHeader>
           <CardTitle className="text-base dark:text-white">
             {participantsFiltres.length} participant{participantsFiltres.length > 1 ? "s" : ""}
@@ -71,7 +71,7 @@ export function OrganisateurParticipants() {
         </CardHeader>
         <CardContent>
           {participantsFiltres.length === 0 ? (
-            <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
+            <p className="text-sm text-muted-foreground dark:text-gw-texte-pale text-center py-10">
               Aucun participant pour le moment.
             </p>
           ) : (
@@ -79,7 +79,7 @@ export function OrganisateurParticipants() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-muted-foreground dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                  <tr className="text-left text-muted-foreground dark:text-gw-texte-pale border-b border-gw-bordure dark:border-gw-nuit">
                     <th className="pb-2 pr-4 font-medium">Participant</th>
                     <th className="pb-2 pr-4 text-right font-medium">Réservations</th>
                     <th className="pb-2 font-medium">
@@ -93,12 +93,12 @@ export function OrganisateurParticipants() {
                       <td className="py-3 pr-4">
                         <div className="flex items-center gap-3">
                           <AvatarParticipant prenom={p.prenom} nom={p.nom} avatar={p.avatar} className="h-9 w-9 text-xs" />
-                          <p className="min-w-0 truncate font-medium text-[#0F172A] dark:text-white">
+                          <p className="min-w-0 truncate font-medium text-[#2A1A5E] dark:text-white">
                             {p.prenom} {p.nom}
                           </p>
                         </div>
                       </td>
-                      <td className="py-3 pr-4 text-right tabular-nums text-[#0F172A] dark:text-gray-200">{p.nb_reservations}</td>
+                      <td className="py-3 pr-4 text-right tabular-nums text-[#2A1A5E] dark:text-gw-texte-pale">{p.nb_reservations}</td>
                       <td className="py-3 text-right">
                         <BoutonDetails onClick={() => setDetail(p)} />
                       </td>

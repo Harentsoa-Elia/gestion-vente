@@ -87,8 +87,8 @@ export function SaisieCode({
             onPaste={coller}
             onFocus={(e) => e.target.select()}
             className={cn(
-              "h-14 w-11 rounded-xl border-2 bg-gw-fond text-center font-titre text-2xl font-bold text-gw-nuit transition-colors outline-none sm:w-12",
-              "focus:border-gw-violet focus:bg-white focus:ring-4 focus:ring-gw-violet/15 disabled:opacity-60",
+              "h-14 w-11 rounded-xl border-2 bg-gw-fond text-center font-titre text-2xl font-bold text-gw-encre transition-colors outline-none sm:w-12",
+              "focus:border-gw-violet focus:bg-gw-surface focus:ring-4 focus:ring-gw-violet/15 disabled:opacity-60",
               erreur ? "border-gw-rose-action" : c ? "border-gw-lavande" : "border-gw-bordure",
             )}
           />

@@ -133,7 +133,7 @@ function ParticipantSignupForm() {
         {ETAPES.map((libelle, i) => (
           <li key={libelle} className="flex flex-1 flex-col gap-1.5" aria-current={i === etape ? "step" : undefined}>
             <span className={cn("h-1.5 rounded-full transition-colors", i <= etape ? "bg-gw-rose-action" : "bg-gw-bordure")} />
-            <span className={cn("text-[11px] font-semibold", i === etape ? "text-gw-nuit" : "text-gw-texte-doux")}>{libelle}</span>
+            <span className={cn("text-[11px] font-semibold", i === etape ? "text-gw-encre" : "text-gw-texte-doux")}>{libelle}</span>
           </li>
         ))}
       </ol>

@@ -64,13 +64,13 @@ function EnAttente({ groupe, onAnnule }: { groupe: Groupe; onAnnule: () => void 
   }
 
   return (
-    <li className="flex flex-col gap-4 rounded-2xl bg-white p-5 ring-1 ring-amber-200 sm:flex-row sm:items-center">
+    <li className="flex flex-col gap-4 rounded-2xl bg-gw-surface p-5 ring-1 ring-gw-rose-pale sm:flex-row sm:items-center">
       <div className="min-w-0 flex-1">
-        <p className="font-titre truncate text-lg font-bold text-gw-nuit">{groupe.titre}</p>
+        <p className="font-titre truncate text-lg font-bold text-gw-encre">{groupe.titre}</p>
         <p className="text-sm text-gw-texte">
           {groupe.billets.length} × {groupe.billets[0].categorie_nom} · <strong className="font-semibold">{ariary(total)}</strong>
         </p>
-        <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-amber-800">
+        <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-gw-rose-action-fonce">
           <Clock className="h-3.5 w-3.5" aria-hidden />
           {minutes > 0 ? `Places gardées encore ${pluriel(minutes, "minute")}` : "Délai dépassé : places non garanties"}
         </p>
@@ -128,7 +128,7 @@ export function MesReservationsList() {
       </p>
     )
   }
-  if (erreur) return <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{erreur}</p>
+  if (erreur) return <p className="rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">{erreur}</p>
 
   const groupes = onglet === "a-venir" ? aVenir : passes
   const onglets: { cle: Onglet; libelle: string; nombre: number }[] = [
@@ -139,11 +139,11 @@ export function MesReservationsList() {
   return (
     <div>
       {attente.length > 0 && (
-        <section aria-labelledby="titre-attente" className="mb-10 rounded-3xl bg-amber-50 p-5 sm:p-6">
-          <h2 id="titre-attente" className="font-titre text-lg font-bold text-amber-950">
+        <section aria-labelledby="titre-attente" className="mb-10 rounded-3xl bg-gw-rose-pale p-5 sm:p-6">
+          <h2 id="titre-attente" className="font-titre text-lg font-bold text-gw-rose-action-fonce">
             Paiement à finaliser
           </h2>
-          <p className="mt-1 text-sm text-amber-900">Ces places sont gardées 15 minutes après la réservation, le temps de payer.</p>
+          <p className="mt-1 text-sm text-gw-rose-action-fonce">Ces places sont gardées 15 minutes après la réservation, le temps de payer.</p>
           <ul className="mt-4 space-y-3">
             {attente.map((g) => (
               <EnAttente key={g.cle} groupe={g} onAnnule={charger} />
@@ -152,7 +152,7 @@ export function MesReservationsList() {
         </section>
       )}
 
-      <div role="tablist" aria-label="Période" className="inline-flex rounded-full bg-white p-1 ring-1 ring-gw-bordure">
+      <div role="tablist" aria-label="Période" className="inline-flex rounded-full bg-gw-surface p-1 ring-1 ring-gw-bordure">
         {onglets.map((o) => (
           <button
             key={o.cle}
@@ -162,7 +162,7 @@ export function MesReservationsList() {
             onClick={() => setOnglet(o.cle)}
             className={cn(
               "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
-              onglet === o.cle ? "bg-gw-nuit text-white" : "text-gw-texte-doux hover:text-gw-nuit",
+              onglet === o.cle ? "bg-gw-nuit text-white" : "text-gw-texte-doux hover:text-gw-encre",
             )}
           >
             {o.libelle} <span className={cn("ml-1 tabular-nums", onglet === o.cle ? "text-white/70" : "text-gw-texte-pale")}>{o.nombre}</span>
@@ -171,9 +171,9 @@ export function MesReservationsList() {
       </div>
 
       {groupes.length === 0 ? (
-        <div className="mt-8 rounded-3xl bg-white px-6 py-14 text-center ring-1 ring-gw-bordure">
+        <div className="mt-8 rounded-3xl bg-gw-surface px-6 py-14 text-center ring-1 ring-gw-bordure">
           <TicketX className="mx-auto h-10 w-10 text-gw-lavande" aria-hidden />
-          <p className="font-titre mt-3 text-xl font-bold text-gw-nuit">{onglet === "a-venir" ? "Aucun billet à venir" : "Aucun événement passé"}</p>
+          <p className="font-titre mt-3 text-xl font-bold text-gw-encre">{onglet === "a-venir" ? "Aucun billet à venir" : "Aucun événement passé"}</p>
           {onglet === "a-venir" && (
             <>
               <p className="mt-1 text-sm text-gw-texte-doux">Vos billets apparaîtront ici dès le paiement accepté.</p>
@@ -192,7 +192,7 @@ export function MesReservationsList() {
             <section key={g.cle} aria-label={g.titre}>
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <div className="min-w-0">
-                  <Link href={`/evenements/${g.evenementId}`} className="font-titre text-2xl font-bold text-gw-nuit hover:text-gw-violet">
+                  <Link href={`/evenements/${g.evenementId}`} className="font-titre text-2xl font-bold text-gw-encre hover:text-gw-violet">
                     {g.titre}
                   </Link>
                   <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gw-texte-doux">
@@ -206,7 +206,7 @@ export function MesReservationsList() {
                     )}
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-sm font-semibold text-gw-nuit ring-1 ring-gw-bordure">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gw-surface px-3 py-1 text-sm font-semibold text-gw-encre ring-1 ring-gw-bordure">
                   <Ticket className="h-4 w-4 text-gw-violet" aria-hidden /> {pluriel(g.billets.length, "billet")}
                 </span>
               </div>

@@ -86,7 +86,7 @@ function Fleche({ sens, visible, onClick }: { sens: 1 | -1; visible: boolean; on
       aria-hidden={!visible}
       aria-label={sens === 1 ? "Faire défiler vers la droite" : "Faire défiler vers la gauche"}
       className={cn(
-        "absolute top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gw-bordure bg-white text-gw-nuit shadow-[0_4px_14px_-4px_rgba(30,26,60,0.45)] transition-all hover:scale-105 hover:border-gw-violet hover:text-gw-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet",
+        "absolute top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gw-bordure bg-gw-surface text-gw-encre shadow-[0_4px_14px_-4px_rgba(42,26,94,0.45)] transition-all hover:scale-105 hover:border-gw-violet hover:text-gw-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet",
         "dark:border-white/15 dark:bg-gw-carte-sombre dark:text-white dark:hover:border-gw-lavande dark:hover:text-gw-lavande",
         sens === 1 ? "-right-1" : "-left-1",
         visible ? "opacity-100" : "pointer-events-none opacity-0",

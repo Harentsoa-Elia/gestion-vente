@@ -48,9 +48,9 @@ function genreCourt(g: string | null) {
 
 function BadgeStatut({ actif }: { actif: boolean }) {
   return actif ? (
-    <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-400/15 dark:text-emerald-300">Actif</span>
+    <span className="inline-flex rounded-full bg-gw-lavande px-2.5 py-0.5 text-xs font-semibold text-gw-violet-fonce dark:bg-gw-violet/15 dark:text-gw-lavande">Actif</span>
   ) : (
-    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-400/15 dark:text-red-300">
+    <span className="inline-flex items-center gap-1 rounded-full bg-gw-rose-pale px-2.5 py-0.5 text-xs font-semibold text-gw-rose-action-fonce dark:bg-gw-rose/15 dark:text-gw-rose">
       <Ban className="h-3 w-3" aria-hidden /> Suspendu
     </span>
   )
@@ -58,11 +58,11 @@ function BadgeStatut({ actif }: { actif: boolean }) {
 
 function BadgeRole({ role }: { role: CompteEquipe["role"] }) {
   return role === "admin" ? (
-    <span className="inline-flex items-center gap-1 rounded-full bg-gw-nuit px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-white dark:text-gw-nuit">
+    <span className="inline-flex items-center gap-1 rounded-full bg-gw-nuit px-2.5 py-0.5 text-xs font-semibold text-white dark:bg-gw-surface dark:text-gw-encre">
       <ShieldCheck className="h-3 w-3" aria-hidden /> Administrateur
     </span>
   ) : (
-    <span className="inline-flex rounded-full bg-gw-lavande/60 px-2.5 py-0.5 text-xs font-semibold text-gw-nuit dark:bg-white/10 dark:text-white">Organisateur</span>
+    <span className="inline-flex rounded-full bg-gw-lavande/60 px-2.5 py-0.5 text-xs font-semibold text-gw-encre dark:bg-white/10 dark:text-white">Organisateur</span>
   )
 }
 
@@ -134,7 +134,7 @@ function ModaleNouveauCompte({ ouverte, onFermer, onCree }: { ouverte: boolean; 
           )}
         </Champ>
         {erreur && (
-          <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-400/10 dark:text-red-300">
+          <p role="alert" className="rounded-xl bg-gw-rose-pale px-3 py-2 text-sm text-gw-rose-action-fonce dark:bg-gw-rose/10 dark:text-gw-rose">
             {erreur}
           </p>
         )}
@@ -309,7 +309,7 @@ export function AdminUtilisateurs() {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="tablist" aria-label="Type de compte" className="inline-flex rounded-full bg-white p-1 dark:bg-white/5">
+        <div role="tablist" aria-label="Type de compte" className="inline-flex rounded-full bg-gw-surface p-1 dark:bg-white/5">
           {(
             [
               ["equipe", "Équipe", equipe.length],
@@ -324,7 +324,7 @@ export function AdminUtilisateurs() {
               onClick={() => changerOnglet(cle)}
               className={cn(
                 "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
-                onglet === cle ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit" : "text-gw-texte-doux hover:text-gw-nuit dark:text-white/65 dark:hover:text-white",
+                onglet === cle ? "bg-gw-nuit text-white dark:bg-gw-surface dark:text-gw-encre" : "text-gw-texte-doux hover:text-gw-encre dark:text-white/65 dark:hover:text-white",
               )}
             >
               {libelle} <span className="ml-1 opacity-70">{n}</span>
@@ -438,7 +438,7 @@ export function AdminUtilisateurs() {
                         </button>
                         <button
                           type="button"
-                          className={cn(action, actif ? "text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-400/10" : "text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-400/10")}
+                          className={cn(action, actif ? "text-gw-rose-action-fonce hover:bg-gw-rose-pale dark:text-gw-rose dark:hover:bg-gw-rose/10" : "text-gw-violet-fonce hover:bg-gw-violet-pale dark:text-gw-lavande dark:hover:bg-gw-violet/10")}
                           onClick={() => demanderStatut(p)}
                         >
                           {actif ? <Ban className="h-3.5 w-3.5" aria-hidden /> : <RotateCcw className="h-3.5 w-3.5" aria-hidden />}
@@ -529,7 +529,7 @@ function PanneauParticipant({
   return (
     <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label={`Détails de ${p.prenom} ${p.nom}`}>
       <button type="button" aria-label="Fermer" className="absolute inset-0 bg-gw-nuit/40 backdrop-blur-[1px]" onClick={onFermer} />
-      <aside className="relative flex h-full w-full max-w-md flex-col bg-white text-gw-nuit shadow-2xl dark:bg-gw-carte-sombre dark:text-white">
+      <aside className="relative flex h-full w-full max-w-md flex-col bg-gw-surface text-gw-encre shadow-2xl dark:bg-gw-carte-sombre dark:text-white">
         <div className="flex items-start gap-4 border-b border-gw-bordure p-6 dark:border-white/10">
           <AvatarParticipant prenom={p.prenom} nom={p.nom} avatar={p.avatar} className="h-16 w-16 text-lg" />
           <div className="min-w-0 flex-1">
@@ -567,11 +567,11 @@ function PanneauParticipant({
               {p.email}
               <span className="mt-0.5 block">
                 {p.email_verifie ? (
-                  <span className="inline-flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-300">
+                  <span className="inline-flex items-center gap-1 text-xs text-gw-violet-fonce dark:text-gw-lavande">
                     <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> adresse confirmée
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300">
+                  <span className="inline-flex items-center gap-1 text-xs text-gw-rose-action-fonce dark:text-gw-rose">
                     <MailWarning className="h-3.5 w-3.5" aria-hidden /> adresse non confirmée
                   </span>
                 )}
@@ -668,7 +668,7 @@ function PanneauEquipe({
               onClick={() => onSupprimer(u)}
               title={u.evenements > 0 ? "Suppression impossible : ce compte a des événements" : "Supprimer le compte"}
               aria-label={`Supprimer le compte de ${u.fullname}`}
-              className="grid h-9 w-9 place-items-center rounded-full text-gw-texte-doux transition-colors hover:bg-red-50 hover:text-red-700 dark:text-white/60 dark:hover:bg-red-400/10"
+              className="grid h-9 w-9 place-items-center rounded-full text-gw-texte-doux transition-colors hover:bg-gw-rose-pale hover:text-gw-rose-action-fonce dark:text-white/60 dark:hover:bg-gw-rose/10"
             >
               <Trash2 className="h-4 w-4" aria-hidden />
             </button>

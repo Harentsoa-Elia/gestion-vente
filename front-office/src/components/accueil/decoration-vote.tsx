@@ -29,11 +29,11 @@ export function DecorationVote() {
       <div className="absolute right-6 bottom-8 h-32 w-32 rounded-full bg-gw-rose/30 blur-2xl" />
 
       {/* photo de concert, inclinée comme une carte posée */}
-      <figure className="absolute top-1/2 left-1/2 m-0 h-52 w-[78%] -translate-x-1/2 -translate-y-1/2 -rotate-[6deg] overflow-hidden rounded-[1.6rem] bg-gw-nuit shadow-[0_30px_50px_-20px_rgba(30,26,60,0.75)] ring-[6px] ring-white sm:h-56">
+      <figure className="absolute top-1/2 left-1/2 m-0 h-52 w-[78%] -translate-x-1/2 -translate-y-1/2 -rotate-[6deg] overflow-hidden rounded-[1.6rem] bg-gw-nuit shadow-[0_30px_50px_-20px_rgba(42,26,94,0.75)] ring-[6px] ring-white sm:h-56">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={PHOTO} alt="" loading="lazy" className="h-full w-full object-cover object-[50%_40%]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,18,46,0)_45%,rgba(22,18,46,0.75)_100%)]" />
-        <figcaption className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/95 py-1.5 pr-3.5 pl-1.5 text-xs font-semibold text-gw-nuit shadow">
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(29,18,69,0)_45%,rgba(29,18,69,0.75)_100%)]" />
+        <figcaption className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-gw-surface/95 py-1.5 pr-3.5 pl-1.5 text-xs font-semibold text-gw-encre shadow">
           <span className="grid h-6 w-6 place-items-center rounded-full bg-gw-rose-action text-white">
             <Vote className="h-3.5 w-3.5" strokeWidth={2.2} />
           </span>
@@ -49,12 +49,12 @@ export function DecorationVote() {
             style={{ animationDelay: delai }}
           >
             <div
-              className="flex h-16 w-16 items-center justify-center rounded-full shadow-[0_14px_28px_-12px_rgba(30,26,60,0.55)] ring-4 ring-gw-fond"
+              className="flex h-16 w-16 items-center justify-center rounded-full shadow-[0_14px_28px_-12px_rgba(42,26,94,0.55)] ring-4 ring-gw-fond"
               style={{ backgroundColor: fond }}
             >
               {Icone ? <Icone className="h-7 w-7 text-white" strokeWidth={2} /> : <WaouhFace size={40} />}
             </div>
-            <span className="font-titre absolute -right-2 -bottom-1 rounded-full bg-white px-2 py-0.5 text-sm font-bold text-gw-nuit shadow-sm">
+            <span className="font-titre absolute -right-2 -bottom-1 rounded-full bg-gw-surface px-2 py-0.5 text-sm font-bold text-gw-encre shadow-sm">
               ×{poids}
             </span>
           </div>

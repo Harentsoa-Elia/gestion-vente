@@ -49,8 +49,8 @@ function Disponibilite({ tarif }: { tarif: TarifDisponible }) {
 
 function CarteBilletterie({ evenement, tarifs, etat }: { evenement: Evenement; tarifs: TarifDisponible[]; etat: EtatBilletterie }) {
   return (
-    <section aria-labelledby="titre-billets" className="rounded-3xl bg-white p-6 shadow-[0_24px_48px_-30px_rgba(30,26,60,0.5)] ring-1 ring-gw-bordure">
-      <h2 id="titre-billets" className="font-titre flex items-center gap-2 text-xl font-bold text-gw-nuit">
+    <section aria-labelledby="titre-billets" className="rounded-3xl bg-gw-surface p-6 shadow-[0_24px_48px_-30px_rgba(42,26,94,0.5)] ring-1 ring-gw-bordure">
+      <h2 id="titre-billets" className="font-titre flex items-center gap-2 text-xl font-bold text-gw-encre">
         <Ticket className="h-5 w-5 text-gw-violet" aria-hidden /> Billets
       </h2>
 
@@ -61,10 +61,10 @@ function CarteBilletterie({ evenement, tarifs, etat }: { evenement: Evenement; t
             return (
               <li key={t.id} className={cn("flex items-center justify-between gap-3 py-3", complet && "opacity-60")}>
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-gw-nuit">{t.nom}</p>
+                  <p className="truncate font-semibold text-gw-encre">{t.nom}</p>
                   <Disponibilite tarif={t} />
                 </div>
-                <p className={cn("font-titre shrink-0 text-lg font-bold text-gw-nuit", complet && "line-through")}>{ariary(t.prix)}</p>
+                <p className={cn("font-titre shrink-0 text-lg font-bold text-gw-encre", complet && "line-through")}>{ariary(t.prix)}</p>
               </li>
             )
           })}
@@ -81,7 +81,7 @@ function CarteBilletterie({ evenement, tarifs, etat }: { evenement: Evenement; t
               Réserver mes billets
             </Link>
             <p className="mt-3 flex items-start gap-2 text-xs text-gw-texte-doux">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gw-violet" aria-hidden />
               Paiement par MVola, Orange Money ou Airtel Money. Vos billets et leurs QR codes arrivent par e-mail.
             </p>
           </>
@@ -119,7 +119,7 @@ function CarteProposition({ proposition, part }: { proposition: PropositionAvecS
         ) : (
           <div className="scene absolute inset-0" />
         )}
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,18,46,0.1)_20%,rgba(22,18,46,0.92)_100%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(29,18,69,0.1)_20%,rgba(29,18,69,0.92)_100%)]" />
         <p className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-gw-nuit/75 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
           <type.icone className="h-3.5 w-3.5" aria-hidden /> {type.libelle}
         </p>
@@ -207,7 +207,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
   if (erreur || !evenement) {
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
-        <p className="font-titre text-2xl font-bold text-gw-nuit">Événement introuvable</p>
+        <p className="font-titre text-2xl font-bold text-gw-encre">Événement introuvable</p>
         <p className="mt-2 text-gw-texte-doux">{erreur}</p>
         <Link href="/evenements" className="mt-6 inline-flex items-center gap-2 font-semibold text-gw-violet hover:text-gw-rose-action">
           <ArrowLeft className="h-4 w-4" aria-hidden /> Voir tous les événements
@@ -254,11 +254,11 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 pt-8 sm:px-6 lg:grid-cols-[1fr_22rem]">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            {categorie && <span className="rounded-full bg-gw-lavande/60 px-3 py-1 text-xs font-semibold text-gw-nuit">{categorie.nom}</span>}
+            {categorie && <span className="rounded-full bg-gw-lavande/60 px-3 py-1 text-xs font-semibold text-gw-encre">{categorie.nom}</span>}
             {repere && <span className="text-sm font-semibold text-gw-rose-action">{repere}</span>}
             {passe && <span className="rounded-full bg-gw-nuit px-3 py-1 text-xs font-semibold text-white">Terminé</span>}
           </div>
-          <h1 className="font-titre mt-3 text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-gw-nuit sm:text-5xl">{evenement.titre}</h1>
+          <h1 className="font-titre mt-3 text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-gw-encre sm:text-5xl">{evenement.titre}</h1>
 
           <ul className="mt-6 space-y-3 text-gw-texte">
             <li className="flex items-start gap-3">
@@ -266,7 +266,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
                 <CalendarDays className="h-5 w-5" aria-hidden />
               </span>
               <span>
-                <span className="block font-semibold text-gw-nuit">{dateEvenement(evenement.date_debut)}</span>
+                <span className="block font-semibold text-gw-encre">{dateEvenement(evenement.date_debut)}</span>
                 {duree && <span className="text-sm text-gw-texte-doux">{duree}</span>}
               </span>
             </li>
@@ -276,7 +276,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
                   <MapPin className="h-5 w-5" aria-hidden />
                 </span>
                 <span>
-                  <span className="block font-semibold text-gw-nuit">{lieu?.nom}</span>
+                  <span className="block font-semibold text-gw-encre">{lieu?.nom}</span>
                   <span className="text-sm text-gw-texte-doux">{[lieu?.adresse, lieu?.ville, lieu?.region].filter(Boolean).join(", ")}</span>
                 </span>
               </li>
@@ -286,14 +286,14 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gw-fond text-gw-violet">
                   <Users className="h-5 w-5" aria-hidden />
                 </span>
-                <span className="font-semibold text-gw-nuit">{evenement.capacite.toLocaleString("fr-FR")} places au total</span>
+                <span className="font-semibold text-gw-encre">{evenement.capacite.toLocaleString("fr-FR")} places au total</span>
               </li>
             )}
           </ul>
 
           {evenement.description && (
             <section className="mt-10" aria-labelledby="titre-apropos">
-              <h2 id="titre-apropos" className="font-titre text-2xl font-bold text-gw-nuit">
+              <h2 id="titre-apropos" className="font-titre text-2xl font-bold text-gw-encre">
                 À propos
               </h2>
               <p className="mt-3 leading-relaxed whitespace-pre-line text-gw-texte">{evenement.description}</p>
@@ -309,7 +309,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
 
           {propositions.length > 0 && (
             <section className="mt-12" aria-labelledby="titre-vote">
-              <h2 id="titre-vote" className="font-titre flex items-center gap-2 text-2xl font-bold text-gw-nuit">
+              <h2 id="titre-vote" className="font-titre flex items-center gap-2 text-2xl font-bold text-gw-encre">
                 <Vote className="h-6 w-6 text-gw-rose" aria-hidden /> Le public donne son avis
               </h2>
               <p className="mt-2 text-gw-texte-doux">
@@ -331,9 +331,9 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
 
       {/* mobile : barre de réservation toujours visible */}
       {etat.type === "ouverte" && (
-        <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-gw-bordure bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-gw-bordure bg-gw-surface/95 px-4 py-3 backdrop-blur lg:hidden">
           <p className="text-sm text-gw-texte-doux">
-            À partir de <span className="font-titre block text-lg font-bold text-gw-nuit">{ariary(etat.prixMin)}</span>
+            À partir de <span className="font-titre block text-lg font-bold text-gw-encre">{ariary(etat.prixMin)}</span>
           </p>
           <Link
             href={`/evenements/${evenement.id}/reserver`}

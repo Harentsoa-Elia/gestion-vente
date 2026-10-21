@@ -158,7 +158,7 @@ export function SelecteurRecherche({
       </div>
 
       {ouvert && !occupe && (
-        <div className="absolute inset-x-0 top-full z-30 mt-1.5 overflow-hidden rounded-2xl border border-gw-bordure bg-white shadow-[0_18px_40px_-16px_rgba(30,26,60,0.45)] dark:border-gw-bordure-sombre dark:bg-gw-carte-sombre">
+        <div className="absolute inset-x-0 top-full z-30 mt-1.5 overflow-hidden rounded-2xl border border-gw-bordure bg-gw-surface shadow-[0_18px_40px_-16px_rgba(42,26,94,0.45)] dark:border-gw-bordure-sombre dark:bg-gw-carte-sombre">
           <ul ref={liste} id={idListe} role="listbox" aria-label={libelle} className="max-h-64 overflow-y-auto py-1.5">
             {affichees.map((o, i) => (
               <li
@@ -176,7 +176,7 @@ export function SelecteurRecherche({
                 onMouseEnter={() => setActif(i)}
                 className={cn(
                   "cursor-pointer px-3.5 py-2 text-sm",
-                  i === actif ? "bg-gw-fond text-gw-nuit dark:bg-white/10 dark:text-white" : "text-gw-nuit dark:text-white/90",
+                  i === actif ? "bg-gw-fond text-gw-encre dark:bg-white/10 dark:text-white" : "text-gw-encre dark:text-white/90",
                 )}
               >
                 <span className="font-semibold">{o.nom}</span>

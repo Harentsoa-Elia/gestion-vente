@@ -28,7 +28,7 @@ const TYPES: Record<PropositionType, { libelle: string; icone: LucideIcon }> = {
 /** Aplats des cartes, dans l'ordre : nuit, indigo, lavande, rose (palette du thème). */
 const TONS = [
   { fond: "var(--color-gw-nuit)", clair: true, accent: "var(--color-gw-violet)" },
-  { fond: "var(--color-gw-indigo)", clair: true, accent: "var(--color-gw-rose)" },
+  { fond: "var(--color-gw-violet-fonce)", clair: true, accent: "var(--color-gw-rose)" },
   { fond: "var(--color-gw-lavande)", clair: false, accent: "var(--color-gw-violet)" },
   { fond: "var(--color-gw-rose-action)", clair: true, accent: "var(--color-gw-violet)" },
 ]
@@ -38,8 +38,8 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
   const type = TYPES[proposition.type]
   const [score, setScore] = useState(proposition.score)
 
-  const texte = ton.clair ? "text-white" : "text-gw-nuit"
-  const texteDoux = ton.clair ? "text-white/75" : "text-gw-nuit/70"
+  const texte = ton.clair ? "text-white" : "text-gw-encre"
+  const texteDoux = ton.clair ? "text-white/75" : "text-gw-encre/70"
   // visuel : celui de l'organisateur, sinon la photo de l'artiste, sinon une image de test ;
   // une image introuvable (lien cassé) passe à la suivante, et sans image on garde le fond "scène"
   const candidates = [urlMedia(proposition.image_url), urlMedia(proposition.artiste?.image_url), imageTestProposition(proposition)].filter(
@@ -50,7 +50,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
 
   return (
     <article
-      className="group grid overflow-hidden rounded-[1.75rem] shadow-[0_30px_60px_-30px_rgba(30,26,60,0.55)] md:min-h-[26rem] md:grid-cols-[1.15fr_1fr]"
+      className="group grid overflow-hidden rounded-[1.75rem] shadow-[0_30px_60px_-30px_rgba(42,26,94,0.55)] md:min-h-[26rem] md:grid-cols-[1.15fr_1fr]"
       style={{ backgroundColor: ton.fond }}
     >
       {/* aplat de couleur : le texte, en grand, comme HelloAsso */}
@@ -95,7 +95,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
           <div className="scene absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none" style={{ "--accent": ton.accent } as CSSProperties} />
         )}
         {/* dégradé pour que la part des points reste lisible sur n'importe quelle photo */}
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(22,18,46,0)_35%,rgba(22,18,46,0.85)_100%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(29,18,69,0)_35%,rgba(29,18,69,0.85)_100%)]" />
         <type.icone className="absolute top-5 right-5 h-9 w-9 text-white/85 drop-shadow" strokeWidth={1.5} aria-hidden />
         <div className="font-titre absolute bottom-7 left-7 text-white">
           <p className="text-7xl leading-none font-bold tracking-[-0.04em]">
@@ -213,14 +213,14 @@ export function PropositionsEmpilees({
         {/* colonne droite : les propositions, en cartes empilées */}
         <div>
           {chargement ? (
-            <div className="h-[26rem] animate-pulse rounded-[1.75rem] bg-[#E6E1F7]" aria-hidden />
+            <div className="h-[26rem] animate-pulse rounded-[1.75rem] bg-[#EBE6FA]" aria-hidden />
           ) : propositions.length === 0 ? (
             <div className="flex flex-col items-start gap-4 rounded-[1.75rem] bg-gw-lavande p-8 sm:p-10">
-              <Vote className="h-8 w-8 text-gw-indigo" aria-hidden />
-              <p className="font-titre max-w-lg text-3xl leading-tight font-bold tracking-[-0.03em] text-gw-nuit">
+              <Vote className="h-8 w-8 text-gw-violet-fonce" aria-hidden />
+              <p className="font-titre max-w-lg text-3xl leading-tight font-bold tracking-[-0.03em] text-gw-encre">
                 Aucun vote en cours pour le moment
               </p>
-              <p className="max-w-md text-gw-nuit/70">
+              <p className="max-w-md text-gw-encre/70">
                 Dès qu&apos;un organisateur soumet des artistes ou des lieux au public, ils apparaissent ici.
               </p>
             </div>

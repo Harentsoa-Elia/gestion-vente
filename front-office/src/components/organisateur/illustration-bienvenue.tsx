@@ -33,7 +33,7 @@ export function IllustrationBienvenue({ className }: { className?: string }) {
       {/* fondu vers la couleur de la carte, pour que la photo prolonge le texte sans cassure */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[linear-gradient(90deg,#FFFFFF_0%,rgba(255,255,255,0.8)_22%,rgba(255,255,255,0)_62%)] dark:bg-[linear-gradient(90deg,#221D40_0%,rgba(34,29,64,0.8)_22%,rgba(34,29,64,0)_62%)]"
+        className="absolute inset-0 bg-[linear-gradient(90deg,#FFFFFF_0%,rgba(255,255,255,0.8)_22%,rgba(255,255,255,0)_62%)] dark:bg-[linear-gradient(90deg,#2B1F5C_0%,rgba(43,31,92,0.8)_22%,rgba(43,31,92,0)_62%)]"
       />
 
       {CREDIT_PHOTO && (

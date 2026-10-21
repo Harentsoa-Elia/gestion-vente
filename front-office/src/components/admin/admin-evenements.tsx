@@ -191,8 +191,8 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
               filtre === id
-                ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit"
-                : "bg-white text-gw-texte-doux ring-1 ring-gw-bordure hover:text-gw-nuit dark:bg-white/5 dark:text-white/65 dark:ring-white/10 dark:hover:text-white",
+                ? "bg-gw-nuit text-white dark:bg-gw-surface dark:text-gw-encre"
+                : "bg-gw-surface text-gw-texte-doux ring-1 ring-gw-bordure hover:text-gw-encre dark:bg-white/5 dark:text-white/65 dark:ring-white/10 dark:hover:text-white",
             )}
           >
             {libelle}
@@ -269,7 +269,7 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
           <Bouton variante="discret" onClick={() => setAValider(null)}>
             Annuler
           </Bouton>
-          <Bouton onClick={confirmerValidation} chargement={envoi} className="bg-emerald-600 hover:bg-emerald-700">
+          <Bouton onClick={confirmerValidation} chargement={envoi} className="bg-gw-violet hover:bg-gw-violet-fonce">
             <Check className="h-4 w-4" aria-hidden />
             Valider et publier
           </Bouton>
@@ -313,7 +313,7 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
                   key={m}
                   type="button"
                   onClick={() => setMotif((actuel) => (actuel.includes(m) ? actuel : `${actuel.trim()} ${m}`.trim()))}
-                  className="rounded-full bg-gw-fond px-3 py-1.5 text-xs font-medium text-gw-nuit hover:bg-gw-lavande/60 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
+                  className="rounded-full bg-gw-fond px-3 py-1.5 text-xs font-medium text-gw-encre hover:bg-gw-lavande/60 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
                 >
                   + {m}
                 </button>
@@ -402,7 +402,7 @@ function CarteAValider({
             <h2 className="font-titre text-lg font-semibold">{ev.titre}</h2>
             <BadgeStatut statut={statut} />
             {!ev.image_url && (
-              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-amber-200 dark:bg-amber-400/10 dark:text-amber-200 dark:ring-amber-400/30">
+              <span className="rounded-full bg-gw-rose-pale px-2 py-0.5 text-xs font-medium text-gw-rose-action-fonce ring-1 ring-gw-rose-pale dark:bg-gw-rose/10 dark:text-gw-rose-pale dark:ring-gw-rose/30">
                 Sans affiche
               </span>
             )}
@@ -429,7 +429,7 @@ function CarteAValider({
             </li>
           </ul>
           {statut === "rejete" && ev.motif_rejet && (
-            <p className="mt-3 rounded-xl bg-gw-rose-pale px-3 py-2 text-sm text-gw-rose-action dark:bg-gw-rose/15 dark:text-pink-200">
+            <p className="mt-3 rounded-xl bg-gw-rose-pale px-3 py-2 text-sm text-gw-rose-action dark:bg-gw-rose/15 dark:text-gw-rose-pale">
               <span className="font-semibold">Motif du rejet :</span> {ev.motif_rejet}
             </p>
           )}
@@ -438,7 +438,7 @@ function CarteAValider({
         <div className="flex shrink-0 flex-row flex-wrap items-start gap-2 sm:flex-col sm:items-stretch">
           {enAttente && (
             <>
-              <Bouton onClick={onValider} className="bg-emerald-600 hover:bg-emerald-700">
+              <Bouton onClick={onValider} className="bg-gw-violet hover:bg-gw-violet-fonce">
                 <CheckCircle2 className="h-4 w-4" aria-hidden />
                 Valider
               </Bouton>
@@ -462,7 +462,7 @@ function CarteAValider({
             onClick={() => setOuvert((v) => !v)}
             aria-expanded={ouvert}
             aria-controls={idDetail}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold text-gw-texte-doux hover:bg-gw-fond hover:text-gw-nuit dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold text-gw-texte-doux hover:bg-gw-fond hover:text-gw-encre dark:text-white/65 dark:hover:bg-white/10 dark:hover:text-white"
           >
             {ouvert ? "Masquer le détail" : "Voir le détail"}
             <ChevronDown className={cn("h-4 w-4 transition-transform", ouvert && "rotate-180")} aria-hidden />
@@ -473,12 +473,12 @@ function CarteAValider({
       {/* résumé des vérifications, visible sans déplier pour les événements à valider */}
       {enAttente && details && (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-gw-bordure px-5 py-3 text-xs dark:border-gw-bordure-sombre">
-          <span className={cn("flex items-center gap-1.5 font-semibold", aRevoir ? "text-amber-700 dark:text-amber-300" : "text-emerald-700 dark:text-emerald-300")}>
+          <span className={cn("flex items-center gap-1.5 font-semibold", aRevoir ? "text-gw-rose-action-fonce dark:text-gw-rose" : "text-gw-violet-fonce dark:text-gw-lavande")}>
             {aRevoir ? <AlertTriangle className="h-4 w-4" aria-hidden /> : <CheckCircle2 className="h-4 w-4" aria-hidden />}
             {aRevoir ? `${aRevoir} point${aRevoir > 1 ? "s" : ""} à vérifier` : "Tout est complet"}
           </span>
           {verifications.map((v) => (
-            <span key={v.texte} className={cn("flex items-center gap-1", v.ok ? "text-gw-texte-doux dark:text-white/55" : "text-amber-700 dark:text-amber-300")}>
+            <span key={v.texte} className={cn("flex items-center gap-1", v.ok ? "text-gw-texte-doux dark:text-white/55" : "text-gw-rose-action-fonce dark:text-gw-rose")}>
               {v.ok ? <Check className="h-3.5 w-3.5" aria-hidden /> : <AlertTriangle className="h-3.5 w-3.5" aria-hidden />}
               {v.texte}
             </span>
@@ -503,9 +503,9 @@ function CarteAValider({
               {!details ? (
                 <p className="mt-1.5 text-sm text-gw-texte-doux">Chargement...</p>
               ) : details.tarifs.length === 0 ? (
-                <p className="mt-1.5 text-sm text-amber-700 dark:text-amber-300">Aucun tarif défini.</p>
+                <p className="mt-1.5 text-sm text-gw-rose-action-fonce dark:text-gw-rose">Aucun tarif défini.</p>
               ) : (
-                <ul className="mt-1.5 divide-y divide-gw-bordure rounded-xl bg-white text-sm dark:divide-gw-bordure-sombre dark:bg-white/5">
+                <ul className="mt-1.5 divide-y divide-gw-bordure rounded-xl bg-gw-surface text-sm dark:divide-gw-bordure-sombre dark:bg-white/5">
                   {details.tarifs.map((t) => (
                     <li key={t.id} className="flex items-center justify-between px-3 py-2">
                       <span className="font-medium">{t.nom}</span>
@@ -531,14 +531,14 @@ function CarteAValider({
                 {TYPES.map(({ type, titre, icone: Icone }) => {
                   const liste = parType(type)
                   return (
-                    <div key={type} className="rounded-xl bg-white p-3 dark:bg-white/5">
+                    <div key={type} className="rounded-xl bg-gw-surface p-3 dark:bg-white/5">
                       <p className="flex items-center gap-2 text-sm font-semibold">
                         <Icone className="h-4 w-4 text-gw-violet dark:text-gw-lavande" aria-hidden />
                         {titre}
                         <span className="text-xs font-normal text-gw-texte-doux dark:text-white/55">({liste.length})</span>
                       </p>
                       {liste.length === 0 ? (
-                        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">Aucune proposition.</p>
+                        <p className="mt-1 text-sm text-gw-rose-action-fonce dark:text-gw-rose">Aucune proposition.</p>
                       ) : (
                         <ul className="mt-1.5 flex flex-wrap gap-1.5">
                           {liste.map((p) => (

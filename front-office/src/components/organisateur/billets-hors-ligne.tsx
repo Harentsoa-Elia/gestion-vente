@@ -41,19 +41,19 @@ export const TYPES_LOT: Record<TypeLot, { libelle: string; aide: string; icone: 
     libelle: "Dépôt-vente",
     aide: "Billets confiés à une entreprise partenaire, qui vous rend l'argent des vendus et les invendus.",
     icone: Handshake,
-    classes: "bg-gw-lavande/60 text-gw-indigo dark:bg-gw-violet/25 dark:text-gw-lavande",
+    classes: "bg-gw-lavande/60 text-gw-violet-fonce dark:bg-gw-violet/25 dark:text-gw-lavande",
   },
   guichet: {
     libelle: "Guichet",
     aide: "Billets que vous vendez vous-même sur place ou dans votre point de vente.",
     icone: Store,
-    classes: "bg-amber-100 text-amber-800 dark:bg-amber-400/15 dark:text-amber-200",
+    classes: "bg-gw-rose-pale text-gw-rose-action-fonce dark:bg-gw-rose/15 dark:text-gw-rose-pale",
   },
   invitation: {
     libelle: "Invitations",
     aide: "Billets offerts (partenaires, presse, artistes...) : gratuits pour l'invité.",
     icone: Gift,
-    classes: "bg-gw-rose-pale text-gw-rose-action dark:bg-gw-rose/20 dark:text-pink-200",
+    classes: "bg-gw-rose-pale text-gw-rose-action dark:bg-gw-rose/20 dark:text-gw-rose-pale",
   },
 }
 
@@ -167,8 +167,8 @@ export function BilletsHorsLigne() {
             className={cn(
               "-mb-px flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors",
               vue === v
-                ? "border-gw-rose-action text-gw-nuit dark:text-white"
-                : "border-transparent text-gw-texte-doux hover:text-gw-nuit dark:text-white/60 dark:hover:text-white",
+                ? "border-gw-rose-action text-gw-encre dark:text-white"
+                : "border-transparent text-gw-texte-doux hover:text-gw-encre dark:text-white/60 dark:hover:text-white",
             )}
           >
             <Icone className="h-4 w-4" aria-hidden />
@@ -203,8 +203,8 @@ export function BilletsHorsLigne() {
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
                     filtre === t
-                      ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit"
-                      : "bg-white text-gw-texte ring-1 ring-gw-bordure hover:ring-gw-violet dark:bg-white/5 dark:text-white/80 dark:ring-white/10",
+                      ? "bg-gw-nuit text-white dark:bg-gw-surface dark:text-gw-encre"
+                      : "bg-gw-surface text-gw-texte ring-1 ring-gw-bordure hover:ring-gw-violet dark:bg-white/5 dark:text-white/80 dark:ring-white/10",
                   )}
                 >
                   {t === "tous" ? "Tous" : TYPES_LOT[t].libelle}
@@ -223,7 +223,7 @@ export function BilletsHorsLigne() {
               <button
                 type="button"
                 onClick={() => setRevendeurFiltre(null)}
-                className="ml-auto inline-flex items-center gap-1 rounded-full px-2 py-1 font-semibold text-gw-violet hover:bg-white dark:text-gw-lavande dark:hover:bg-white/10"
+                className="ml-auto inline-flex items-center gap-1 rounded-full px-2 py-1 font-semibold text-gw-violet hover:bg-gw-surface dark:text-gw-lavande dark:hover:bg-white/10"
               >
                 <X className="h-3.5 w-3.5" aria-hidden /> Tous les lots
               </button>
@@ -330,7 +330,7 @@ function ListeRevendeurs({
     <div className="flex flex-col gap-4">
       <p className="text-sm text-gw-texte-doux dark:text-white/65">
         {revendeurs.length} revendeur{revendeurs.length > 1 ? "s" : ""} · {entier.format(totalDepot)} billet{totalDepot > 1 ? "s" : ""} en dépôt ·{" "}
-        <span className="font-semibold text-gw-nuit dark:text-white">{montant(totalDu)}</span> à encaisser
+        <span className="font-semibold text-gw-encre dark:text-white">{montant(totalDu)}</span> à encaisser
       </p>
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         {visibles.map((r) => (
@@ -362,7 +362,7 @@ function CarteRevendeur({
   return (
     <article className="gw-carte flex flex-col gap-4 p-5">
       <div className="flex items-start gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gw-lavande/60 font-titre text-sm font-bold text-gw-indigo dark:bg-gw-violet/25 dark:text-gw-lavande" aria-hidden>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gw-lavande/60 font-titre text-sm font-bold text-gw-violet-fonce dark:bg-gw-violet/25 dark:text-gw-lavande" aria-hidden>
           {initiales}
         </span>
         <div className="min-w-0 flex-1">
@@ -394,7 +394,7 @@ function CarteRevendeur({
           {r.lots_en_cours > 0 && ` · ${r.lots_en_cours} en cours`}
         </span>
         {r.lots_a_regler > 0 && (
-          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-200 dark:ring-emerald-400/30">
+          <span className="rounded-full bg-gw-violet-pale px-2.5 py-0.5 text-gw-violet-fonce ring-1 ring-gw-lavande dark:bg-gw-violet/10 dark:text-gw-lavande dark:ring-gw-violet/30">
             {r.lots_a_regler} lot{r.lots_a_regler > 1 ? "s" : ""} à régler
           </span>
         )}
@@ -503,7 +503,7 @@ function CarteLot({ lot, seuilPct, onVentes, onReglement }: { lot: LotResume; se
           className={cn(
             "ml-auto rounded-full px-2.5 py-0.5 text-xs font-semibold",
             regle
-              ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-200 dark:ring-emerald-400/30"
+              ? "bg-gw-violet-pale text-gw-violet-fonce ring-1 ring-gw-lavande dark:bg-gw-violet/10 dark:text-gw-lavande dark:ring-gw-violet/30"
               : "bg-gw-fond text-gw-texte ring-1 ring-gw-bordure dark:bg-white/10 dark:text-white/80 dark:ring-white/15",
           )}
         >
@@ -542,11 +542,11 @@ function CarteLot({ lot, seuilPct, onVentes, onReglement }: { lot: LotResume; se
           </div>
           <div className="relative mt-2 h-2.5 rounded-full bg-gw-fond dark:bg-white/10" role="progressbar" aria-valuenow={pctVendus} aria-valuemin={0} aria-valuemax={100} aria-label="Billets vendus">
             <div
-              className={cn("h-full rounded-full", lot.seuil_atteint || regle ? "bg-emerald-500" : "bg-gradient-to-r from-gw-violet to-gw-rose")}
+              className={cn("h-full rounded-full", lot.seuil_atteint || regle ? "bg-gw-violet" : "bg-gradient-to-r from-gw-violet to-gw-rose")}
               style={{ width: `${pctVendus}%` }}
             />
             {lot.type === "depot" && (
-              <span className="absolute -top-1 h-4.5 w-0.5 rounded bg-gw-nuit/70 dark:bg-white/70" style={{ left: `${seuilPct}%` }} title={`Seuil de ${seuilPct} %`} />
+              <span className="absolute -top-1 h-4.5 w-0.5 rounded bg-gw-nuit/70 dark:bg-gw-surface/70" style={{ left: `${seuilPct}%` }} title={`Seuil de ${seuilPct} %`} />
             )}
           </div>
           <p className="mt-1.5 text-xs text-gw-texte-doux dark:text-white/55">
@@ -846,7 +846,7 @@ function ModaleGeneration({
           </fieldset>
           )}
 
-          {erreur && <p className="rounded-xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action dark:bg-gw-rose/15 dark:text-pink-200">{erreur}</p>}
+          {erreur && <p className="rounded-xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action dark:bg-gw-rose/15 dark:text-gw-rose-pale">{erreur}</p>}
 
           <div className="flex justify-end gap-2">
             <Bouton type="button" variante="discret" onClick={onFermer}>
@@ -1000,7 +1000,7 @@ function ModaleReglement({
                 <label
                   className={cn(
                     "flex items-center gap-2 rounded-xl px-2.5 py-1.5 font-mono text-xs",
-                    b.utilise || b.annule ? "text-gw-texte-pale line-through dark:text-white/35" : "cursor-pointer bg-white dark:bg-white/5",
+                    b.utilise || b.annule ? "text-gw-texte-pale line-through dark:text-white/35" : "cursor-pointer bg-gw-surface dark:bg-white/5",
                   )}
                   title={b.utilise ? "Déjà passé à l'entrée" : b.annule ? "Déjà annulé" : undefined}
                 >
@@ -1019,7 +1019,7 @@ function ModaleReglement({
             </div>
           )}
           {sousSeuil && (
-            <div className="flex gap-3 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-400/10 dark:text-amber-100">
+            <div className="flex gap-3 rounded-2xl bg-gw-rose-pale p-4 text-sm text-gw-rose-action-fonce dark:bg-gw-rose/10 dark:text-gw-rose-pale">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
               <div>
                 <p>

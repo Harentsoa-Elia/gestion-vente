@@ -75,10 +75,10 @@ export function CatalogueEvenements() {
   ]
 
   const selectClasse =
-    "h-11 rounded-full border border-gw-bordure bg-white px-4 text-sm text-gw-nuit focus:border-gw-violet focus:outline-none"
+    "h-11 rounded-full border border-gw-bordure bg-gw-surface px-4 text-sm text-gw-encre focus:border-gw-violet focus:outline-none"
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gw-surface">
       <div className="scene pt-12 pb-10 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <h1 className="font-titre text-4xl font-bold tracking-[-0.03em] sm:text-5xl">Événements</h1>
@@ -102,7 +102,7 @@ export function CatalogueEvenements() {
                 onChange={(e) => setSaisie(e.target.value)}
                 placeholder="Artiste, titre, lieu..."
                 aria-label="Rechercher un événement"
-                className="h-11 w-full rounded-full bg-white pr-4 pl-11 text-sm text-gw-nuit placeholder:text-gw-texte-pale focus:outline-2 focus:outline-gw-rose"
+                className="h-11 w-full rounded-full bg-gw-surface pr-4 pl-11 text-sm text-gw-encre placeholder:text-gw-texte-pale focus:outline-2 focus:outline-gw-rose"
               />
             </div>
             <select
@@ -153,7 +153,7 @@ export function CatalogueEvenements() {
               onClick={() => majUrl({ onglet: o.id === "passes" ? "passes" : null, periode: null })}
               className={cn(
                 "font-titre -mb-px flex items-center gap-2 border-b-[3px] pb-3 text-lg font-semibold transition-colors",
-                onglet === o.id ? "border-gw-violet text-gw-nuit" : "border-transparent text-gw-texte-doux hover:text-gw-nuit",
+                onglet === o.id ? "border-gw-violet text-gw-encre" : "border-transparent text-gw-texte-doux hover:text-gw-encre",
               )}
             >
               {o.libelle}
@@ -161,7 +161,7 @@ export function CatalogueEvenements() {
                 <span
                   className={cn(
                     "rounded-full px-2 py-0.5 text-xs",
-                    onglet === o.id ? "bg-gw-violet text-white" : "bg-[#F1EEFB] text-gw-texte-doux",
+                    onglet === o.id ? "bg-gw-violet text-white" : "bg-[#F6F4FC] text-gw-texte-doux",
                   )}
                 >
                   {o.nombre}
@@ -181,7 +181,7 @@ export function CatalogueEvenements() {
           ) : !chargement && resultats.length === 0 ? (
             <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-gw-lavande px-6 py-14 text-center">
               <CalendarX className="h-8 w-8 text-[#B5A8F5]" aria-hidden />
-              <p className="font-titre text-lg font-semibold text-gw-nuit">
+              <p className="font-titre text-lg font-semibold text-gw-encre">
                 {filtresActifs
                   ? "Aucun événement ne correspond à ces critères"
                   : onglet === "a-venir"
@@ -216,7 +216,7 @@ export function CatalogueEvenements() {
                   <button
                     type="button"
                     onClick={() => setNbAffiches((n) => n + PAR_PAGE)}
-                    className="rounded-full border border-gw-nuit px-6 py-3 text-sm font-semibold text-gw-nuit transition-colors hover:bg-gw-nuit hover:text-white"
+                    className="rounded-full border border-gw-nuit px-6 py-3 text-sm font-semibold text-gw-encre transition-colors hover:bg-gw-nuit hover:text-white"
                   >
                     Afficher plus d&apos;événements
                   </button>

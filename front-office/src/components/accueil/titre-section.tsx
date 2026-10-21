@@ -23,7 +23,7 @@ export function TitreSection({
     <div className="mb-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 id={id} className="font-titre flex items-center gap-3 text-3xl font-bold tracking-[-0.02em] text-gw-nuit">
+          <h2 id={id} className="font-titre flex items-center gap-3 text-3xl font-bold tracking-[-0.02em] text-gw-encre">
             {titre}
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gw-rose-pale text-gw-rose-action">
               <Icone className="h-[18px] w-[18px]" strokeWidth={2.2} aria-hidden />
@@ -34,7 +34,7 @@ export function TitreSection({
         {lien && (
           <Link
             href={lien.href}
-            className="group inline-flex items-center gap-2 text-sm font-semibold text-gw-nuit hover:text-gw-violet"
+            className="group inline-flex items-center gap-2 text-sm font-semibold text-gw-encre hover:text-gw-violet"
           >
             {lien.libelle}
             <span className="flex h-7 w-7 items-center justify-center rounded-full border border-gw-lavande text-gw-violet transition-colors group-hover:bg-gw-violet group-hover:text-white">

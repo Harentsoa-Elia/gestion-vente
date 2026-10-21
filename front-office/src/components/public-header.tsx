@@ -15,7 +15,10 @@ import {
   LayoutDashboard,
   Megaphone,
   HelpCircle,
+  Moon,
+  Sun,
 } from "lucide-react"
+import { useModeNuit } from "@/lib/mode-nuit"
 import { Logo } from "@/components/marque/logo"
 import {
   getParticipantToken,
@@ -168,6 +171,7 @@ export function PublicHeader() {
 
   // "Se déconnecter ?" avant de quitter le compte (Annuler / Se déconnecter)
   const { demander: demanderDeconnexion, fenetre: confirmationDeconnexion } = useConfirmationDeconnexion(handleLogout, participantName)
+  const { nuit, basculer } = useModeNuit()
 
   const lancerRecherche = (e: FormEvent) => {
     e.preventDefault()
@@ -175,7 +179,7 @@ export function PublicHeader() {
     router.push(q ? `/evenements?q=${encodeURIComponent(q)}` : "/evenements")
   }
 
-  if (!isMounted) return <div className="h-16 border-b border-gw-bordure bg-white" />
+  if (!isMounted) return <div className="h-16 border-b border-gw-bordure bg-gw-surface" />
 
   const champRecherche = (
     <form role="search" onSubmit={lancerRecherche} className="relative w-full">
@@ -189,16 +193,16 @@ export function PublicHeader() {
         onChange={(e) => setRecherche(e.target.value)}
         placeholder="Rechercher un événement"
         aria-label="Rechercher un événement"
-        className="h-10 w-full rounded-full border border-gw-bordure bg-gw-fond pr-4 pl-10 text-sm text-gw-nuit placeholder:text-gw-texte-pale focus:border-gw-violet focus:bg-white focus:outline-none"
+        className="h-10 w-full rounded-full border border-gw-bordure bg-gw-fond pr-4 pl-10 text-sm text-gw-encre placeholder:text-gw-texte-pale focus:border-gw-violet focus:bg-gw-surface focus:outline-none"
       />
     </form>
   )
 
   const lienMenu =
-    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-gw-texte hover:bg-gw-fond hover:text-gw-nuit focus-visible:outline-2 focus-visible:outline-gw-violet"
+    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-gw-texte hover:bg-gw-fond hover:text-gw-encre focus-visible:outline-2 focus-visible:outline-gw-violet"
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gw-bordure bg-white">
+    <header className="sticky top-0 z-50 w-full border-b border-gw-bordure bg-gw-surface">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:gap-6 sm:px-6">
         <Logo />
 
@@ -210,9 +214,20 @@ export function PublicHeader() {
             onClick={() => setRechercheMobile((v) => !v)}
             aria-label="Rechercher"
             aria-expanded={rechercheMobile}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-gw-nuit hover:bg-gw-fond md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-gw-encre hover:bg-gw-fond md:hidden"
           >
             <Search className="h-5 w-5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={basculer}
+            aria-label={nuit ? "Passer en mode jour" : "Passer en mode nuit"}
+            title={nuit ? "Mode jour" : "Mode nuit"}
+            aria-pressed={nuit}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-gw-encre hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet"
+          >
+            {nuit ? <Sun className="h-5 w-5" aria-hidden /> : <Moon className="h-5 w-5" aria-hidden />}
           </button>
 
           <button
@@ -221,7 +236,7 @@ export function PublicHeader() {
             onClick={() => setMenuOuvert((v) => !v)}
             aria-expanded={menuOuvert}
             aria-controls="menu-principal"
-            className="flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet"
+            className="flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet"
           >
             {menuOuvert ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
             <span className="hidden sm:inline">Menu</span>
@@ -232,8 +247,8 @@ export function PublicHeader() {
               href={accueilSelonRole(roleStaff)}
               className={
                 compte
-                  ? "hidden h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond lg:flex"
-                  : "flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond"
+                  ? "hidden h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond lg:flex"
+                  : "flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond"
               }
               title="Vous êtes déjà connecté : retour direct à votre espace"
             >
@@ -249,7 +264,7 @@ export function PublicHeader() {
             ) : roleStaff ? null : (
               <Link
                 href="/participants/login"
-                className="hidden h-10 items-center rounded-full px-3 text-sm font-semibold text-gw-nuit hover:bg-gw-fond sm:flex"
+                className="hidden h-10 items-center rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond sm:flex"
               >
                 Connexion
               </Link>
@@ -271,14 +286,14 @@ export function PublicHeader() {
         <div
           id="menu-principal"
           ref={panneauRef}
-          className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-gw-bordure bg-white shadow-[0_24px_48px_-24px_rgba(30,26,60,0.35)]"
+          className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-gw-bordure bg-gw-surface shadow-[0_24px_48px_-24px_rgba(42,26,94,0.35)]"
         >
           <nav
             aria-label="Menu principal"
             className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-2 md:gap-12"
           >
             <div>
-              <p className="font-titre text-lg font-semibold text-gw-nuit">Espace participant</p>
+              <p className="font-titre text-lg font-semibold text-gw-encre">Espace participant</p>
               <ul className="mt-3 space-y-1">
                 {ESPACE_PARTICIPANT.map(({ href, libelle, icone: Icone }) => (
                   <li key={libelle}>
@@ -294,7 +309,7 @@ export function PublicHeader() {
                   <>
                     <Link
                       href="/participants/mes-reservations"
-                      className="rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-nuit"
+                      className="rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-encre"
                     >
                       Mes réservations
                     </Link>
@@ -314,7 +329,7 @@ export function PublicHeader() {
                   <>
                     <Link
                       href="/participants/login"
-                      className="rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-nuit"
+                      className="rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-encre"
                     >
                       Connexion
                     </Link>
@@ -330,7 +345,7 @@ export function PublicHeader() {
             </div>
 
             <div className="md:border-l md:border-gw-bordure md:pl-12">
-              <p className="font-titre text-lg font-semibold text-gw-nuit">Espace organisateur</p>
+              <p className="font-titre text-lg font-semibold text-gw-encre">Espace organisateur</p>
               <ul className="mt-3 space-y-1">
                 {espaceOrganisateur(roleStaff).map(({ href, libelle, icone: Icone }) => (
                   <li key={libelle}>

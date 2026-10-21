@@ -99,7 +99,7 @@ function Parcours({ evenement }: { evenement: Evenement }) {
               e.fait
                 ? "bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-white"
                 : e.actif
-                  ? "bg-white text-gw-violet ring-2 ring-gw-violet dark:bg-transparent dark:text-white dark:ring-white"
+                  ? "bg-gw-surface text-gw-violet ring-2 ring-gw-violet dark:bg-transparent dark:text-white dark:ring-white"
                   : "bg-gw-fond text-gw-texte-doux dark:bg-white/10 dark:text-white/50",
             )}
           >
@@ -275,7 +275,7 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-gw-bordure pt-5 dark:border-gw-bordure-sombre">
             <div className="text-sm">
               {statut === "rejete" && (
-                <div className="mb-3 rounded-xl bg-gw-rose-pale px-4 py-3 text-gw-rose-action dark:bg-gw-rose/15 dark:text-pink-200">
+                <div className="mb-3 rounded-xl bg-gw-rose-pale px-4 py-3 text-gw-rose-action dark:bg-gw-rose/15 dark:text-gw-rose-pale">
                   <p className="font-semibold">L&apos;administrateur a rejeté cet événement. Corrigez-le puis soumettez-le à nouveau.</p>
                   {evenement.motif_rejet && (
                     <p className="mt-1">
@@ -289,17 +289,17 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
                 {TYPES.map((t) => {
                   const ok = parType[t.type].length > 0
                   return (
-                    <li key={t.type} className={cn("flex items-center gap-1.5", ok ? "text-emerald-700 dark:text-emerald-300" : "text-gw-texte-doux dark:text-white/55")}>
+                    <li key={t.type} className={cn("flex items-center gap-1.5", ok ? "text-gw-violet-fonce dark:text-gw-lavande" : "text-gw-texte-doux dark:text-white/55")}>
                       {ok ? <Check className="h-4 w-4" aria-hidden /> : <Circle className="h-4 w-4" aria-hidden />}
                       au moins un {t.type === "CATEGORIE" ? "type d'événement" : t.type === "LIEU" ? "lieu" : "artiste"} proposé
                     </li>
                   )
                 })}
-                <li className={cn("flex items-center gap-1.5", billets.length > 0 ? "text-emerald-700 dark:text-emerald-300" : "text-gw-texte-doux dark:text-white/55")}>
+                <li className={cn("flex items-center gap-1.5", billets.length > 0 ? "text-gw-violet-fonce dark:text-gw-lavande" : "text-gw-texte-doux dark:text-white/55")}>
                   {billets.length > 0 ? <Check className="h-4 w-4" aria-hidden /> : <Circle className="h-4 w-4" aria-hidden />}
                   des tarifs (conseillé)
                 </li>
-                <li className={cn("flex items-center gap-1.5", evenement.image_url ? "text-emerald-700 dark:text-emerald-300" : "text-gw-texte-doux dark:text-white/55")}>
+                <li className={cn("flex items-center gap-1.5", evenement.image_url ? "text-gw-violet-fonce dark:text-gw-lavande" : "text-gw-texte-doux dark:text-white/55")}>
                   {evenement.image_url ? <Check className="h-4 w-4" aria-hidden /> : <Circle className="h-4 w-4" aria-hidden />}
                   {evenement.image_url ? (
                     "une affiche (conseillé)"
@@ -341,8 +341,8 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
             className={cn(
               "-mb-px flex shrink-0 items-center gap-2 border-b-[3px] pb-3 text-sm font-semibold transition-colors",
               onglet === o.id
-                ? "border-gw-violet text-gw-nuit dark:border-white dark:text-white"
-                : "border-transparent text-gw-texte-doux hover:text-gw-nuit dark:text-white/55 dark:hover:text-white",
+                ? "border-gw-violet text-gw-encre dark:border-white dark:text-white"
+                : "border-transparent text-gw-texte-doux hover:text-gw-encre dark:text-white/55 dark:hover:text-white",
             )}
           >
             {o.libelle}
@@ -565,7 +565,7 @@ function OngletPropositions({
                         type="button"
                         onClick={() => setARetirer(p)}
                         aria-label={`Retirer ${p.libelle}`}
-                        className="rounded-full p-2 text-gw-texte-doux hover:bg-white hover:text-red-600 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-red-400"
+                        className="rounded-full p-2 text-gw-texte-doux hover:bg-gw-surface hover:text-gw-rose-action dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-gw-rose"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -625,7 +625,7 @@ function OngletPropositions({
           {aRetirer && aRetirer.score > 0 && (
             <>
               {" "}
-              Ses <strong className="text-gw-nuit dark:text-white">{entier.format(aRetirer.score)} points</strong> de réactions seront
+              Ses <strong className="text-gw-encre dark:text-white">{entier.format(aRetirer.score)} points</strong> de réactions seront
               perdus.
             </>
           )}
@@ -799,7 +799,7 @@ function OngletBillets({
                         type="button"
                         onClick={() => setASupprimer(b)}
                         aria-label={`Supprimer ${b.nom}`}
-                        className="rounded-full p-2 text-gw-texte-doux hover:bg-gw-fond hover:text-red-600 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-red-400"
+                        className="rounded-full p-2 text-gw-texte-doux hover:bg-gw-fond hover:text-gw-rose-action dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-gw-rose"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

@@ -25,7 +25,7 @@ function Couverture({ evenement, categorie }: { evenement: Evenement; categorie?
   const Icone = iconeCategorie(categorie?.nom)
   const d = new Date(evenement.date_debut)
   // teinte dérivée de l'id : deux événements voisins n'ont pas la même couverture
-  const teintes = ["var(--color-gw-violet)", "var(--color-gw-rose)", "#8B5CF6", "#C2410C", "#0E7490"]
+  const teintes = ["var(--color-gw-violet)", "var(--color-gw-rose)", "#6C5CE7", "#C92A7A", "#5A4BD6"]
   const accent = teintes[evenement.id % teintes.length]
   const [imageEnErreur, setImageEnErreur] = useState(false)
   const image = urlMedia(evenement.image_url) ?? imageTestEvenement(evenement)
@@ -73,7 +73,7 @@ export function CarteEvenement({ evenement, lieu, categorie, variante = "a-venir
       <div className="relative aspect-[2/1] overflow-hidden rounded-xl bg-gw-nuit">
         <Couverture evenement={evenement} categorie={categorie} />
         {categorie && (
-          <span className="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-medium text-gw-nuit">
+          <span className="absolute top-3 left-3 rounded-full bg-gw-surface/95 px-2.5 py-1 text-xs font-medium text-gw-encre">
             {categorie.nom}
           </span>
         )}
@@ -86,7 +86,7 @@ export function CarteEvenement({ evenement, lieu, categorie, variante = "a-venir
 
       <div className="mt-3 flex flex-1 flex-col">
         {repere && <p className="text-sm font-semibold text-gw-rose-action">{repere}</p>}
-        <h3 className="font-titre mt-0.5 line-clamp-2 text-lg leading-snug font-semibold text-gw-nuit">
+        <h3 className="font-titre mt-0.5 line-clamp-2 text-lg leading-snug font-semibold text-gw-encre">
           {/* le lien couvre toute la carte */}
           <Link
             href={`/evenements/${evenement.id}`}
@@ -108,7 +108,7 @@ export function CarteEvenement({ evenement, lieu, categorie, variante = "a-venir
 
         {!passe && (
           <div className="mt-2 flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-gw-nuit">{prix ?? "Tarifs bientôt annoncés"}</p>
+            <p className="text-sm font-semibold text-gw-encre">{prix ?? "Tarifs bientôt annoncés"}</p>
             {!!evenement.nombre_vues && (
               <p className="flex items-center gap-1 text-xs text-gw-texte-doux">
                 <Eye className="h-3.5 w-3.5" aria-hidden />

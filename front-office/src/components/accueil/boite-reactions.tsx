@@ -35,10 +35,10 @@ const REACTIONS: {
   couleur: string // couleur du libellé quand la réaction est choisie (contraste AA sur blanc)
   fond: string // fond de la pastille
 }[] = [
-  { type: "LIKE", libelle: "J'aime", couleur: "#1466D8", fond: "linear-gradient(180deg,#18AFFF,#0062DF)" },
-  { type: "JADORE", libelle: "J'adore", couleur: "#D8263F", fond: "linear-gradient(180deg,#FF6680,#E61739)" },
-  { type: "WAOUH", libelle: "Waouh", couleur: "#B45309", fond: "transparent" },
-  { type: "FAVORI", libelle: "Favori", couleur: "#A16207", fond: "linear-gradient(180deg,#FFD25E,#F2A60D)" },
+  { type: "LIKE", libelle: "J'aime", couleur: "#6C5CE7", fond: "linear-gradient(180deg,#8B7CF5,#5A4BD6)" },
+  { type: "JADORE", libelle: "J'adore", couleur: "#C92A7A", fond: "linear-gradient(180deg,#E8479A,#C92A7A)" },
+  { type: "WAOUH", libelle: "Waouh", couleur: "#AE1F68", fond: "transparent" },
+  { type: "FAVORI", libelle: "Favori", couleur: "#AE1F68", fond: "linear-gradient(180deg,#F59BC7,#E8479A)" },
 ]
 const PAR_TYPE = Object.fromEntries(REACTIONS.map((r) => [r.type, r])) as Record<Reaction, (typeof REACTIONS)[number]>
 
@@ -287,9 +287,9 @@ export function BoiteReactions({
   const active = maReaction ? PAR_TYPE[maReaction.type] : null
 
   return (
-    <div className="rounded-2xl bg-white text-[#1C1E21] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]">
+    <div className="rounded-2xl bg-gw-surface text-[#2A1A5E] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]">
       {/* résumé : pastilles, total, nombre de commentaires */}
-      <div className="flex items-center justify-between gap-3 px-3 pt-2.5 pb-2 text-sm text-[#65676B]">
+      <div className="flex items-center justify-between gap-3 px-3 pt-2.5 pb-2 text-sm text-[#6B5F99]">
         {total > 0 ? (
           <span className="flex items-center gap-1.5">
             <span className="flex -space-x-1">
@@ -323,7 +323,7 @@ export function BoiteReactions({
       </div>
 
       {/* barre d'actions */}
-      <div className="mx-3 flex border-y border-[#E4E6EB] py-1">
+      <div className="mx-3 flex border-y border-[#EBE6FA] py-1">
         <div
           ref={zone}
           className="relative flex flex-1"
@@ -336,7 +336,7 @@ export function BoiteReactions({
               aria-label={`Choisir une réaction pour ${libelle}`}
               onKeyDown={toucheChoix}
               onPointerEnter={garderOuvert}
-              className="absolute bottom-full left-0 z-20 mb-2 flex items-center gap-1 rounded-full bg-white px-2 py-1.5 shadow-[0_6px_24px_rgba(0,0,0,0.22)]"
+              className="absolute bottom-full left-0 z-20 mb-2 flex items-center gap-1 rounded-full bg-gw-surface px-2 py-1.5 shadow-[0_6px_24px_rgba(0,0,0,0.22)]"
             >
               {REACTIONS.map(({ type, libelle: nom }, i) => (
                 <button
@@ -384,7 +384,7 @@ export function BoiteReactions({
             onPointerUp={() => window.clearTimeout(m.appui)}
             onPointerCancel={() => window.clearTimeout(m.appui)}
             onContextMenu={(e) => e.preventDefault()}
-            className="flex flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-[#65676B] transition-colors select-none hover:bg-[#F2F2F2] focus-visible:outline-2 focus-visible:outline-[#1466D8] disabled:opacity-60"
+            className="flex flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-[#6B5F99] transition-colors select-none hover:bg-[#F6F4FC] focus-visible:outline-2 focus-visible:outline-[#6C5CE7] disabled:opacity-60"
             style={active ? { color: active.couleur } : undefined}
           >
             {active ? (
@@ -404,7 +404,7 @@ export function BoiteReactions({
             setCommentairesOuverts(true)
             champ.current?.focus()
           }}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-[#65676B] transition-colors hover:bg-[#F2F2F2] focus-visible:outline-2 focus-visible:outline-[#1466D8]"
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-[#6B5F99] transition-colors hover:bg-[#F6F4FC] focus-visible:outline-2 focus-visible:outline-[#6C5CE7]"
         >
           <MessageCircle className="h-5 w-5" aria-hidden />
           Commenter
@@ -416,11 +416,11 @@ export function BoiteReactions({
         <ul className="max-h-44 space-y-2 overflow-y-auto px-3 pt-3">
           {commentaires.map((c) => (
             <li key={c.id} className="flex gap-2">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E4E6EB]">
-                <UserRound className="h-4 w-4 text-[#65676B]" aria-hidden />
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EBE6FA]">
+                <UserRound className="h-4 w-4 text-[#6B5F99]" aria-hidden />
               </span>
               <div className="min-w-0">
-                <div className="rounded-2xl bg-[#F0F2F5] px-3 py-2">
+                <div className="rounded-2xl bg-[#F6F4FC] px-3 py-2">
                   <p className="text-[13px] font-semibold">
                     {moi != null && c.participant_id === moi
                       ? "Vous"
@@ -430,7 +430,7 @@ export function BoiteReactions({
                   </p>
                   <p className="text-sm break-words">{c.contenu}</p>
                 </div>
-                <p className="mt-0.5 pl-3 text-xs text-[#65676B]">{ilYa(c.date_interaction)}</p>
+                <p className="mt-0.5 pl-3 text-xs text-[#6B5F99]">{ilYa(c.date_interaction)}</p>
               </div>
             </li>
           ))}
@@ -446,8 +446,8 @@ export function BoiteReactions({
         }}
         className="flex items-center gap-2 p-3"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E4E6EB]">
-          <UserRound className="h-4 w-4 text-[#65676B]" aria-hidden />
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EBE6FA]">
+          <UserRound className="h-4 w-4 text-[#6B5F99]" aria-hidden />
         </span>
         <div className="relative flex-1">
           <input
@@ -457,13 +457,13 @@ export function BoiteReactions({
             maxLength={500}
             placeholder="Écrivez un commentaire..."
             aria-label={`Commenter ${libelle}`}
-            className="h-9 w-full rounded-full bg-[#F0F2F5] pr-10 pl-4 text-sm placeholder:text-[#65676B] focus:outline-2 focus:outline-[#1466D8]"
+            className="h-9 w-full rounded-full bg-[#F6F4FC] pr-10 pl-4 text-sm placeholder:text-[#6B5F99] focus:outline-2 focus:outline-[#6C5CE7]"
           />
           <button
             type="submit"
             disabled={!commentaire.trim() || envoi}
             aria-label="Publier le commentaire"
-            className="absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-[#1466D8] transition-opacity hover:bg-[#E4E6EB] disabled:opacity-30"
+            className="absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-[#6C5CE7] transition-opacity hover:bg-[#EBE6FA] disabled:opacity-30"
           >
             <SendHorizontal className="h-4 w-4" aria-hidden />
           </button>

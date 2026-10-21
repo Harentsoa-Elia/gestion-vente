@@ -109,7 +109,7 @@ export function ZoneImage({
             <button
               type="button"
               onClick={retirer}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-gw-texte-doux hover:bg-gw-fond hover:text-red-600 dark:text-white/60 dark:hover:bg-white/10"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-gw-texte-doux hover:bg-gw-fond hover:text-gw-rose-action dark:text-white/60 dark:hover:bg-white/10"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden /> Retirer
             </button>
@@ -161,7 +161,7 @@ export function ZoneImage({
             <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-white">
               <ImagePlus className="h-6 w-6" aria-hidden />
             </span>
-            <span className="text-sm font-semibold text-gw-nuit dark:text-white">Glissez une image ici ou cliquez pour la choisir</span>
+            <span className="text-sm font-semibold text-gw-encre dark:text-white">Glissez une image ici ou cliquez pour la choisir</span>
             <span className="text-xs text-gw-texte-doux dark:text-white/55">JPEG, PNG ou WebP · 8 Mo maximum · format paysage conseillé</span>
           </span>
         )}
@@ -201,7 +201,7 @@ export function VignetteImage({ image, onEnvoyer, onRetirer, libelle }: PropsCom
           "grid h-12 w-12 place-items-center overflow-hidden rounded-xl transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet",
           url
             ? "bg-gw-nuit"
-            : "border-2 border-dashed border-gw-lavande bg-white text-gw-violet hover:border-gw-violet dark:border-white/20 dark:bg-white/5 dark:text-gw-lavande",
+            : "border-2 border-dashed border-gw-lavande bg-gw-surface text-gw-violet hover:border-gw-violet dark:border-white/20 dark:bg-white/5 dark:text-gw-lavande",
         )}
       >
         {occupe ? (
@@ -219,7 +219,7 @@ export function VignetteImage({ image, onEnvoyer, onRetirer, libelle }: PropsCom
           onClick={retirer}
           aria-label={`Retirer l'image de ${libelle}`}
           title="Retirer l'image"
-          className="absolute -top-1.5 -right-1.5 grid h-5 w-5 place-items-center rounded-full bg-white text-gw-texte-doux opacity-0 shadow ring-1 ring-gw-bordure transition group-hover/vignette:opacity-100 hover:text-red-600 focus-visible:opacity-100 dark:bg-gw-carte-sombre dark:ring-white/15"
+          className="absolute -top-1.5 -right-1.5 grid h-5 w-5 place-items-center rounded-full bg-gw-surface text-gw-texte-doux opacity-0 shadow ring-1 ring-gw-bordure transition group-hover/vignette:opacity-100 hover:text-gw-rose-action focus-visible:opacity-100 dark:bg-gw-carte-sombre dark:ring-white/15"
         >
           <X className="h-3 w-3" aria-hidden />
         </button>

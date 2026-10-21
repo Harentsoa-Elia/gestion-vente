@@ -109,7 +109,7 @@ function BarreLaterale({
           className="flex items-center justify-between rounded-2xl bg-white/15 px-4 py-3 text-sm font-semibold backdrop-blur-sm transition-colors hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-white"
         >
           Voir le site public
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-gw-violet">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gw-surface text-gw-violet">
             <ExternalLink className="h-3.5 w-3.5" aria-hidden />
           </span>
         </Link>
@@ -162,7 +162,7 @@ function BarreLaterale({
           target="_blank"
           className="block rounded-2xl bg-white/12 p-4 transition-colors hover:bg-white/20"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-gw-rose-action">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gw-surface text-gw-rose-action">
             <Vote className="h-5 w-5" aria-hidden />
           </span>
           <p className="font-titre mt-3 text-base font-semibold leading-tight">Ce que vote votre public</p>
@@ -194,11 +194,11 @@ function BarreLaterale({
             {darkMode ? <Moon className="h-4 w-4" aria-hidden /> : <Sun className="h-4 w-4" aria-hidden />}
             Mode sombre
           </span>
-          <span className={cn("relative h-5 w-9 rounded-full transition-colors", darkMode ? "bg-white" : "bg-white/30")}>
+          <span className={cn("relative h-5 w-9 rounded-full transition-colors", darkMode ? "bg-gw-surface" : "bg-white/30")}>
             <span
               className={cn(
                 "absolute top-0.5 h-4 w-4 rounded-full transition-all",
-                darkMode ? "left-[18px] bg-gw-violet" : "left-0.5 bg-white",
+                darkMode ? "left-[18px] bg-gw-violet" : "left-0.5 bg-gw-surface",
               )}
             />
           </span>
@@ -279,7 +279,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
   if (!mounted) return null
 
   const fondBarre = darkMode
-    ? "bg-[linear-gradient(170deg,#2B2360_0%,#1E1A3C_55%,#15122B_100%)]"
+    ? "bg-[linear-gradient(170deg,#35267A_0%,#2A1A5E_55%,#1D1245_100%)]"
     : "bg-[linear-gradient(170deg,#7B6CF0_0%,#6C5CE7_35%,#A23AA6_75%,#C92A7A_100%)]"
 
   const barre = (
@@ -324,7 +324,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
           </div>
         )}
 
-        <main className="min-w-0 flex-1 bg-[var(--gw-contenu)] text-gw-nuit lg:my-3 lg:mr-3 lg:rounded-[2rem] dark:text-white">
+        <main className="min-w-0 flex-1 bg-[var(--gw-contenu)] text-gw-encre lg:my-3 lg:mr-3 lg:rounded-[2rem] dark:text-white">
           <div className="flex items-center justify-between px-4 pt-4 lg:hidden">
             <Logo ton={darkMode ? "clair" : "sombre"} />
             <button

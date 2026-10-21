@@ -111,7 +111,7 @@ function CarteHorsLigne({ hl, piste }: { hl: DashboardOrganisateur["hors_ligne"]
   // répartition des billets émis : vendus, encore à vendre, offerts
   const segments = [
     { libelle: "Vendus", nombre: hl.vendus, couleur: "linear-gradient(90deg,#6C5CE7,#E8479A)" },
-    { libelle: "Pas encore vendus", nombre: hl.en_depot, couleur: "#F5B544" },
+    { libelle: "Pas encore vendus", nombre: hl.en_depot, couleur: "#E8479A" },
     { libelle: "Invitations", nombre: hl.invitations, couleur: "#B5A8F5" },
   ].filter((x) => x.nombre > 0)
   const tuiles = [
@@ -146,7 +146,7 @@ function CarteHorsLigne({ hl, piste }: { hl: DashboardOrganisateur["hors_ligne"]
           </span>
         ))}
         {hl.a_encaisser > 0 && (
-          <span className="ml-auto rounded-full bg-amber-50 px-3 py-1 font-semibold text-amber-800 dark:bg-amber-400/10 dark:text-amber-200">
+          <span className="ml-auto rounded-full bg-gw-rose-pale px-3 py-1 font-semibold text-gw-rose-action-fonce dark:bg-gw-rose/10 dark:text-gw-rose-pale">
             {entier.format(hl.a_encaisser)} Ar à encaisser auprès des revendeurs
           </span>
         )}
@@ -228,10 +228,10 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
   if (loading) {
     return (
       <div className="grid gap-6 px-4 py-8 lg:px-8" aria-busy>
-        <div className="h-40 animate-pulse rounded-3xl bg-white/70 dark:bg-white/5" />
+        <div className="h-40 animate-pulse rounded-3xl bg-gw-surface/70 dark:bg-white/5" />
         <div className="grid gap-6 md:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-3xl bg-white/70 dark:bg-white/5" />
+            <div key={i} className="h-28 animate-pulse rounded-3xl bg-gw-surface/70 dark:bg-white/5" />
           ))}
         </div>
       </div>
@@ -247,9 +247,9 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
   const totalCategories = data.reservations_confirmees || categories.reduce((s, c) => s + c.nombre, 0)
   const partTete = totalCategories > 0 ? Math.round((categories[0].nombre / totalCategories) * 100) : 0
 
-  const axe = darkMode ? "rgba(255,255,255,0.55)" : "#6E6987"
-  const grille = darkMode ? "rgba(255,255,255,0.08)" : "#ECE8F7"
-  const piste = darkMode ? "rgba(255,255,255,0.06)" : "#F1EEFB"
+  const axe = darkMode ? "rgba(255,255,255,0.55)" : "#6B5F99"
+  const grille = darkMode ? "rgba(255,255,255,0.08)" : "#EBE6FA"
+  const piste = darkMode ? "rgba(255,255,255,0.06)" : "#F6F4FC"
 
   return (
     <div className="grid gap-6 px-4 py-6 lg:px-8 lg:py-8 2xl:grid-cols-[minmax(0,1fr)_320px]">
@@ -306,12 +306,12 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
               <p className="flex items-center gap-2 whitespace-nowrap">
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[linear-gradient(135deg,#6C5CE7,#E8479A)]" aria-hidden />
                 Places vendues
-                <span className="ml-auto pl-3 font-semibold tabular-nums text-gw-nuit dark:text-white">{Math.round(data.taux_remplissage_moyen)} %</span>
+                <span className="ml-auto pl-3 font-semibold tabular-nums text-gw-encre dark:text-white">{Math.round(data.taux_remplissage_moyen)} %</span>
               </p>
               <p className="flex items-center gap-2 whitespace-nowrap">
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-gw-lavande dark:bg-white/20" aria-hidden />
                 Places libres
-                <span className="ml-auto pl-3 font-semibold tabular-nums text-gw-nuit dark:text-white">{100 - Math.round(data.taux_remplissage_moyen)} %</span>
+                <span className="ml-auto pl-3 font-semibold tabular-nums text-gw-encre dark:text-white">{100 - Math.round(data.taux_remplissage_moyen)} %</span>
               </p>
               <Link
                 href="/organisateur/reservations"
@@ -359,7 +359,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
                       stroke="url(#ventes-trait)"
                       strokeWidth={3}
                       fill="url(#ventes-aire)"
-                      activeDot={{ r: 6, fill: "#E8479A", stroke: darkMode ? "#221D40" : "#FFFFFF", strokeWidth: 3 }}
+                      activeDot={{ r: 6, fill: "#E8479A", stroke: darkMode ? "#2B1F5C" : "#FFFFFF", strokeWidth: 3 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -474,7 +474,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
         <section className="gw-carte self-start p-5">
           <div className="flex items-center justify-between">
             <h2 className="font-titre text-lg font-semibold">Mon profil</h2>
-            <NotificationBell boutonClassName="text-gw-nuit hover:bg-gw-fond dark:text-white dark:hover:bg-white/10" />
+            <NotificationBell boutonClassName="text-gw-encre hover:bg-gw-fond dark:text-white dark:hover:bg-white/10" />
           </div>
           <div className="mt-4 flex items-center gap-4">
             <AvatarEquipe compte={user} className="h-14 w-14 text-lg" />

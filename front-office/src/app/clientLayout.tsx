@@ -10,6 +10,7 @@ import { variablesPolices } from "@/components/accueil/fonts"
 import { usePathname } from "next/navigation"
 import { isPublicRoute } from "@/utils"
 import { installerRafraichissement } from "@/lib/jetons"
+import { ModeNuitProvider } from "@/lib/mode-nuit"
 
 // rafraîchissement automatique des jetons : installé avant le premier appel à l'API
 if (typeof window !== "undefined") installerRafraichissement()
@@ -46,12 +47,18 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
 
         {/* Les espaces organisateur et admin (/organisateur, /admin) ont leur barre latérale,
             la page /login n'a pas d'en-tête : seules les pages publiques ont l'en-tête et le pied de page. */}
-        {isPublic && <PublicHeader />}
+        <ModeNuitProvider>
+          {(nuit) => (
+            <div className={isPublic ? `gw-public${nuit ? " dark" : ""}` : undefined}>
+              {isPublic && <PublicHeader />}
 
-        <main>{children}</main>
-        {isPublic && <PublicFooter />}
+              <main>{children}</main>
+              {isPublic && <PublicFooter />}
+            </div>
+          )}
+        </ModeNuitProvider>
 
-        <Toaster richColors position="top-right" />
+        <Toaster position="top-right" />
       </body>
     </html>
   )

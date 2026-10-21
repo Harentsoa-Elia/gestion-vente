@@ -95,7 +95,7 @@ export function VerificationEmail({
           {envoyerAuDemarrage && envoi ? "Envoi d'un code" : "Nous avons envoyé un code à 6 chiffres"}
           {email ? (
             <>
-              {" "}à <strong className="font-semibold text-gw-nuit">{email}</strong>
+              {" "}à <strong className="font-semibold text-gw-encre">{email}</strong>
             </>
           ) : null}
           . Pensez à regarder dans les indésirables (spams).

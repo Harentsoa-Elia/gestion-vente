@@ -64,7 +64,7 @@ export function ChoixFond({
           <ImagePlus className="h-4 w-4" aria-hidden />
         )}
         {envoi && (
-          <span className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-black/50">
+          <span className="absolute inset-0 flex items-center justify-center bg-gw-surface/70 dark:bg-black/50">
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
           </span>
         )}
@@ -75,7 +75,7 @@ export function ChoixFond({
           onClick={() => changer(null)}
           aria-label={`Retirer le ${libelle}`}
           title="Retirer le fond"
-          className="rounded-full p-1 text-gw-texte-doux hover:bg-gw-fond hover:text-red-600 dark:text-white/55 dark:hover:bg-white/10"
+          className="rounded-full p-1 text-gw-texte-doux hover:bg-gw-fond hover:text-gw-rose-action dark:text-white/55 dark:hover:bg-white/10"
         >
           <X className="h-3.5 w-3.5" />
         </button>
@@ -116,7 +116,7 @@ export function ApercuBillet({
   const image = urlMedia(fond)
   return (
     <div
-      className={cn("relative aspect-[63/44] w-full overflow-hidden rounded-md border border-dashed border-gw-lavande bg-white text-gw-nuit shadow-sm", className)}
+      className={cn("relative aspect-[63/44] w-full overflow-hidden rounded-md border border-dashed border-gw-lavande bg-gw-surface text-gw-encre shadow-sm", className)}
       style={image ? { backgroundImage: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
     >
       <span className="absolute inset-y-0 left-0 w-[3.5%]">
@@ -126,7 +126,7 @@ export function ApercuBillet({
       <div
         className={cn(
           "absolute top-[5%] bottom-[5%] left-[5%] right-[46%] flex flex-col rounded-[3px] px-[3%] py-[2.5%]",
-          image && "bg-white/85",
+          image && "bg-gw-surface/85",
         )}
       >
         <span className="text-[9px] font-bold text-gw-rose-action">guichetweb</span>
@@ -136,8 +136,8 @@ export function ApercuBillet({
         <span className="truncate text-[10px] font-bold text-gw-violet">{prix}</span>
         <span className="truncate text-[8px] text-gw-texte-doux">{porteur}</span>
       </div>
-      <div className="absolute top-[8%] right-[3.5%] flex w-[40%] flex-col items-center rounded-[3px] bg-white p-[2%]">
-        <QrCode className="aspect-square h-auto w-full text-gw-nuit" strokeWidth={1.2} aria-hidden />
+      <div className="absolute top-[8%] right-[3.5%] flex w-[40%] flex-col items-center rounded-[3px] bg-gw-surface p-[2%]">
+        <QrCode className="aspect-square h-auto w-full text-gw-encre" strokeWidth={1.2} aria-hidden />
         <span className="mt-0.5 font-mono text-[7px] font-bold">BHL-...</span>
       </div>
     </div>

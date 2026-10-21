@@ -56,7 +56,7 @@ export function PanneauDetails({
   return (
     <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label={`Détails : ${titre}`}>
       <button type="button" aria-label="Fermer" className="absolute inset-0 bg-gw-nuit/40 backdrop-blur-[1px]" onClick={onFermer} />
-      <aside className="relative flex h-full w-full max-w-md flex-col bg-white text-gw-nuit shadow-2xl dark:bg-gw-carte-sombre dark:text-white">
+      <aside className="relative flex h-full w-full max-w-md flex-col bg-gw-surface text-gw-encre shadow-2xl dark:bg-gw-carte-sombre dark:text-white">
         <div className="flex items-start gap-4 border-b border-gw-bordure p-6 dark:border-white/10">
           {visuel}
           <div className="min-w-0 flex-1">

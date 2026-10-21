@@ -295,7 +295,7 @@ export function Impression() {
 
           {pdf && (
             <section className="gw-carte overflow-hidden p-2" aria-label="Aperçu du PDF">
-              <iframe ref={apercu} src={pdf.url} title="Aperçu des billets à imprimer" className="h-[70vh] w-full rounded-xl bg-white" />
+              <iframe ref={apercu} src={pdf.url} title="Aperçu des billets à imprimer" className="h-[70vh] w-full rounded-xl bg-gw-surface" />
             </section>
           )}
         </div>

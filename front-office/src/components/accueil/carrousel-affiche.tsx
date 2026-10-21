@@ -89,10 +89,10 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
                   "absolute inset-0 transition-opacity duration-500",
                   centre
                     ? "bg-[linear-gradient(180deg,rgba(108,92,231,0.15)_0%,rgba(108,92,231,0.55)_55%,rgba(201,42,122,0.92)_100%)]"
-                    : "bg-[linear-gradient(180deg,rgba(21,18,43,0.35),rgba(21,18,43,0.85))]",
+                    : "bg-[linear-gradient(180deg,rgba(29,18,69,0.35),rgba(29,18,69,0.85))]",
                 )}
               />
-              <div className="absolute top-4 left-4 rounded-xl bg-white/95 px-3 py-1.5 text-center leading-none text-gw-nuit shadow">
+              <div className="absolute top-4 left-4 rounded-xl bg-gw-surface/95 px-3 py-1.5 text-center leading-none text-gw-encre shadow">
                 <span className="font-titre block text-xl font-bold">{date.getDate()}</span>
                 <span className="mt-0.5 block text-[10px] font-semibold tracking-wider">{MOIS[date.getMonth()]}</span>
               </div>
@@ -114,7 +114,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
                     <p className="mt-2 line-clamp-2 text-sm text-white/80">{e.description}</p>
                     <Link
                       href={`/evenements/${e.id}`}
-                      className="mt-4 inline-flex rounded-full bg-white px-5 py-2 text-sm font-semibold text-gw-rose-action transition-colors hover:bg-gw-rose-pale"
+                      className="mt-4 inline-flex rounded-full bg-gw-surface px-5 py-2 text-sm font-semibold text-gw-rose-action transition-colors hover:bg-gw-rose-pale"
                     >
                       Réserver
                     </Link>

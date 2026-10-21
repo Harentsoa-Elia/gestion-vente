@@ -67,7 +67,7 @@ export function Pagination({
   // une seule page : pas de barre
   if (pages <= 1) return null
   const fleche =
-    "flex h-8 w-8 items-center justify-center rounded-full text-gw-nuit transition-colors hover:bg-gw-lavande/40 disabled:pointer-events-none disabled:opacity-30 dark:text-white dark:hover:bg-white/10"
+    "flex h-8 w-8 items-center justify-center rounded-full text-gw-encre transition-colors hover:bg-gw-lavande/40 disabled:pointer-events-none disabled:opacity-30 dark:text-white dark:hover:bg-white/10"
   return (
     <nav
       aria-label="Pagination"
@@ -95,7 +95,7 @@ export function Pagination({
               className={cn(
                 "h-8 min-w-8 rounded-full px-2 text-xs font-semibold tabular-nums transition-colors",
                 n === page
-                  ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit"
+                  ? "bg-gw-nuit text-white dark:bg-gw-surface dark:text-gw-encre"
                   : "text-gw-texte hover:bg-gw-lavande/40 dark:text-white/75 dark:hover:bg-white/10",
               )}
             >

@@ -154,7 +154,7 @@ function ModaleElement({
           </Champ>
         )}
         {erreur && (
-          <p role="alert" className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-400/10 dark:text-red-300">
+          <p role="alert" className="rounded-xl bg-gw-rose-pale px-3 py-2 text-sm text-gw-rose-action-fonce dark:bg-gw-rose/10 dark:text-gw-rose">
             {erreur}
           </p>
         )}
@@ -241,7 +241,7 @@ export function AdminReferentiel() {
               }}
               className={cn(
                 "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
-                table === cle ? "bg-gw-nuit text-white dark:bg-white dark:text-gw-nuit" : "bg-white text-gw-texte hover:bg-gw-lavande/50 dark:bg-white/5 dark:text-white/75",
+                table === cle ? "bg-gw-nuit text-white dark:bg-gw-surface dark:text-gw-encre" : "bg-gw-surface text-gw-texte hover:bg-gw-lavande/50 dark:bg-white/5 dark:text-white/75",
               )}
             >
               <Icone className="h-4 w-4" aria-hidden /> {libelle}
@@ -273,7 +273,7 @@ export function AdminReferentiel() {
               <span
                 className={cn(
                   "hidden shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold sm:inline-flex",
-                  e.utilisations ? "bg-gw-lavande/60 text-gw-nuit dark:bg-white/10 dark:text-white" : "bg-gw-fond text-gw-texte-doux dark:bg-white/5 dark:text-white/55",
+                  e.utilisations ? "bg-gw-lavande/60 text-gw-encre dark:bg-white/10 dark:text-white" : "bg-gw-fond text-gw-texte-doux dark:bg-white/5 dark:text-white/55",
                 )}
               >
                 {e.utilisations ? `Utilisé ${e.utilisations} fois` : "Pas encore utilisé"}
@@ -304,7 +304,7 @@ export function AdminReferentiel() {
                 aria-label={`Supprimer ${e.nom}`}
                 title={e.utilisations > 0 ? "Suppression impossible : élément utilisé" : "Supprimer"}
                 className={cn(
-                  "rounded-full p-2 text-gw-texte-doux hover:bg-red-50 hover:text-red-700 dark:text-white/55 dark:hover:bg-red-400/10",
+                  "rounded-full p-2 text-gw-texte-doux hover:bg-gw-rose-pale hover:text-gw-rose-action-fonce dark:text-white/55 dark:hover:bg-gw-rose/10",
                   e.utilisations > 0 && "opacity-40",
                 )}
               >

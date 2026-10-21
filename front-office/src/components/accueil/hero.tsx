@@ -37,7 +37,7 @@ function Champ({
     <div className={cn("flex min-w-0 items-center gap-3 px-4 py-3", className)}>
       <Icone className="h-5 w-5 shrink-0 text-gw-violet" aria-hidden />
       <div className="min-w-0 flex-1">
-        <label htmlFor={htmlFor} className="block text-sm font-semibold text-gw-nuit">
+        <label htmlFor={htmlFor} className="block text-sm font-semibold text-gw-encre">
           {libelle}
         </label>
         {children}
@@ -47,7 +47,7 @@ function Champ({
 }
 
 const styleSaisie =
-  "mt-0.5 w-full truncate bg-transparent text-sm text-gw-texte placeholder:text-gw-texte-pale focus:outline-none disabled:text-[#B5B1C7]"
+  "mt-0.5 w-full truncate bg-transparent text-sm text-gw-texte placeholder:text-gw-texte-pale focus:outline-none disabled:text-[#B3A9D9]"
 
 export function Hero({ lieux, categories, catalogue }: HeroProps) {
   const router = useRouter()
@@ -80,7 +80,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
       {/* fond : photos en fondu enchaîné (le fond "scène" reste visible pendant le chargement) */}
       <div className="scene relative overflow-hidden" style={{ "--accent": "var(--color-gw-rose)" } as CSSProperties}>
         <FondDiaporama {...diaporama} />
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#16122E]/90 via-[#16122E]/55 to-[#16122E]/10" />
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#1D1245]/90 via-[#1D1245]/55 to-[#1D1245]/10" />
 
         <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-40 sm:px-6 sm:pt-20 sm:pb-48 lg:pb-52">
 
@@ -109,7 +109,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
               className="inline-flex items-center gap-3 rounded-full bg-gw-rose-action py-2 pr-2 pl-6 font-semibold text-white transition-colors hover:bg-gw-rose-action-fonce focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               Voir les événements
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-gw-rose-action">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gw-surface text-gw-rose-action">
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </span>
             </Link>
@@ -118,7 +118,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
               href="#avis"
               className="group inline-flex items-center gap-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-gw-violet transition-transform group-hover:scale-105">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gw-surface text-gw-violet transition-transform group-hover:scale-105">
                 <Vote className="h-5 w-5" aria-hidden />
               </span>
               Donner mon avis
@@ -132,7 +132,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
       </div>
 
       {/* bord arrondi blanc qui remonte sous la barre de recherche, comme le modèle */}
-      <div aria-hidden className="relative -mt-12 h-12 rounded-t-[3rem] bg-white" />
+      <div aria-hidden className="relative -mt-12 h-12 rounded-t-[3rem] bg-gw-surface" />
 
       {/* barre de recherche à onglets, à cheval sur le hero */}
       <div className="relative mx-auto -mt-32 max-w-6xl px-4 sm:-mt-36 sm:px-6">
@@ -140,7 +140,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
           onSubmit={rechercher}
           role="search"
           aria-label="Rechercher des événements"
-          className="rounded-2xl bg-white shadow-[0_2px_4px_rgba(30,26,60,0.06),0_24px_48px_-20px_rgba(30,26,60,0.35)]"
+          className="rounded-2xl bg-gw-surface shadow-[0_2px_4px_rgba(42,26,94,0.06),0_24px_48px_-20px_rgba(42,26,94,0.35)]"
         >
           <div role="tablist" aria-label="Période" className="flex gap-1 border-b border-gw-bordure px-3 pt-2">
             {onglets.map(({ id, libelle, icone: Icone }) => (
@@ -154,7 +154,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
                   "-mb-px flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition-colors",
                   onglet === id
                     ? "border-gw-violet text-gw-violet"
-                    : "border-transparent text-gw-texte-doux hover:text-gw-nuit",
+                    : "border-transparent text-gw-texte-doux hover:text-gw-encre",
                 )}
               >
                 <Icone className="h-4 w-4" aria-hidden />
@@ -163,7 +163,7 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
             ))}
             <Link
               href="#avis"
-              className="-mb-px ml-auto hidden items-center gap-2 border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-gw-texte-doux hover:text-gw-nuit sm:flex"
+              className="-mb-px ml-auto hidden items-center gap-2 border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-gw-texte-doux hover:text-gw-encre sm:flex"
             >
               <Vote className="h-4 w-4" aria-hidden />
               En préparation

@@ -44,8 +44,8 @@ export default function ParticipantAuthWrapper({ children }: ParticipantAuthWrap
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3B82F6] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6C5CE7] mx-auto"></div>
+          <p className="mt-4 text-gw-texte">Chargement...</p>
         </div>
       </div>
     )

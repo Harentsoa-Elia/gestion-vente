@@ -14,9 +14,9 @@ export const OPERATEURS: {
   texte: string
   exemple: string
 }[] = [
-  { mode: "mvola", nom: "MVola", prefixes: ["034", "038"], couleur: "#FFCC00", texte: "#1E1A3C", exemple: "034 12 345 67" },
-  { mode: "orange_money", nom: "Orange Money", prefixes: ["032", "037"], couleur: "#FF7900", texte: "#1E1A3C", exemple: "032 12 345 67" },
-  { mode: "airtel_money", nom: "Airtel Money", prefixes: ["033"], couleur: "#E40000", texte: "#FFFFFF", exemple: "033 12 345 67" },
+  { mode: "mvola", nom: "MVola", prefixes: ["034", "038"], couleur: "#6C5CE7", texte: "#FFFFFF", exemple: "034 12 345 67" },
+  { mode: "orange_money", nom: "Orange Money", prefixes: ["032", "037"], couleur: "#6C5CE7", texte: "#FFFFFF", exemple: "032 12 345 67" },
+  { mode: "airtel_money", nom: "Airtel Money", prefixes: ["033"], couleur: "#6C5CE7", texte: "#FFFFFF", exemple: "033 12 345 67" },
 ]
 
 export const operateur = (mode: string | null | undefined) => OPERATEURS.find((o) => o.mode === mode)

@@ -59,7 +59,7 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
   }, [ouvert])
 
   const element =
-    "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-gw-texte hover:bg-gw-fond hover:text-gw-nuit focus-visible:outline-2 focus-visible:outline-gw-violet"
+    "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-gw-texte hover:bg-gw-fond hover:text-gw-encre focus-visible:outline-2 focus-visible:outline-gw-violet"
 
   return (
     <div ref={zone} className="relative">
@@ -71,7 +71,7 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
         aria-controls={idMenu}
         aria-label={`Mon compte : ${nomComplet}`}
         className={cn(
-          "flex h-10 items-center gap-2 rounded-full pr-2 pl-1 text-sm font-semibold text-gw-nuit hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet sm:pr-3",
+          "flex h-10 items-center gap-2 rounded-full pr-2 pl-1 text-sm font-semibold text-gw-encre hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet sm:pr-3",
           ouvert && "bg-gw-fond",
         )}
       >
@@ -79,7 +79,7 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
           <AvatarParticipant prenom={compte.prenom} nom={compte.nom} avatar={compte.avatar} className="h-8 w-8 text-xs" />
           {!compte.email_verifie && (
             // pastille : adresse e-mail à confirmer
-            <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white" />
+            <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-gw-rose ring-2 ring-white" />
           )}
         </span>
         <span className="hidden max-w-[10rem] truncate sm:inline">{nomComplet}</span>
@@ -89,19 +89,19 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
       {ouvert && (
         <div
           id={idMenu}
-          className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-gw-bordure bg-white shadow-[0_24px_48px_-20px_rgba(30,26,60,0.45)]"
+          className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-gw-bordure bg-gw-surface shadow-[0_24px_48px_-20px_rgba(42,26,94,0.45)]"
         >
           <div className="flex items-center gap-3 border-b border-gw-bordure bg-gw-fond/60 px-4 py-3.5">
             <AvatarParticipant prenom={compte.prenom} nom={compte.nom} avatar={compte.avatar} className="h-11 w-11 text-sm" />
             <div className="min-w-0 flex-1">
-            <p className="truncate font-titre font-semibold text-gw-nuit">{nomComplet}</p>
+            <p className="truncate font-titre font-semibold text-gw-encre">{nomComplet}</p>
             <p className="truncate text-xs text-gw-texte-doux">{compte.email}</p>
             {compte.email_verifie ? (
-              <p className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
+              <p className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-gw-violet-fonce">
                 <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> Adresse confirmée
               </p>
             ) : (
-              <p className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
+              <p className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-gw-rose-action-fonce">
                 <MailWarning className="h-3.5 w-3.5" aria-hidden /> Adresse à confirmer
               </p>
             )}
@@ -120,14 +120,14 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
                 <UserPen className="h-4 w-4 text-gw-violet" aria-hidden />
                 <span className="flex-1">Mon profil</span>
                 {profilIncomplet(compte) && (
-                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">à compléter</span>
+                  <span className="rounded-full bg-gw-rose-pale px-2 py-0.5 text-[11px] font-semibold text-gw-rose-action-fonce">à compléter</span>
                 )}
               </Link>
             </li>
             {!compte.email_verifie && (
               <li>
                 <Link href={`/participants/verifier-email?redirect=${encodeURIComponent(pathname || "/")}`} className={element}>
-                  <MailWarning className="h-4 w-4 text-amber-600" aria-hidden />
+                  <MailWarning className="h-4 w-4 text-gw-rose-action" aria-hidden />
                   Confirmer mon adresse e-mail
                 </Link>
               </li>

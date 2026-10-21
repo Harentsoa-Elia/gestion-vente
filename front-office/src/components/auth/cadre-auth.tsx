@@ -63,7 +63,7 @@ export function CadreAuth({
         className={cn(
           // --panneau : couleur du panneau de droite, reprise par l'onglet actif et ses coins creusés
           "[--panneau:#ffffff]",
-          "grid w-full max-w-[960px] overflow-hidden rounded-[28px] bg-(--panneau) shadow-[0_30px_80px_-30px_rgba(30,26,60,0.45)] md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]",
+          "grid w-full max-w-[960px] overflow-hidden rounded-[28px] bg-(--panneau) shadow-[0_30px_80px_-30px_rgba(42,26,94,0.45)] md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]",
         )}
       >
         <PanneauVisuel onglets={onglets} />
@@ -75,7 +75,7 @@ export function CadreAuth({
                 <Icone className="h-7 w-7" aria-hidden />
               </span>
               {surtitre && <p className="text-xs font-semibold tracking-[0.18em] text-gw-rose-action uppercase">{surtitre}</p>}
-              <h1 className="mt-1 font-titre text-[28px] leading-tight font-bold text-gw-nuit">{titre}</h1>
+              <h1 className="mt-1 font-titre text-[28px] leading-tight font-bold text-gw-encre">{titre}</h1>
               {sousTitre && <p className="mt-2 max-w-sm text-sm text-gw-texte-doux">{sousTitre}</p>}
             </div>
             {children}
@@ -106,7 +106,7 @@ function PanneauVisuel({ onglets }: { onglets: OngletAuth[] }) {
       {/* teinte guichetweb : nuit → violet → rose */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[linear-gradient(160deg,rgba(30,26,60,0.92)_0%,rgba(108,92,231,0.78)_55%,rgba(201,42,122,0.72)_100%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(160deg,rgba(42,26,94,0.92)_0%,rgba(108,92,231,0.78)_55%,rgba(201,42,122,0.72)_100%)]"
       />
       {/* formes diagonales, inspirées du modèle */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
@@ -217,7 +217,7 @@ export function ChampAuth({
           type={motDePasse && visible ? "text" : type}
           {...props}
           className={cn(
-            "w-full border-0 border-b-2 border-gw-bordure bg-transparent py-2.5 pl-8 text-[15px] text-gw-nuit outline-none transition-colors placeholder:text-gw-texte-doux/60 focus:border-gw-violet",
+            "w-full border-0 border-b-2 border-gw-bordure bg-transparent py-2.5 pl-8 text-[15px] text-gw-encre outline-none transition-colors placeholder:text-gw-texte-doux/60 focus:border-gw-violet",
             motDePasse ? "pr-10" : "pr-1",
           )}
         />
@@ -268,7 +268,7 @@ export function ChoixSegmente<T extends string>({
                 "rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-colors",
                 choisi
                   ? "border-gw-violet bg-gw-violet text-white shadow-[0_8px_20px_-10px_rgba(108,92,231,0.9)]"
-                  : "border-gw-bordure text-gw-nuit hover:border-gw-violet/50 hover:bg-gw-fond",
+                  : "border-gw-bordure text-gw-encre hover:border-gw-violet/50 hover:bg-gw-fond",
               )}
             >
               {o.libelle}
@@ -297,7 +297,7 @@ export function BoutonAuth({
         "inline-flex items-center justify-center gap-2 rounded-full px-7 py-3 text-sm font-bold tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet disabled:cursor-not-allowed disabled:opacity-60",
         variante === "plein" &&
           "bg-gw-rose-action text-white shadow-[0_14px_30px_-12px_rgba(201,42,122,0.8)] hover:bg-gw-rose-action-fonce",
-        variante === "contour" && "border-2 border-gw-bordure text-gw-nuit hover:border-gw-violet hover:text-gw-violet",
+        variante === "contour" && "border-2 border-gw-bordure text-gw-encre hover:border-gw-violet hover:text-gw-violet",
         className,
       )}
     >

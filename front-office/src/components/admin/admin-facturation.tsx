@@ -224,7 +224,7 @@ function ReglageFrais({
               autoFocus
               value={valeur}
               onChange={(e) => setValeur(e.target.value.replace(/[^\d.,]/g, ""))}
-              className="w-32 rounded-xl border border-gw-bordure bg-white px-3 py-2 text-right text-sm tabular-nums dark:border-white/15 dark:bg-white/5"
+              className="w-32 rounded-xl border border-gw-bordure bg-gw-surface px-3 py-2 text-right text-sm tabular-nums dark:border-white/15 dark:bg-white/5"
             />
             <span className="text-sm text-gw-texte-doux dark:text-white/60">Ar</span>
             <button type="button" onClick={() => { setEdition(false); setErreur("") }} className="rounded-full px-3 py-2 text-sm font-semibold text-gw-texte-doux hover:bg-gw-fond dark:text-white/65 dark:hover:bg-white/10">

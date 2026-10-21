@@ -124,7 +124,7 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
       ) : (
         <form onSubmit={changer} className="mx-auto max-w-sm space-y-6">
           <p className="rounded-2xl bg-gw-fond px-4 py-3 text-center text-sm text-gw-texte-doux">
-            Code envoyé à <strong className="font-semibold text-gw-nuit">{email}</strong>, s&apos;il correspond à un compte.
+            Code envoyé à <strong className="font-semibold text-gw-encre">{email}</strong>, s&apos;il correspond à un compte.
             Pensez aux indésirables (spams).
           </p>
           <SaisieCode valeur={code} onChange={setCode} erreur={!!erreur && code.length === 0} />

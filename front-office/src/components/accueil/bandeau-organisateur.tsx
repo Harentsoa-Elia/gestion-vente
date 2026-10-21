@@ -26,7 +26,7 @@ export function BandeauOrganisateur() {
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <Link
               href="/login"
-              className="rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gw-nuit transition-colors hover:bg-gw-fond"
+              className="rounded-full bg-gw-surface px-5 py-2.5 text-sm font-semibold text-gw-encre transition-colors hover:bg-gw-fond"
             >
               Publier un événement
             </Link>

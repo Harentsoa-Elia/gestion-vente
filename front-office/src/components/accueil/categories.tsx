@@ -73,7 +73,7 @@ export function RangeeCategories({ categories }: { categories: Categorie[] }) {
                   <span className="flex h-20 w-20 items-center justify-center rounded-full border border-gw-bordure text-gw-texte transition-colors group-hover:border-gw-violet group-hover:bg-gw-violet group-hover:text-white group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-gw-violet">
                     <Icone className="h-7 w-7" strokeWidth={1.6} aria-hidden />
                   </span>
-                  <span className="line-clamp-2 text-sm font-medium text-gw-nuit">{c.nom}</span>
+                  <span className="line-clamp-2 text-sm font-medium text-gw-encre">{c.nom}</span>
                 </Link>
               </li>
             )
@@ -98,7 +98,7 @@ function FlecheDefilement({ sens, visible, onClick }: { sens: 1 | -1; visible: b
       aria-label={sens === 1 ? "Voir les catégories suivantes" : "Voir les catégories précédentes"}
       className={cn(
         // centrée sur les pastilles rondes (h-20, sous le pt-12 de la rangée)
-        "absolute top-[4.5rem] flex h-10 w-10 items-center justify-center rounded-full border border-gw-bordure bg-white text-gw-nuit shadow-[0_4px_14px_-4px_rgba(30,26,60,0.35)] transition-all hover:scale-105 hover:border-gw-violet hover:text-gw-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet",
+        "absolute top-[4.5rem] flex h-10 w-10 items-center justify-center rounded-full border border-gw-bordure bg-gw-surface text-gw-encre shadow-[0_4px_14px_-4px_rgba(42,26,94,0.35)] transition-all hover:scale-105 hover:border-gw-violet hover:text-gw-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet",
         sens === 1 ? "right-1 sm:right-2" : "left-1 sm:left-2",
         visible ? "opacity-100" : "pointer-events-none opacity-0",
       )}

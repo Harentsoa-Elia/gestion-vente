@@ -67,9 +67,9 @@ export function ConfirmationDeconnexion({
         aria-modal="true"
         aria-labelledby={idTitre}
         aria-describedby={idTexte}
-        className="relative w-full max-w-sm rounded-3xl bg-white p-6 text-center text-gw-nuit shadow-2xl dark:bg-gw-carte-sombre dark:text-white"
+        className="relative w-full max-w-sm rounded-3xl bg-gw-surface p-6 text-center text-gw-encre shadow-2xl dark:bg-gw-carte-sombre dark:text-white"
       >
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gw-rose-pale text-gw-rose-action dark:bg-gw-rose/20 dark:text-pink-200">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gw-rose-pale text-gw-rose-action dark:bg-gw-rose/20 dark:text-gw-rose-pale">
           <LogOut className="h-5 w-5" aria-hidden />
         </span>
         <h2 id={idTitre} className="font-titre mt-4 text-xl font-semibold">
@@ -78,7 +78,7 @@ export function ConfirmationDeconnexion({
         <p id={idTexte} className="mt-2 text-sm text-gw-texte-doux dark:text-white/65">
           {nom && (
             <>
-              Vous êtes connecté en tant que <span className="font-semibold text-gw-nuit dark:text-white">{nom}</span>.{" "}
+              Vous êtes connecté en tant que <span className="font-semibold text-gw-encre dark:text-white">{nom}</span>.{" "}
             </>
           )}
           Voulez-vous vraiment vous déconnecter ? Pour revenir, il faudra saisir à nouveau votre e-mail et votre mot de passe.
@@ -89,7 +89,7 @@ export function ConfirmationDeconnexion({
             type="button"
             onClick={onAnnuler}
             disabled={envoi}
-            className="h-11 flex-1 rounded-full bg-gw-fond px-5 text-sm font-semibold text-gw-nuit transition-colors hover:bg-gw-lavande/50 focus-visible:outline-2 focus-visible:outline-gw-violet disabled:opacity-50 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+            className="h-11 flex-1 rounded-full bg-gw-fond px-5 text-sm font-semibold text-gw-encre transition-colors hover:bg-gw-lavande/50 focus-visible:outline-2 focus-visible:outline-gw-violet disabled:opacity-50 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
           >
             Annuler
           </button>

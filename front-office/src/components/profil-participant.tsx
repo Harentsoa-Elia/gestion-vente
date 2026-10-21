@@ -108,7 +108,7 @@ export function ProfilParticipant() {
   return (
     <div className="space-y-6">
       {manquants.length > 0 && (
-        <div className="flex gap-3 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200">
+        <div className="flex gap-3 rounded-2xl bg-gw-rose-pale p-4 text-sm text-gw-rose-action-fonce ring-1 ring-gw-rose-pale">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <p>
             Complétez votre profil : il manque <strong>{manquants.join(", ")}</strong>.
@@ -117,7 +117,7 @@ export function ProfilParticipant() {
       )}
 
       {/* photo de profil */}
-      <section className="flex flex-wrap items-center gap-5 rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8">
+      <section className="flex flex-wrap items-center gap-5 rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8">
         <div className="relative">
           <AvatarParticipant prenom={profil.prenom} nom={profil.nom} avatar={profil.avatar} className="h-24 w-24 text-2xl" />
           <button
@@ -131,7 +131,7 @@ export function ProfilParticipant() {
           </button>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-titre text-xl font-semibold text-gw-nuit">
+          <p className="font-titre text-xl font-semibold text-gw-encre">
             {profil.prenom} {profil.nom}
           </p>
           <p className="mt-0.5 text-sm text-gw-texte-doux">JPEG, PNG ou WebP, 8 Mo maximum. Elle sera recadrée en carré.</p>
@@ -140,7 +140,7 @@ export function ProfilParticipant() {
               type="button"
               onClick={() => champPhoto.current?.click()}
               disabled={envoiPhoto}
-              className="inline-flex items-center gap-1.5 rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-nuit hover:bg-gw-lavande/50 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-encre hover:bg-gw-lavande/50 disabled:opacity-50"
             >
               <Camera className="h-4 w-4" aria-hidden /> {profil.avatar ? "Changer la photo" : "Ajouter une photo"}
             </button>
@@ -169,20 +169,20 @@ export function ProfilParticipant() {
         />
       </section>
 
-      <form onSubmit={enregistrer} className="space-y-7 rounded-3xl bg-white p-6 ring-1 ring-gw-bordure sm:p-8">
+      <form onSubmit={enregistrer} className="space-y-7 rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8">
         {/* e-mail : identifiant de connexion, non modifiable ici */}
         <div>
           <p className="mb-1 text-xs font-semibold text-gw-texte-doux">Adresse e-mail</p>
-          <p className="flex items-center gap-2 text-[15px] text-gw-nuit">
+          <p className="flex items-center gap-2 text-[15px] text-gw-encre">
             <Mail className="h-[18px] w-[18px] text-gw-texte-doux/70" aria-hidden />
             {profil.email}
           </p>
           {profil.email_verifie ? (
-            <p className="mt-1 inline-flex items-center gap-1 pl-7 text-xs font-semibold text-emerald-700">
+            <p className="mt-1 inline-flex items-center gap-1 pl-7 text-xs font-semibold text-gw-violet-fonce">
               <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> Adresse confirmée
             </p>
           ) : (
-            <Link href="/participants/verifier-email?redirect=/participants/profil" className="mt-1 inline-flex items-center gap-1 pl-7 text-xs font-semibold text-amber-700 hover:underline">
+            <Link href="/participants/verifier-email?redirect=/participants/profil" className="mt-1 inline-flex items-center gap-1 pl-7 text-xs font-semibold text-gw-rose-action-fonce hover:underline">
               <MailWarning className="h-3.5 w-3.5" aria-hidden /> Confirmer mon adresse
             </Link>
           )}

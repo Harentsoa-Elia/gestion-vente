@@ -58,7 +58,7 @@ export function CarteBillet({
   return (
     <article
       className={cn(
-        "relative grid overflow-hidden rounded-3xl bg-white shadow-[0_24px_48px_-28px_rgba(30,26,60,0.55)] ring-1 ring-gw-bordure sm:grid-cols-[1fr_auto]",
+        "relative grid overflow-hidden rounded-3xl bg-gw-surface shadow-[0_24px_48px_-28px_rgba(42,26,94,0.55)] ring-1 ring-gw-bordure sm:grid-cols-[1fr_auto]",
         (billet.utilise || passe) && "opacity-90",
       )}
     >
@@ -75,7 +75,7 @@ export function CarteBillet({
             </span>
           )}
           {billet.utilise ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/20 px-2.5 py-1 text-emerald-200">
+            <span className="inline-flex items-center gap-1 rounded-full bg-gw-violet/20 px-2.5 py-1 text-gw-lavande">
               <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> Utilisé à l&apos;entrée
             </span>
           ) : passe ? (
@@ -107,7 +107,7 @@ export function CarteBillet({
         </dl>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          <button type="button" onClick={telecharger} disabled={!!occupe} className={cn(action, "bg-white text-gw-nuit hover:bg-gw-lavande")}>
+          <button type="button" onClick={telecharger} disabled={!!occupe} className={cn(action, "bg-gw-surface text-gw-encre hover:bg-gw-lavande")}>
             {occupe === "pdf" ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : <Download className="h-3.5 w-3.5" aria-hidden />}
             Télécharger le PDF
           </button>
@@ -123,11 +123,11 @@ export function CarteBillet({
         <span aria-hidden className="absolute -top-3 -left-3 h-6 w-6 rounded-full bg-gw-fond sm:-top-3 sm:-left-3" />
         <span aria-hidden className="absolute -top-3 -right-3 h-6 w-6 rounded-full bg-gw-fond sm:top-auto sm:-bottom-3 sm:-left-3 sm:right-auto" />
         {billet.qr_code ? (
-          <div className={cn("relative rounded-2xl bg-white p-2", billet.utilise && "opacity-40")}>
+          <div className={cn("relative rounded-2xl bg-gw-surface p-2", billet.utilise && "opacity-40")}>
             <QRCode value={billet.qr_code} size={compact ? 132 : 168} level="M" aria-label={`QR code du billet ${billet.numero_billet}`} />
           </div>
         ) : null}
-        <p className="font-mono text-xs font-semibold tracking-wider text-gw-nuit">{billet.numero_billet}</p>
+        <p className="font-mono text-xs font-semibold tracking-wider text-gw-encre">{billet.numero_billet}</p>
         <p className="max-w-[11rem] text-center text-xs text-gw-texte-doux">
           {billet.utilise
             ? billet.date_scan

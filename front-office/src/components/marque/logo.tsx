@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { cn } from "@/utils"
 
@@ -16,8 +18,9 @@ interface LogoProps {
 }
 
 /**
- * Logotype en minuscules, dans l'esprit de billetweb.
- * Le point du i est remplacé par un petit carré rose, comme un ticket poinçonné.
+ * Logotype : le nom de la plateforme aux couleurs de la charte.
+ * "guichet" en caractères droits, "web" en écriture manuscrite rose, comme une signature.
+ * Le point du i est un petit carré rose incliné, comme un ticket poinçonné.
  * C'est un lien vers la page d'accueil.
  */
 export function Logo({ ton = "sombre", className }: LogoProps) {
@@ -26,18 +29,32 @@ export function Logo({ ton = "sombre", className }: LogoProps) {
       href="/"
       aria-label={`${NOM_PLATEFORME}, retour à l'accueil`}
       className={cn(
-        "font-titre inline-flex items-baseline rounded-md text-[1.6rem] font-semibold leading-none tracking-[-0.04em] outline-offset-4 focus-visible:outline-2 focus-visible:outline-gw-violet",
-        ton === "sombre" ? "text-gw-nuit" : "text-white",
+        "inline-flex items-center rounded-md leading-none outline-offset-4 focus-visible:outline-2 focus-visible:outline-gw-violet",
         className,
       )}
     >
       <span aria-hidden className="inline-flex items-baseline">
-        gu
-        <span className="relative">
-          i
-          <span className="absolute left-1/2 top-[0.02em] h-[0.2em] w-[0.2em] -translate-x-1/2 rotate-12 rounded-[0.05em] bg-gw-rose" />
+        <span
+          className={cn(
+            "font-titre inline-flex items-baseline text-[1.55rem] font-semibold tracking-[-0.04em]",
+            ton === "sombre" ? "text-gw-encre" : "text-white",
+          )}
+        >
+          gu
+          <span className="relative">
+            ı
+            <span className="absolute left-1/2 top-[0.02em] h-[0.2em] w-[0.2em] -translate-x-1/2 rotate-12 rounded-[0.05em] bg-gw-rose-action" />
+          </span>
+          chet
         </span>
-        chetweb
+        <span
+          className={cn(
+            "font-script -ml-0.5 -rotate-6 text-[1.85rem] leading-none",
+            ton === "sombre" ? "text-gw-rose-action" : "text-gw-rose-pale",
+          )}
+        >
+          web
+        </span>
       </span>
     </Link>
   )
