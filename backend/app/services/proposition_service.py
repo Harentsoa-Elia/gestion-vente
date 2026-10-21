@@ -9,7 +9,7 @@ from app.models.lieu import Lieu
 from app.models.artiste import Artiste
 from app.models.categorie import Categorie
 from app.schemas.proposition import PropositionCreate, PropositionType
-from app.utils.scoring import POIDS_INTERACTION
+from app.utils.scoring import poids
 
 
 class PropositionService:
@@ -56,7 +56,8 @@ class PropositionService:
                 )
             )
             interactions = result_interactions.scalars().all()
-            score = sum(POIDS_INTERACTION[i.type_interaction] for i in interactions)
+            # un score ne descend pas sous 0, même avec des commentaires négatifs
+            score = max(0, sum(poids(i.type_interaction, i.sentiment, i.confiance) for i in interactions))
             resultats.append({
                 "id": proposition.id,
                 "type": proposition.type,

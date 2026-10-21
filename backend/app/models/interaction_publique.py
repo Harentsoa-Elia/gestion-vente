@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -17,6 +17,9 @@ class InteractionPublique(Base):
     id = Column(Integer, primary_key=True, index=True)
     type_interaction = Column(Enum(InteractionType, name="interactiontype"), nullable=False)
     contenu = Column(String, nullable=True)
+    # commentaires seulement : sentiment détecté par le module d'IA (positif, neutre, negatif) et sa probabilité
+    sentiment = Column(String(10), nullable=True)
+    confiance = Column(Float, nullable=True)
     date_interaction = Column(DateTime(timezone=True), server_default=func.now())
 
     proposition_id = Column(Integer, ForeignKey("propositions.id"), nullable=False)

@@ -331,7 +331,7 @@ class AdministrationService:
         col_reco = getattr(Recommandation, colonne)
         if (await self.db.execute(select(func.count(Recommandation.id)).where(col_reco == element_id))).scalar():
             raise ErreurAdministration(f"'{element.nom}' figure dans des recommandations : il ne peut pas être supprimé.")
-        nom = element.nom
+            nom = element.nom
         await self.db.delete(element)
         await self.db.commit()
         return nom

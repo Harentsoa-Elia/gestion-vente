@@ -34,6 +34,7 @@ from passlib.context import CryptContext
 from sqlalchemy import delete, func, or_, select
 
 from app.database import AsyncSessionLocal
+from app.ia.sentiment import analyser
 from app.models.artiste import Artiste
 from app.models.billet import Billet
 from app.models.billet_hors_ligne import LotHorsLigne
@@ -76,6 +77,9 @@ COMMENTAIRES = [
     "Trop hâte !", "On sera là avec toute la bande", "Tsara be ity !", "Mankasitraka ny mpikarakara",
     "Excellent choix, ça va être une belle soirée", "Enfin un grand événement à Fianar !", "Je vote pour ça sans hésiter",
     "Parfait pour l'ambiance", "Mahafinaritra !", "Ce serait génial", "Venez nombreux !", "Bravo pour l'organisation",
+    # avis neutres ou négatifs : classés par le module d'IA, ils comptent 0 ou retirent des points
+    "Les billets seront à quel prix ?", "Il y aura un parking ?", "Je verrai selon la date", "Ohatrinona ny tapakila ?",
+    "Trop loin pour nous", "Trop cher pour des étudiants", "Le son était mauvais la dernière fois", "Lafo loatra",
 ]
 
 # (titre, description, jours par rapport à aujourd'hui, heure, durée h, lieu, catégorie, statut, capacité, tarifs, taux de vente)
@@ -365,7 +369,10 @@ async def creer(db) -> None:
                                                date_interaction=maintenant() - timedelta(days=rnd.randint(0, 30), hours=rnd.randint(0, 23))))
                     nb_reactions += 1
                 if rnd.random() < p_engagement * 0.06:
-                    db.add(InteractionPublique(type_interaction=InteractionType.COMMENTAIRE, contenu=rnd.choice(COMMENTAIRES), proposition_id=prop.id,
+                    texte = rnd.choice(COMMENTAIRES)
+                    a = analyser(texte)  # même analyse que pour un commentaire publié sur le site
+                    db.add(InteractionPublique(type_interaction=InteractionType.COMMENTAIRE, contenu=texte, proposition_id=prop.id,
+                                               sentiment=a.sentiment if a else None, confiance=a.confiance if a else None,
                                                participant_id=p.id, date_interaction=maintenant() - timedelta(days=rnd.randint(0, 30), hours=rnd.randint(0, 23))))
                     nb_reactions += 1
 

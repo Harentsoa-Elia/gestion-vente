@@ -32,6 +32,7 @@ import type { Evenement, Lieu, PropositionAvecScore, PropositionType, Recommanda
 import { WaouhFace } from "@/components/ui/WaouhFace"
 import { Anneau } from "@/components/organisateur/anneau"
 import { cn } from "@/utils"
+import { AvisIA } from "@/components/organisateur/avis-ia"
 
 /*
  * Recommandations : le module d'Intelligence Décisionnelle côté organisateur.
@@ -56,7 +57,8 @@ const POIDS: { libelle: string; poids: number; icone: React.ReactNode }[] = [
   { libelle: "Waouh", poids: 2, icone: <WaouhFace size={16} /> },
   { libelle: "Favori", poids: 2, icone: <Star className="h-4 w-4" /> },
   { libelle: "J'adore", poids: 3, icone: <Heart className="h-4 w-4" /> },
-  { libelle: "Commentaire", poids: 0, icone: <MessageCircle className="h-4 w-4" /> },
+  { libelle: "Commentaire positif (IA)", poids: 2, icone: <MessageCircle className="h-4 w-4" /> },
+  { libelle: "Commentaire négatif (IA)", poids: -2, icone: <MessageCircle className="h-4 w-4" /> },
 ]
 
 interface ClassementType {
@@ -86,6 +88,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
   const [reco, setReco] = useState<Recommandation | null>(null)
   const [chargement, setChargement] = useState(true)
   const [chargementEvenement, setChargementEvenement] = useState(false)
+  const [versionAvis, setVersionAvis] = useState(0)
   const [calcul, setCalcul] = useState(false)
   const [erreur, setErreur] = useState<string | null>(null)
 
@@ -149,6 +152,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
     try {
       const nouvelle = await calculerRecommandation(choisi)
       setReco(nouvelle)
+      setVersionAvis((v) => v + 1)
       // les scores ont pu bouger depuis le chargement de la page
       setPropositions(await fetchPropositionsAvecScores(choisi))
       toast.success("Recommandation calculée à partir des réactions actuelles du public.")
@@ -473,6 +477,9 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
                   </p>
                 )}
               </section>
+
+              {/* module d'IA : sentiment des commentaires */}
+              {choisi != null && <AvisIA evenementId={choisi} version={versionAvis} />}
             </>
           )}
 
@@ -491,7 +498,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
                       className="flex items-center gap-1.5 rounded-full bg-gw-fond px-2.5 py-1 text-xs dark:bg-white/10"
                     >
                       {r.icone}
-                      {r.libelle} ×{r.poids}
+                      {r.libelle} {r.poids < 0 ? r.poids : `×${r.poids}`}
                     </li>
                   ))}
                 </ul>

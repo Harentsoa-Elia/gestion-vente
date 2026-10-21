@@ -25,7 +25,7 @@ from app.models.proposition import Proposition
 from app.models.reservation import Reservation
 from app.services.billetterie_service import DUREE_RESERVATION
 from app.utils.fuseau import FUSEAU_MADAGASCAR
-from app.utils.scoring import POIDS_INTERACTION
+from app.utils.scoring import SEUIL_CONFIANCE, poids
 from app.auth.roles import est_admin
 
 TRANCHES = [(0, 17, "Moins de 18 ans"), (18, 24, "18-24 ans"), (25, 34, "25-34 ans"), (35, 44, "35-44 ans"), (45, 200, "45 ans et plus")]
@@ -114,15 +114,18 @@ class StatistiquesService:
 
         # --- popularité : points des réactions aux propositions (mêmes poids que les recommandations)
         scores: Dict[int, int] = {}
-        for ev, type_, n in (
+        fiable = InteractionPublique.confiance >= SEUIL_CONFIANCE
+        for ev, type_, sentiment, sur, n in (
             await self.db.execute(
-                select(Proposition.evenement_id, InteractionPublique.type_interaction, func.count(InteractionPublique.id))
+                select(Proposition.evenement_id, InteractionPublique.type_interaction, InteractionPublique.sentiment,
+                       fiable, func.count(InteractionPublique.id))
                 .join(InteractionPublique, InteractionPublique.proposition_id == Proposition.id)
                 .where(Proposition.evenement_id.in_(ids))
-                .group_by(Proposition.evenement_id, InteractionPublique.type_interaction)
+                .group_by(Proposition.evenement_id, InteractionPublique.type_interaction, InteractionPublique.sentiment, fiable)
             )
         ).all():
-            scores[ev] = scores.get(ev, 0) + POIDS_INTERACTION.get(type_, 0) * int(n)
+            scores[ev] = scores.get(ev, 0) + poids(type_, sentiment, 1.0 if sur else None) * int(n)
+        scores = {ev: max(0, s) for ev, s in scores.items()}
 
         evenements = []
         occupees_ev: Dict[int, int] = {}

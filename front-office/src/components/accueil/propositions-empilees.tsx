@@ -205,8 +205,8 @@ export function PropositionsEmpilees({
           />
           <DecorationVote />
           <p className="mx-auto mt-4 max-w-sm text-center text-sm text-gw-texte-doux">
-            Chaque réaction ajoute des points à la proposition. Un "&nbsp;J&apos;adore&nbsp;" compte trois fois
-            plus qu&apos;un "&nbsp;J&apos;aime&nbsp;".
+            Chaque réaction ajoute des points à la proposition. Un "J&apos;adore" compte trois fois
+            plus qu&apos;un "J&apos;aime".
           </p>
         </div>
 

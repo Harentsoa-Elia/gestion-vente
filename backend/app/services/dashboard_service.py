@@ -6,7 +6,7 @@ from typing import List, Dict, Optional
 from app.models.evenement import Evenement
 from app.models.proposition import Proposition
 from app.models.interaction_publique import InteractionPublique
-from app.utils.scoring import POIDS_INTERACTION
+from app.utils.scoring import poids
 from app.models.billet import Billet
 
 
@@ -45,13 +45,11 @@ class DashboardService:
             return 0
 
         interactions_result = await self.db.execute(
-            select(InteractionPublique.type_interaction).filter(
+            select(InteractionPublique.type_interaction, InteractionPublique.sentiment, InteractionPublique.confiance).filter(
                 InteractionPublique.proposition_id.in_(proposition_ids)
             )
         )
-        interactions = interactions_result.scalars().all()
-
-        return sum(POIDS_INTERACTION.get(i, 0) for i in interactions)
+        return max(0, sum(poids(t, s, c) for t, s, c in interactions_result.all()))
 
     async def get_evenements_populaires(self, organisateur_id: int, limit: int = 5) -> List[Dict]:
         result = await self.db.execute(

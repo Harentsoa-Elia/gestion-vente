@@ -34,6 +34,8 @@ class InteractionPubliqueResponse(InteractionPubliqueBase):
     id: int = Field(..., description="Unique ID de l'interaction")
     participant_id: Optional[int] = None
     date_interaction: datetime
+    sentiment: Optional[str] = Field(None, description="Commentaire : sentiment détecté par le module d'IA")
+    confiance: Optional[float] = None
 
     class Config:
         from_attributes = True

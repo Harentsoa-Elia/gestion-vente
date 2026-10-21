@@ -1,0 +1,155 @@
+{
+ "modele": "Régression logistique",
+ "corpus": 2100,
+ "test": 90,
+ "comparaison": {
+  "Naive Bayes multinomial": {
+   "exactitude_vc": 0.7735,
+   "f1_vc": 0.7705,
+   "f1_test": 0.8296,
+   "duree_s": 1.5
+  },
+  "Régression logistique": {
+   "exactitude_vc": 0.8132,
+   "f1_vc": 0.8089,
+   "f1_test": 0.8296,
+   "duree_s": 3.1
+  },
+  "SVM linéaire": {
+   "exactitude_vc": 0.7702,
+   "f1_vc": 0.7633,
+   "f1_test": 0.819,
+   "duree_s": 1.8
+  }
+ },
+ "exactitude_test": 0.8333,
+ "f1_macro_test": 0.8296,
+ "par_classe": {
+  "negatif": {
+   "precision": 0.8438,
+   "recall": 0.9,
+   "f1-score": 0.871,
+   "support": 30.0
+  },
+  "neutre": {
+   "precision": 0.7778,
+   "recall": 0.9333,
+   "f1-score": 0.8485,
+   "support": 30.0
+  },
+  "positif": {
+   "precision": 0.9091,
+   "recall": 0.6667,
+   "f1-score": 0.7692,
+   "support": 30.0
+  }
+ },
+ "matrice_confusion": {
+  "classes": [
+   "negatif",
+   "neutre",
+   "positif"
+  ],
+  "valeurs": [
+   [
+    27,
+    3,
+    0
+   ],
+   [
+    0,
+    28,
+    2
+   ],
+   [
+    5,
+    5,
+    20
+   ]
+  ]
+ },
+ "ms_par_commentaire": 3.12,
+ "seuil": {
+  "valeur": 0.6,
+  "retenus": 75,
+  "exactitude_retenus": 0.8667,
+  "exactitude_incertains": 0.6667
+ },
+ "erreurs": [
+  {
+   "texte": "C'est exactement ce qu'il nous fallait",
+   "attendu": "positif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "Il était temps ! Merci",
+   "attendu": "positif",
+   "predit": "negatif"
+  },
+  {
+   "texte": "Je l'ai vu à Tana, c'était grandiose",
+   "attendu": "positif",
+   "predit": "negatif"
+  },
+  {
+   "texte": "On compte les jours",
+   "attendu": "positif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "Ce lieu est vraiment agréable le soir",
+   "attendu": "positif",
+   "predit": "negatif"
+  },
+  {
+   "texte": "Hanatrika aho tsy misy fisalasalana",
+   "attendu": "positif",
+   "predit": "negatif"
+  },
+  {
+   "texte": "Je suis impatient d'y être",
+   "attendu": "positif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "Excellente programmation",
+   "attendu": "positif",
+   "predit": "negatif"
+  },
+  {
+   "texte": "Merci de penser aux provinces",
+   "attendu": "positif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "Mon artiste préféré, quelle joie",
+   "attendu": "positif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "Encore lui ? On en a marre",
+   "attendu": "negatif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "Ce lieu est impossible d'accès quand il pleut",
+   "attendu": "negatif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "Le parking est un cauchemar là-bas",
+   "attendu": "negatif",
+   "predit": "neutre"
+  },
+  {
+   "texte": "On sera fixé la semaine prochaine",
+   "attendu": "neutre",
+   "predit": "positif"
+  },
+  {
+   "texte": "À voir selon la météo",
+   "attendu": "neutre",
+   "predit": "positif"
+  }
+ ]
+}

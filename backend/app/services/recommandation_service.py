@@ -7,7 +7,7 @@ from app.models.recommandation import Recommandation
 from app.models.proposition import Proposition, PropositionType
 from app.models.interaction_publique import InteractionPublique
 from app.models.lieu import Lieu
-from app.utils.scoring import POIDS_INTERACTION
+from app.utils.scoring import poids
 
 class RecommandationService:
     def __init__(self, db: AsyncSession):
@@ -36,7 +36,8 @@ class RecommandationService:
                 )
             )
             interactions = result_interactions.scalars().all()
-            score = sum(POIDS_INTERACTION[i.type_interaction] for i in interactions)
+            # un score ne descend pas sous 0, même avec des commentaires négatifs
+            score = max(0, sum(poids(i.type_interaction, i.sentiment, i.confiance) for i in interactions))
             scores[proposition.id] = {"proposition": proposition, "score": score}
 
         return scores

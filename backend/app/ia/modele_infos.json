@@ -1,0 +1,7 @@
+{
+ "modele": "Régression logistique",
+ "exactitude_test": 0.8333,
+ "f1_macro_test": 0.8296,
+ "corpus": 2100,
+ "entraine_le": "2026-10-21"
+}
