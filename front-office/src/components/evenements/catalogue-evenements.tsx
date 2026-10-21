@@ -16,7 +16,7 @@ const normaliser = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 
 /**
- * Page /evenements : onglets 'À venir' et 'Passés', comme les onglets d'Eventbrite.
+ * Page /evenements : onglets "À venir" et "Passés", comme les onglets d'Eventbrite.
  * Les filtres vivent dans l'URL (?onglet, q, lieu, categorie, periode) : la recherche du hero
  * y mène directement, et une recherche peut être partagée par lien.
  */

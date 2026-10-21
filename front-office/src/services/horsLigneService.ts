@@ -77,7 +77,7 @@ export async function pdfLot(id: number, options: OptionsImpression): Promise<{ 
   const params = new URLSearchParams({ format: options.format })
   if (options.de) params.set("de", String(options.de))
   if (options.a) params.set("a", String(options.a))
-  // PDF emballé en JSON : un gestionnaire de téléchargement (IDM…) ne l'intercepte pas
+  // PDF emballé en JSON : un gestionnaire de téléchargement (IDM...) ne l'intercepte pas
   // et la page peut l'afficher en aperçu (voir backend : billets-apercu)
   const res = await fetch(`${API_BASE_URL}/organisateur/hors-ligne/lots/${id}/billets-apercu?${params}`, { headers: getAuthHeaders() })
   const data = await parseJsonSafe(res)

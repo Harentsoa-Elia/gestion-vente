@@ -88,8 +88,8 @@ async def pdf_apercu(
     auth_data: dict = Depends(equipe),
     db: AsyncSession = Depends(get_db),
 ):
-    """Les gestionnaires de téléchargement (Internet Download Manager…) interceptent les réponses PDF
-    et coupent la requête du site (« Failed to fetch »). Emballé en JSON, le PDF arrive bien à la page,
+    """Les gestionnaires de téléchargement (Internet Download Manager...) interceptent les réponses PDF
+    et coupent la requête du site ("Failed to fetch"). Emballé en JSON, le PDF arrive bien à la page,
     qui l'affiche en aperçu et le propose au téléchargement."""
     try:
         contenu, nom = await HorsLigneService(db).pdf(auth_data, lot_id, format, de, a)

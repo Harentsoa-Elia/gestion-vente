@@ -5,7 +5,7 @@ import { Loader2, LogOut } from "lucide-react"
 
 /*
  * Confirmation avant de se déconnecter, comme sur Facebook :
- * « Se déconnecter ? » avec deux boutons, « Annuler » et « Se déconnecter ».
+ * "Se déconnecter ?" avec deux boutons, "Annuler" et "Se déconnecter".
  * Utilisée partout où il y a un bouton Déconnexion : site public (participant),
  * espace organisateur et administration.
  */
@@ -32,7 +32,7 @@ export function ConfirmationDeconnexion({
     if (!ouverte) return
     setEnvoi(false)
     const precedent = document.activeElement as HTMLElement | null
-    // le focus va sur « Annuler » : un appui sur Entrée par erreur ne déconnecte pas
+    // le focus va sur "Annuler" : un appui sur Entrée par erreur ne déconnecte pas
     annuler.current?.focus()
     const echap = (e: KeyboardEvent) => e.key === "Escape" && onAnnuler()
     window.addEventListener("keydown", echap)
@@ -110,7 +110,7 @@ export function ConfirmationDeconnexion({
 
 /**
  * Raccourci : `demander()` ouvre la confirmation, `fenetre` est l'élément à afficher.
- * L'action n'est lancée que si l'utilisateur clique « Se déconnecter ».
+ * L'action n'est lancée que si l'utilisateur clique "Se déconnecter".
  */
 export function useConfirmationDeconnexion(action: () => Promise<void> | void, nom?: string | null) {
   const [ouverte, setOuverte] = useState(false)

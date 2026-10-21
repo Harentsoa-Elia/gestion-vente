@@ -4,7 +4,7 @@ export interface CategorieBillet {
   prix: number
   quantite_disponible: number | null
   evenement_id: number
-  /** fond d'image des billets de ce tarif (/media/fonds/…) */
+  /** fond d'image des billets de ce tarif (/media/fonds/...) */
   fond_url?: string | null
 }
 

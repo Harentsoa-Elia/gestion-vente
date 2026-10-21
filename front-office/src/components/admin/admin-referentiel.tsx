@@ -89,7 +89,7 @@ function ModaleElement({
           : { nom: f.nom.trim(), genre_artistique: ouNull(f.genre), description: ouNull(f.description) }
     try {
       const r = await enregistrerElementReferentiel(table, element?.id ?? null, saisie)
-      toast.success(element ? `« ${r.nom} » modifié.` : `« ${r.nom} » ajouté.`)
+      toast.success(element ? `"${r.nom}" modifié.` : `"${r.nom}" ajouté.`)
       onEnregistre()
     } catch (err) {
       setErreur(err instanceof Error ? err.message : "L'enregistrement a échoué.")
@@ -99,7 +99,7 @@ function ModaleElement({
   }
 
   return (
-    <Modale ouverte={ouverte} titre={element ? `Modifier « ${element.nom} »` : `Ajouter un ${onglet.singulier}`} onFermer={onFermer}>
+    <Modale ouverte={ouverte} titre={element ? `Modifier "${element.nom}"` : `Ajouter un ${onglet.singulier}`} onFermer={onFermer}>
       <form onSubmit={enregistrer} className="space-y-4">
         <Champ libelle="Nom" requis>
           {(id) => <input id={id} required value={f.nom} onChange={(e) => maj("nom")(e.target.value)} className={classeChamp} />}
@@ -252,13 +252,13 @@ export function AdminReferentiel() {
         <label className="relative w-full sm:w-72">
           <span className="sr-only">Rechercher</span>
           <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gw-texte-pale" aria-hidden />
-          <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder={table === "lieux" ? "Nom, ville, région…" : "Rechercher…"} className={cn(classeChamp, "pl-9")} />
+          <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder={table === "lieux" ? "Nom, ville, région..." : "Rechercher..."} className={cn(classeChamp, "pl-9")} />
         </label>
       </div>
 
       {!ref ? (
         <p className="flex items-center gap-2 py-10 text-gw-texte-doux dark:text-white/60">
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
         </p>
       ) : (
         <ListeVoirPlus elements={elements} classePagination="border-t-0 px-1">
@@ -282,7 +282,7 @@ export function AdminReferentiel() {
                 <ChoixFond
                   compact
                   url={e.fond_url}
-                  libelle={`fond des billets « ${e.nom} »`}
+                  libelle={`fond des billets "${e.nom}"`}
                   onChanger={async (f) => {
                     await definirFondType(e.id, f)
                     charger()
@@ -331,12 +331,12 @@ export function AdminReferentiel() {
 
       <Modale
         ouverte={!!aSupprimer}
-        titre={aSupprimer?.utilisations ? "Suppression impossible" : `Supprimer « ${aSupprimer?.nom ?? ""} » ?`}
+        titre={aSupprimer?.utilisations ? "Suppression impossible" : `Supprimer "${aSupprimer?.nom ?? ""}" ?`}
         onFermer={() => setASupprimer(null)}
       >
         <p className="text-sm text-gw-texte dark:text-white/75">
           {aSupprimer?.utilisations
-            ? `« ${aSupprimer.nom} » est utilisé ${aSupprimer.utilisations} fois par des événements ou des propositions : le supprimer les casserait. Vous pouvez en revanche le modifier (crayon).`
+            ? `"${aSupprimer.nom}" est utilisé ${aSupprimer.utilisations} fois par des événements ou des propositions : le supprimer les casserait. Vous pouvez en revanche le modifier (crayon).`
             : "Il ne sera plus proposé aux organisateurs. Cette action est définitive."}
         </p>
         <div className="mt-6 flex justify-end gap-2">

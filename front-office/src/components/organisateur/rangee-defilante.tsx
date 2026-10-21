@@ -17,7 +17,7 @@ export function RangeeDefilante({
   role,
 }: {
   children: ReactNode
-  /** classes du conteneur des éléments (gap, padding…) */
+  /** classes du conteneur des éléments (gap, padding...) */
   className?: string
   libelle?: string
   role?: string
@@ -39,7 +39,7 @@ export function RangeeDefilante({
     if (!r) return
     const observateur = new ResizeObserver(mesurer)
     observateur.observe(r)
-    // le contenu peut changer de largeur (chargement des compteurs…)
+    // le contenu peut changer de largeur (chargement des compteurs...)
     for (const enfant of Array.from(r.children)) observateur.observe(enfant)
     return () => observateur.disconnect()
   }, [mesurer, children])

@@ -5,7 +5,7 @@ from app.database import Base
 
 
 class JetonRafraichissement(Base):
-    """Jeton de rafraîchissement (« refresh token ») d'une session.
+    """Jeton de rafraîchissement ("refresh token") d'une session.
 
     Le jeton d'accès (JWT) ne dure que quelques minutes ; ce jeton-ci, valable plusieurs jours,
     permet d'en obtenir un nouveau sans redemander le mot de passe. Seule son empreinte SHA-256
@@ -16,7 +16,7 @@ class JetonRafraichissement(Base):
     __tablename__ = "jetons_rafraichissement"
 
     id = Column(Integer, primary_key=True, index=True)
-    # « equipe » (table users : organisateurs, administrateurs) ou « participant »
+    # "equipe" (table users : organisateurs, administrateurs) ou "participant"
     compte = Column(String(20), nullable=False)
     compte_id = Column(Integer, nullable=False)
     empreinte = Column(String(64), nullable=False, unique=True, index=True)

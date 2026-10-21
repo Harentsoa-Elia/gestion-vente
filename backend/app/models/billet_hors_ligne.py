@@ -1,11 +1,11 @@
 """Billets hors ligne : billets générés par l'organisateur et vendus ou offerts en dehors du site.
 
 Un lot regroupe des billets d'un même tarif, générés en une fois :
-- « depot »      : dépôt-vente chez une entreprise partenaire (revendeur). Les billets ne sont pas
+- "depot"      : dépôt-vente chez une entreprise partenaire (revendeur). Les billets ne sont pas
                    payés au départ ; le revendeur rend l'argent des billets vendus et les invendus,
                    en principe une fois 80 % du lot vendu ;
-- « guichet »    : billets que l'organisateur vend lui-même sur place ;
-- « invitation » : billets offerts.
+- "guichet"    : billets que l'organisateur vend lui-même sur place ;
+- "invitation" : billets offerts.
 
 La plateforme facture l'organisateur à la génération : frais fixe par billet, payé par Mobile Money (simulé).
 Chaque billet a son QR code chiffré et se contrôle à l'entrée comme un billet acheté en ligne ;

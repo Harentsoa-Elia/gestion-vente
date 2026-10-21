@@ -75,7 +75,7 @@ class HorsLigneService:
         if categorie.quantite_disponible is not None:
             restantes = categorie.quantite_disponible - await BilletterieService(self.db).places_prises(categorie.id)
             if saisie.quantite > restantes:
-                raise ErreurHorsLigne(f"Il ne reste que {max(restantes, 0)} places « {categorie.nom} ».")
+                raise ErreurHorsLigne(f"Il ne reste que {max(restantes, 0)} places '{categorie.nom}'.")
 
         # paiement des frais de la plateforme (Mobile Money simulé) ; rien à payer si le frais est à 0
         frais = await ParametresService(self.db).frais_billet_hors_ligne()
@@ -323,7 +323,7 @@ class HorsLigneService:
     async def pdf(
         self, auth_data: dict, lot_id: int, format: str = "planche", de: Optional[int] = None, a: Optional[int] = None
     ) -> tuple[bytes, str]:
-        """Billets du lot à imprimer. format : « planche » (18 par page A4, à découper) ou « a5 » (un par page).
+        """Billets du lot à imprimer. format : "planche" (18 par page A4, à découper) ou "a5" (un par page).
         de / a : positions dans le lot (1 = premier billet), pour imprimer une partie ou réimprimer un billet ;
         le QR code reste le même. Les billets annulés ne sont jamais imprimés."""
         lot = await self.lot_autorise(auth_data, lot_id)

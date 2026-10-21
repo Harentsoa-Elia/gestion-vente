@@ -191,7 +191,7 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
   if (chargement) {
     return (
       <div className="flex items-center justify-center gap-2 px-8 py-24 text-gw-texte-doux dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de vos événements…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de vos événements...
       </div>
     )
   }
@@ -249,12 +249,12 @@ export function OrganisateurRecommandations({ darkMode = false }: { darkMode?: b
 
           {chargementEvenement ? (
             <div className="flex items-center justify-center gap-2 py-20 text-gw-texte-doux dark:text-white/60">
-              <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
             </div>
           ) : propositions.length === 0 ? (
             <div className="gw-carte flex flex-col items-center gap-3 px-6 py-14 text-center">
               <Sparkles className="h-8 w-8 text-gw-violet" aria-hidden />
-              <p className="font-titre text-lg font-semibold">Aucune proposition pour « {evenement?.titre} »</p>
+              <p className="font-titre text-lg font-semibold">Aucune proposition pour "{evenement?.titre}"</p>
               <p className="max-w-md text-sm text-gw-texte-doux dark:text-white/60">
                 Soumettez au public plusieurs lieux, artistes ou types d'événement : leurs réactions permettront de calculer une
                 recommandation.
@@ -547,7 +547,7 @@ function BoutonCalcul({
       )}
     >
       {calcul ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : secondaire ? <RefreshCw className="h-4 w-4" aria-hidden /> : <Sparkles className="h-4 w-4" aria-hidden />}
-      {calcul ? "Calcul en cours…" : libelle}
+      {calcul ? "Calcul en cours..." : libelle}
     </button>
   )
 }

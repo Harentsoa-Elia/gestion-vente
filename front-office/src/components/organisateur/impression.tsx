@@ -24,7 +24,7 @@ import { BadgeType } from "@/components/organisateur/billets-hors-ligne"
 type Selection = "tous" | "plage" | "un"
 
 const FORMATS: { id: FormatImpression; titre: string; aide: string; icone: typeof LayoutGrid }[] = [
-  { id: "planche", titre: "Planche A4 à découper", aide: "Jusqu’à 18 billets par page A4 (63 × 44 mm), avec traits de coupe. Idéal pour le guichet et les revendeurs.", icone: LayoutGrid },
+  { id: "planche", titre: "Planche A4 à découper", aide: "Jusqu'à 18 billets par page A4 (63 × 44 mm), avec traits de coupe. Idéal pour le guichet et les revendeurs.", icone: LayoutGrid },
   { id: "a5", titre: "Un billet par page (A5)", aide: "Grand format, comme le billet envoyé par e-mail. Idéal pour les invitations.", icone: FileText },
 ]
 
@@ -105,9 +105,9 @@ export function Impression() {
       return fichier
     } catch (e) {
       toast.error(
-        // « Failed to fetch » : serveur arrêté, ou requête coupée par un gestionnaire de téléchargement
+        // "Failed to fetch" : serveur arrêté, ou requête coupée par un gestionnaire de téléchargement
         e instanceof TypeError
-          ? "Le PDF n'a pas pu être récupéré : vérifiez que l'API est démarrée. Si Internet Download Manager s'ouvre, ajoutez « localhost » à ses exceptions."
+          ? "Le PDF n'a pas pu être récupéré : vérifiez que l'API est démarrée. Si Internet Download Manager s'ouvre, ajoutez 'localhost' à ses exceptions."
           : e instanceof Error
             ? e.message
             : "Le PDF n'a pas pu être préparé.",
@@ -130,7 +130,7 @@ export function Impression() {
   if (!lots) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
       </div>
     )
   }
@@ -267,7 +267,7 @@ export function Impression() {
               <>
                 <Bouton
                   onClick={() => {
-                    // impression directe depuis l'aperçu ; sinon, « Ouvrir pour imprimer »
+                    // impression directe depuis l'aperçu ; sinon, "Ouvrir pour imprimer"
                     try {
                       apercu.current?.contentWindow?.focus()
                       apercu.current?.contentWindow?.print()
@@ -317,7 +317,7 @@ export function Impression() {
                 />
                 <p className="mt-3 text-xs text-gw-texte-doux dark:text-white/60">
                   {lot.fond_source === "tarif"
-                    ? `Fond du tarif « ${lot.categorie_nom} ».`
+                    ? `Fond du tarif "${lot.categorie_nom}".`
                     : lot.fond_source === "type"
                       ? "Fond du type d'événement, choisi par l'administrateur."
                       : "Aucun fond : design guichetweb."}{" "}
@@ -333,7 +333,7 @@ export function Impression() {
               <Ticket className="h-4 w-4 text-gw-violet dark:text-gw-lavande" aria-hidden /> Bien imprimer
             </h2>
             <ul className="mt-2 list-disc space-y-1.5 pl-5 text-gw-texte-doux dark:text-white/65">
-              <li>Imprimez à la taille réelle (100 %), sans « ajuster à la page ».</li>
+              <li>Imprimez à la taille réelle (100 %), sans "ajuster à la page".</li>
               <li>Papier A4 ; un papier épais (160 g ou plus) rend les billets plus solides.</li>
               <li>Découpez en suivant les pointillés de la planche.</li>
               <li>Ne photocopiez pas un billet : la copie aurait le même QR code et serait refusée après le premier passage.</li>

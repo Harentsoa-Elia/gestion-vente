@@ -54,7 +54,7 @@ const espaceOrganisateur = (role: RoleStaff | null) => [
   { href: "/#organiser", libelle: "Comment ça marche ?", icone: HelpCircle },
 ]
 
-/** « Publier un événement » : la liste de ses événements si l'organisateur est connecté. */
+/** "Publier un événement" : la liste de ses événements si l'organisateur est connecté. */
 const lienPublier = (role: RoleStaff | null) => (role === "organisateur" ? "/organisateur/evenements" : role ? accueilSelonRole(role) : "/login")
 
 export function PublicHeader() {
@@ -78,7 +78,7 @@ export function PublicHeader() {
   }, [])
 
   // Session : relue à chaque changement de page, au retour sur l'onglet et quand un autre onglet
-  // se connecte ou se déconnecte. Sans cela, l'en-tête gardait « Connexion » après une connexion
+  // se connecte ou se déconnecte. Sans cela, l'en-tête gardait "Connexion" après une connexion
   // faite sans recharger la page (ou dans un autre onglet).
   useEffect(() => {
     if (!isMounted) return
@@ -166,7 +166,7 @@ export function PublicHeader() {
     router.push("/")
   }
 
-  // « Se déconnecter ? » avant de quitter le compte (Annuler / Se déconnecter)
+  // "Se déconnecter ?" avant de quitter le compte (Annuler / Se déconnecter)
   const { demander: demanderDeconnexion, fenetre: confirmationDeconnexion } = useConfirmationDeconnexion(handleLogout, participantName)
 
   const lancerRecherche = (e: FormEvent) => {

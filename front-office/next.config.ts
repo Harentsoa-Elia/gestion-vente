@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // tunnel https de test (cloudflared) : autorise le rechargement à chaud depuis ces adresses
   allowedDevOrigins: ["*.trycloudflare.com"],
-  // pas de bouton « N » de Next.js en bas de l'écran pendant le développement
+  // pas de bouton "N" de Next.js en bas de l'écran pendant le développement
   devIndicators: false,
   async rewrites() {
     return [

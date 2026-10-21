@@ -24,7 +24,7 @@ import { Anneau } from "@/components/organisateur/anneau"
 import { cn } from "@/utils"
 
 /*
- * Tableau de bord de l'organisateur, sur le modèle « uTask » :
+ * Tableau de bord de l'organisateur, sur le modèle "uTask" :
  * bandeau de bienvenue, trois chiffres clés, anneau de remplissage, courbe des ventes,
  * événements populaires, réservations par catégorie, puis profil et agenda à droite.
  * Couleurs guichetweb ; thème clair ou sombre selon la barre latérale (prop darkMode).
@@ -186,7 +186,7 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // la photo changée depuis la fenêtre « Mon profil » s'affiche aussitôt
+  // la photo changée depuis la fenêtre "Mon profil" s'affiche aussitôt
   useEffect(() => {
     const maj = (e: Event) => setUser((e as CustomEvent<AuthUser>).detail)
     window.addEventListener("gw-compte-equipe", maj)

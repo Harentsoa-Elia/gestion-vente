@@ -51,14 +51,14 @@ export const TYPES_LOT: Record<TypeLot, { libelle: string; aide: string; icone: 
   },
   invitation: {
     libelle: "Invitations",
-    aide: "Billets offerts (partenaires, presse, artistes…) : gratuits pour l'invité.",
+    aide: "Billets offerts (partenaires, presse, artistes...) : gratuits pour l'invité.",
     icone: Gift,
     classes: "bg-gw-rose-pale text-gw-rose-action dark:bg-gw-rose/20 dark:text-pink-200",
   },
 }
 
 const entier = new Intl.NumberFormat("fr-FR")
-/** montant en ariary, « 0 Ar » compris (ariary() affiche « Gratuit » pour un prix nul) */
+/** montant en ariary, "0 Ar" compris (ariary() affiche "Gratuit" pour un prix nul) */
 const montant = (m: number) => `${entier.format(Math.round(m))} Ar`
 const dateCourte = (iso: string) =>
   new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })
@@ -118,7 +118,7 @@ export function BilletsHorsLigne() {
   if (!donnees || !revendeurs) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
       </div>
     )
   }
@@ -315,7 +315,7 @@ function ListeRevendeurs({
         <Handshake className="h-8 w-8 text-gw-violet dark:text-gw-lavande" aria-hidden />
         <p className="font-titre text-lg font-semibold">Aucun revendeur pour l&apos;instant</p>
         <p className="max-w-md text-sm text-gw-texte-doux dark:text-white/60">
-          Un revendeur est créé au premier lot « Dépôt-vente » que vous lui confiez. Vous pourrez ensuite lui donner autant
+          Un revendeur est créé au premier lot "Dépôt-vente" que vous lui confiez. Vous pourrez ensuite lui donner autant
           de lots que vous voulez et suivre tout ce qu&apos;il vous doit ici.
         </p>
         <Bouton className="mt-2" onClick={onPremier}>
@@ -700,7 +700,7 @@ function ModaleGeneration({
     <Modale ouverte={ouverte} titre="Générer des billets" onFermer={onFermer} large>
       {!evenements ? (
         <div className="flex items-center gap-2 py-8 text-gw-texte-doux">
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
         </div>
       ) : evenements.length === 0 ? (
         <p className="text-sm text-gw-texte-doux dark:text-white/65">
@@ -781,7 +781,7 @@ function ModaleGeneration({
                         {r.nom}
                       </option>
                     ))}
-                    <option value={NOUVEAU}>+ Nouveau revendeur…</option>
+                    <option value={NOUVEAU}>+ Nouveau revendeur...</option>
                   </select>
                 )}
               </Champ>
@@ -808,7 +808,7 @@ function ModaleGeneration({
             {tarif && type !== "invitation" && n > 0 && (
               <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/55">
                 Valeur des billets à la vente : {montant(n * tarif.prix)}
-                {type === "depot" ? " — à encaisser auprès du revendeur au règlement." : "."}
+                {type === "depot" ? " - à encaisser auprès du revendeur au règlement." : "."}
               </p>
             )}
           </div>
@@ -972,7 +972,7 @@ function ModaleReglement({
     <Modale ouverte titre={lot.type === "invitation" ? "Clôturer les invitations" : "Règlement du lot"} onFermer={onFermer} large>
       {!detail ? (
         <div className="flex items-center gap-2 py-8 text-gw-texte-doux">
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
         </div>
       ) : (
         <div className="space-y-4">

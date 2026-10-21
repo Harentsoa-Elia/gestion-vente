@@ -34,7 +34,7 @@ COPY --from=build /usr/local/lib/python3.13/site-packages /usr/local/lib/python3
 COPY --from=build /usr/local/bin /usr/local/bin
 COPY --from=build /app .
 
-# Copier l’entrypoint
+# Copier l'entrypoint
 COPY ./docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 

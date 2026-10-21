@@ -10,7 +10,7 @@ import { Modale } from "@/components/organisateur/ui"
 
 /*
  * Profil d'un membre de l'équipe (organisateur ou administrateur) : photo de profil.
- *  - useCompteEquipe() : le compte connecté, tenu à jour quand la photo change (événement « gw-compte-equipe ») ;
+ *  - useCompteEquipe() : le compte connecté, tenu à jour quand la photo change (événement "gw-compte-equipe") ;
  *  - ouvrirProfilEquipe() : ouvre la fenêtre du profil depuis n'importe quelle page de l'espace ;
  *  - AvatarEquipe : la photo, ou les initiales sur le dégradé guichetweb.
  */
@@ -85,7 +85,7 @@ export function ModaleProfilEquipe({ ouverte, onFermer, compte }: { ouverte: boo
           </button>
         </div>
         <div>
-          <p className="font-titre text-xl font-semibold">{compte?.fullname ?? "…"}</p>
+          <p className="font-titre text-xl font-semibold">{compte?.fullname ?? "..."}</p>
           {compte?.email && <p className="text-sm text-gw-texte-doux dark:text-white/60">{compte.email}</p>}
           <p className="mt-1 inline-flex rounded-full bg-gw-lavande/50 px-2.5 py-0.5 text-xs font-semibold text-gw-violet dark:bg-white/10 dark:text-gw-lavande">
             {libelleRole(compte?.role)}

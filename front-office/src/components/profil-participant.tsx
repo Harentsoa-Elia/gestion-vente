@@ -11,7 +11,7 @@ import { formaterTelephone, normaliserTelephone } from "@/lib/billetterie"
 import { BoutonAuth, ChampAuth, ChoixSegmente, MessageErreur } from "@/components/auth/cadre-auth"
 
 /*
- * « Mon profil » (participant) : compléter ou corriger son téléphone, son genre et sa date de naissance.
+ * "Mon profil" (participant) : compléter ou corriger son téléphone, son genre et sa date de naissance.
  * Les comptes créés avant que ces champs soient demandés à l'inscription peuvent ainsi être complétés.
  * Le téléphone est aussi retenu automatiquement au premier paiement Mobile Money.
  * Photo de profil : envoyée tout de suite au choix du fichier, recadrée en carré par le serveur.
@@ -55,7 +55,7 @@ export function ProfilParticipant() {
       <MessageErreur>{erreur}</MessageErreur>
     ) : (
       <p className="flex items-center gap-2 text-gw-texte-doux">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
       </p>
     )
   }
@@ -217,7 +217,7 @@ export function ProfilParticipant() {
 
         <div className="flex justify-end border-t border-gw-bordure pt-6">
           <BoutonAuth type="submit" chargement={envoi}>
-            {envoi ? "Enregistrement…" : "Enregistrer"}
+            {envoi ? "Enregistrement..." : "Enregistrer"}
           </BoutonAuth>
         </div>
       </form>

@@ -32,7 +32,7 @@ import {
 /**
  * Associe une icône à une catégorie d'après son nom (les catégories sont libres côté back-office).
  * L'ordre compte : la première règle qui correspond l'emporte, d'où les cas précis avant les cas généraux
- * (« Arts martiaux » avant « art », « Rencontre professionnelle » avant « conférence »…).
+ * ("Arts martiaux" avant "art", "Rencontre professionnelle" avant "conférence"...).
  */
 const REGLES: [RegExp, LucideIcon][] = [
   [/humour|stand[- ]?up|com[eé]die/i, Laugh],

@@ -1,9 +1,9 @@
-"""Sessions : jeton d'accès court + jeton de rafraîchissement (« refresh token ») avec rotation.
+"""Sessions : jeton d'accès court + jeton de rafraîchissement ("refresh token") avec rotation.
 
 - À la connexion, le client reçoit un jeton d'accès (JWT, ACCESS_TOKEN_MINUTES, 15 min par défaut)
   et un jeton de rafraîchissement (aléatoire, REFRESH_TOKEN_JOURS, 7 jours par défaut).
 - Quand le jeton d'accès arrive à expiration, le site appelle POST /auth/rafraichir : il reçoit
-  une nouvelle paire et l'ancien jeton de rafraîchissement est marqué « utilisé » (rotation).
+  une nouvelle paire et l'ancien jeton de rafraîchissement est marqué "utilisé" (rotation).
 - Un jeton de rafraîchissement déjà utilisé qui revient (hors course entre deux onglets, tolérée
   quelques secondes) signale un vol : toutes les sessions du compte sont révoquées.
 - Déconnexion, mot de passe changé ou compte suspendu : les jetons sont révoqués.

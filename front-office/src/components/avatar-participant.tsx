@@ -14,7 +14,7 @@ export function AvatarParticipant({
   prenom: string
   nom: string
   avatar?: string | null
-  /** taille et arrondi : ex. « h-8 w-8 text-xs » */
+  /** taille et arrondi : ex. "h-8 w-8 text-xs" */
   className?: string
 }) {
   const [erreur, setErreur] = useState(false)

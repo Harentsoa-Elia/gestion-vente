@@ -23,9 +23,9 @@ import { Bouton, Champ, Modale, classeChamp } from "@/components/organisateur/ui
 /*
  * Utilisateurs (administrateur) :
  *  - Équipe : organisateurs et administrateurs ; liste compacte (nom, rôle, statut) et panneau
- *    « Détails » : événements, ventes, changer le rôle, suspendre / réactiver, supprimer
+ *    "Détails" : événements, ventes, changer le rôle, suspendre / réactiver, supprimer
  *    (seulement un compte sans événement) ; créer un compte ;
- *  - Participants : liste compacte (nom, statut) ; tout le reste dans le panneau « Détails »,
+ *  - Participants : liste compacte (nom, statut) ; tout le reste dans le panneau "Détails",
  *    d'où l'on peut aussi suspendre / réactiver.
  */
 
@@ -43,7 +43,7 @@ function age(naissance: string | null) {
 
 function genreCourt(g: string | null) {
   const x = (g ?? "").toLowerCase()
-  return x.startsWith("f") ? "Femme" : x.startsWith("m") || x.startsWith("h") ? "Homme" : x ? "Autre" : "—"
+  return x.startsWith("f") ? "Femme" : x.startsWith("m") || x.startsWith("h") ? "Homme" : x ? "Autre" : "-"
 }
 
 function BadgeStatut({ actif }: { actif: boolean }) {
@@ -115,7 +115,7 @@ function ModaleNouveauCompte({ ouverte, onFermer, onCree }: { ouverte: boolean; 
         <Champ libelle="Adresse e-mail" requis>
           {(id) => <input id={id} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={classeChamp} placeholder="nom@exemple.mg" />}
         </Champ>
-        <Champ libelle="Mot de passe provisoire" requis aide="La personne pourra le changer avec « Mot de passe oublié ».">
+        <Champ libelle="Mot de passe provisoire" requis aide="La personne pourra le changer avec 'Mot de passe oublié'.">
           {(id) => (
             <div className="flex gap-2">
               <input id={id} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className={cn(classeChamp, "font-mono")} />
@@ -173,9 +173,9 @@ export function AdminUtilisateurs() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
   const [envoi, setEnvoi] = useState(false)
   const [moi, setMoi] = useState<number | null>(null)
-  /** participant ouvert dans le panneau « Détails » */
+  /** participant ouvert dans le panneau "Détails" */
   const [detailId, setDetailId] = useState<number | null>(null)
-  /** membre de l'équipe ouvert dans le panneau « Détails » */
+  /** membre de l'équipe ouvert dans le panneau "Détails" */
   const [detailEquipeId, setDetailEquipeId] = useState<number | null>(null)
 
   const charger = useCallback(() => {
@@ -241,7 +241,7 @@ export function AdminUtilisateurs() {
   const detail = participants.find((p) => p.id === detailId) ?? null
   const detailEquipe = equipe.find((u) => u.id === detailEquipeId) ?? null
 
-  // actions sur un compte de l'équipe (depuis le panneau « Détails »)
+  // actions sur un compte de l'équipe (depuis le panneau "Détails")
   const demanderRole = (u: CompteEquipe) => {
     const nouveau = u.role === "admin" ? "organisateur" : "admin"
     setConfirmation({
@@ -334,13 +334,13 @@ export function AdminUtilisateurs() {
         <label className="relative w-full sm:w-72">
           <span className="sr-only">Rechercher</span>
           <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gw-texte-pale" aria-hidden />
-          <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Nom, e-mail…" className={cn(classeChamp, "pl-9")} />
+          <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Nom, e-mail..." className={cn(classeChamp, "pl-9")} />
         </label>
       </div>
 
       {chargement ? (
         <p className="flex items-center gap-2 py-10 text-gw-texte-doux dark:text-white/60">
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
         </p>
       ) : onglet === "equipe" ? (
         <div className="gw-carte overflow-x-auto">
@@ -493,7 +493,7 @@ export function AdminUtilisateurs() {
   )
 }
 
-/* ---------- panneau « Détails » d'un participant ---------- */
+/* ---------- panneau "Détails" d'un participant ---------- */
 
 function PanneauParticipant({
   participant: p,
@@ -514,7 +514,7 @@ function PanneauParticipant({
   if (!p) return null
   const actif = p.statut !== "suspendu"
   const a = age(p.date_naissance)
-  const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "—")
+  const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "-")
 
   const Ligne = ({ icone: Icone, libelle, children }: { icone: typeof Mail; libelle: string; children: React.ReactNode }) => (
     <div className="flex gap-3 py-3">
@@ -578,7 +578,7 @@ function PanneauParticipant({
               </span>
             </Ligne>
             <Ligne icone={Phone} libelle="Téléphone">
-              {p.telephone ? formaterTelephone(p.telephone) : "—"}
+              {p.telephone ? formaterTelephone(p.telephone) : "-"}
             </Ligne>
             <Ligne icone={UserRound} libelle="Genre et âge">
               {genreCourt(p.genre)}
@@ -605,7 +605,7 @@ function PanneauParticipant({
   )
 }
 
-/* ---------- panneau « Détails » d'un membre de l'équipe ---------- */
+/* ---------- panneau "Détails" d'un membre de l'équipe ---------- */
 
 function PanneauEquipe({
   compte: u,

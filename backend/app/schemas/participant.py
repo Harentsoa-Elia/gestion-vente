@@ -6,7 +6,7 @@ from enum import Enum
 
 
 def telephone_malgache(valeur: Optional[str]) -> Optional[str]:
-    """Numéro mobile malgache facultatif : « +261 34 12 345 67 » ou « 034 12 345 67 » -> « 0341234567 »."""
+    """Numéro mobile malgache facultatif : "+261 34 12 345 67" ou "034 12 345 67" -> "0341234567"."""
     if valeur is None or not str(valeur).strip():
         return None
     chiffres = re.sub(r"\D", "", str(valeur))
@@ -60,7 +60,7 @@ class ParticipantLogin(BaseModel):
 
 
 class ParticipantUpdate(BaseModel):
-    """Profil modifiable par le participant (page « Mon profil »). L'e-mail ne change pas ici."""
+    """Profil modifiable par le participant (page "Mon profil"). L'e-mail ne change pas ici."""
     nom: Optional[str] = Field(None, min_length=1, max_length=100)
     prenom: Optional[str] = Field(None, min_length=1, max_length=100)
     telephone: Optional[str] = None

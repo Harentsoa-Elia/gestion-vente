@@ -17,7 +17,7 @@ import { BadgeType, TYPES_LOT } from "@/components/organisateur/billets-hors-lig
 
 const entier = new Intl.NumberFormat("fr-FR")
 const montant = (m: number) => `${entier.format(Math.round(m))} Ar`
-const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "—")
+const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "-")
 
 export function AdminFacturation() {
   const [donnees, setDonnees] = useState<Facturation | null>(null)
@@ -33,7 +33,7 @@ export function AdminFacturation() {
   if (!donnees) {
     return (
       <div className="flex items-center gap-2 px-4 py-16 text-gw-texte-doux lg:px-8 dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
       </div>
     )
   }

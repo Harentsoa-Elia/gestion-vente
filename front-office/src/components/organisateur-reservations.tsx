@@ -44,7 +44,7 @@ export function OrganisateurReservations() {
   const [loadingEvenements, setLoadingEvenements] = useState(true)
   const [loadingReservations, setLoadingReservations] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  /** réservation ouverte dans le panneau « Détails » */
+  /** réservation ouverte dans le panneau "Détails" */
   const [detail, setDetail] = useState<ReservationDetail | null>(null)
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export function OrganisateurReservations() {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Rechercher un participant…"
+                placeholder="Rechercher un participant..."
                 value={recherche}
                 onChange={(e) => setRecherche(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-[#1E293B] dark:text-white text-sm"
@@ -131,7 +131,7 @@ export function OrganisateurReservations() {
             <CardContent>
               {loadingReservations ? (
                 <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
-                  Chargement des réservations…
+                  Chargement des réservations...
                 </p>
               ) : reservationsFiltrees.length === 0 ? (
                 <p className="text-sm text-muted-foreground dark:text-gray-400 text-center py-10">
@@ -211,7 +211,7 @@ export function OrganisateurReservations() {
                 {
                   icone: Phone,
                   libelle: "Téléphone",
-                  contenu: detail.participant.telephone ? formaterTelephone(detail.participant.telephone) : "—",
+                  contenu: detail.participant.telephone ? formaterTelephone(detail.participant.telephone) : "-",
                 },
               ]
             : []

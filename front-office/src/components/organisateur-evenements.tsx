@@ -16,7 +16,7 @@ import { BadgeStatut, Bouton, Modale, STATUTS } from "@/components/organisateur/
 import { FormulaireEvenement } from "@/components/organisateur/formulaire-evenement"
 
 /*
- * « Mes événements » : les événements de l'organisateur connecté, filtrables par statut
+ * "Mes événements" : les événements de l'organisateur connecté, filtrables par statut
  * (brouillon, en attente de validation, validé, rejeté), et la création d'un événement.
  * Chaque ligne mène à la fiche de l'événement (informations, propositions, billets).
  */
@@ -65,7 +65,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
   }, [evenements])
 
   const affiches = filtre === "tous" ? evenements : evenements.filter((e) => e.statut_validation === filtre)
-  // 5 premiers événements, le reste derrière « Voir plus »
+  // pagination : 5 événements par page
   const { visibles: affichesVisibles, bouton: boutonVoirPlus } = useVoirPlus(affiches)
   const lieuxParId = useMemo(() => new Map(lieux.map((l) => [l.id, l])), [lieux])
 
@@ -124,7 +124,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
         <div className="gw-carte flex flex-col items-center gap-3 px-6 py-14 text-center">
           <CalendarPlus className="h-8 w-8 text-gw-violet dark:text-gw-lavande" aria-hidden />
           <p className="font-titre text-lg font-semibold">
-            {filtre === "tous" ? "Vous n'avez pas encore d'événement" : `Aucun événement « ${STATUTS[filtre as StatutValidation].libelle.toLowerCase()} »`}
+            {filtre === "tous" ? "Vous n'avez pas encore d'événement" : `Aucun événement "${STATUTS[filtre as StatutValidation].libelle.toLowerCase()}"`}
           </p>
           {filtre === "tous" && (
             <Bouton onClick={() => setCreation(true)} className="mt-2">
@@ -200,7 +200,7 @@ export function OrganisateurEvenements(_props: { darkMode?: boolean }) {
               try {
                 await envoyerImageEvenement(cree.id, affiche)
               } catch {
-                toast.error("L'événement est créé, mais l'affiche n'a pas pu être envoyée : ajoutez-la dans l'onglet « Informations ».")
+                toast.error("L'événement est créé, mais l'affiche n'a pas pu être envoyée : ajoutez-la dans l'onglet 'Informations'.")
               }
             }
             toast.success("Événement créé en brouillon. Ajoutez maintenant vos propositions.")

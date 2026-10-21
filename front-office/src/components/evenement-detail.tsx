@@ -16,7 +16,7 @@ import { BoiteReactions } from "@/components/accueil/boite-reactions"
 
 /*
  * Page publique d'un événement : affiche, informations pratiques, tarifs avec les places
- * restantes et bouton « Réserver » ; plus bas, les propositions ouvertes au vote du public.
+ * restantes et bouton "Réserver" ; plus bas, les propositions ouvertes au vote du public.
  */
 
 type EtatBilletterie =

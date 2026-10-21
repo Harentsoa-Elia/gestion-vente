@@ -9,8 +9,8 @@ import { AvatarParticipant } from "@/components/avatar-participant"
 
 /*
  * Menu du participant connecté, dans l'en-tête public : un clic sur son nom ouvre
- * « Mes billets », « Mon profil » (avec un rappel s'il manque le téléphone, le genre ou la date
- * de naissance), la confirmation de l'adresse e-mail (si besoin) et « Déconnexion ».
+ * "Mes billets", "Mon profil" (avec un rappel s'il manque le téléphone, le genre ou la date
+ * de naissance), la confirmation de l'adresse e-mail (si besoin) et "Déconnexion".
  * Se ferme avec Échap, par un clic ailleurs ou en changeant de page.
  */
 

@@ -13,7 +13,7 @@ import { cn } from "@/utils"
  *   ... visibles.map(...) ...
  *   {bouton}            // la barre de pagination (rien s'il n'y a qu'une page)
  *
- * On revient à la première page quand la liste change (autre filtre, recherche, événement…).
+ * On revient à la première page quand la liste change (autre filtre, recherche, événement...).
  */
 
 export const LIGNES_VISIBLES = 5
@@ -34,15 +34,15 @@ export function useVoirPlus<T>(liste: T[], parPage = LIGNES_VISIBLES, classePagi
   return { visibles, bouton, page: courante }
 }
 
-/** Numéros affichés : 1 … 4 5 6 … 141 (toujours la première, la dernière et les voisines). */
-function numeros(page: number, pages: number): (number | "…")[] {
+/** Numéros affichés : 1 ... 4 5 6 ... 141 (toujours la première, la dernière et les voisines). */
+function numeros(page: number, pages: number): (number | "...")[] {
   if (pages <= 7) return Array.from({ length: pages }, (_, i) => i + 1)
-  const liste: (number | "…")[] = [1]
+  const liste: (number | "...")[] = [1]
   const de = Math.max(2, Math.min(page - 1, pages - 4))
   const a = Math.min(pages - 1, Math.max(page + 1, 5))
-  if (de > 2) liste.push("…")
+  if (de > 2) liste.push("...")
   for (let n = de; n <= a; n++) liste.push(n)
-  if (a < pages - 1) liste.push("…")
+  if (a < pages - 1) liste.push("...")
   liste.push(pages)
   return liste
 }
@@ -74,16 +74,16 @@ export function Pagination({
       className={cn("mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gw-bordure pt-3 dark:border-white/10", className)}
     >
       <p className="text-xs text-gw-texte-doux tabular-nums dark:text-white/55">
-        {debut + 1}–{debut + affiches} sur {total.toLocaleString("fr-FR")}
+        {debut + 1}-{debut + affiches} sur {total.toLocaleString("fr-FR")}
       </p>
       <div className="flex items-center gap-0.5">
         <button type="button" className={fleche} onClick={() => onPage(page - 1)} disabled={page <= 1} aria-label="Page précédente">
           <ChevronLeft className="h-4 w-4" aria-hidden />
         </button>
         {numeros(page, pages).map((n, i) =>
-          n === "…" ? (
+          n === "..." ? (
             <span key={`e${i}`} className="w-6 text-center text-xs text-gw-texte-doux dark:text-white/45" aria-hidden>
-              …
+              ...
             </span>
           ) : (
             <button
@@ -111,8 +111,8 @@ export function Pagination({
   )
 }
 
-/** Même chose sous forme de composant, pratique après des « return » anticipés :
- *  <ListeVoirPlus elements={liste}>{(visibles) => <ul>…</ul>}</ListeVoirPlus> */
+/** Même chose sous forme de composant, pratique après des "return" anticipés :
+ *  <ListeVoirPlus elements={liste}>{(visibles) => <ul>...</ul>}</ListeVoirPlus> */
 export function ListeVoirPlus<T>({
   elements,
   nombre = LIGNES_VISIBLES,

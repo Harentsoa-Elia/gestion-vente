@@ -12,7 +12,7 @@ import { TYPES_IMAGE_ACCEPTES, urlMedia, verifierFichierImage } from "@/lib/medi
  *   aperçu, boutons Remplacer / Retirer ;
  * - VignetteImage : petite vignette cliquable (visuel d'une proposition dans une liste).
  * L'envoi et le retrait sont délégués au parent (appels API) ; ces composants gèrent le choix
- * du fichier, sa vérification et l'état 'en cours'.
+ * du fichier, sa vérification et l'état "en cours".
  */
 
 interface PropsCommunes {
@@ -162,7 +162,7 @@ export function ZoneImage({
               <ImagePlus className="h-6 w-6" aria-hidden />
             </span>
             <span className="text-sm font-semibold text-gw-nuit dark:text-white">Glissez une image ici ou cliquez pour la choisir</span>
-            <span className="text-xs text-gw-texte-doux dark:text-white/55">JPEG, PNG ou WebP  8 Mo maximum  format paysage conseillé</span>
+            <span className="text-xs text-gw-texte-doux dark:text-white/55">JPEG, PNG ou WebP · 8 Mo maximum · format paysage conseillé</span>
           </span>
         )}
         {occupe && (

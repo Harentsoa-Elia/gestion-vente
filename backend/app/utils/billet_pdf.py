@@ -45,7 +45,7 @@ class InfosBillet:
 
 @lru_cache(maxsize=32)
 def _fond_recadre(url: str, ratio: float) -> Optional[bytes]:
-    """Image de fond recadrée au format du billet (comme « cover » en CSS), en JPEG ; None si illisible."""
+    """Image de fond recadrée au format du billet (comme "cover" en CSS), en JPEG ; None si illisible."""
     if not url or not url.startswith(PREFIXE_URL + "/"):
         return None
     chemin = (MEDIA_DIR / url[len(PREFIXE_URL) + 1:]).resolve()
@@ -95,7 +95,7 @@ def qr_png(valeur: str, taille_module: int = 10) -> bytes:
 
 def _latin1(texte: str) -> str:
     """Les polices intégrées du PDF ne couvrent que le latin-1 : on remplace le reste."""
-    remplacements = {"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"', "\u2013": "-", "\u2014": "-", "\u2026": "...", "\u202f": " ", "\u00a0": " ", "\u0153": "oe", "\u0152": "OE"}
+    remplacements = {"’": "'", "‘": "'", "“": '"', "”": '"', "–": "-", "—": "-", "…": "...", " ": " ", " ": " ", "œ": "oe", "Œ": "OE"}
     for a, b in remplacements.items():
         texte = texte.replace(a, b)
     return texte.encode("latin-1", "replace").decode("latin-1")
@@ -137,7 +137,7 @@ def generer_pdf_billets(billets: List[InfosBillet]) -> bytes:
         pdf.cell(80, 10, "guichetweb")
         pdf.set_font("Helvetica", "", 9)
         pdf.set_xy(l - 98, 15)
-        pdf.cell(80, 10, _latin1(f"Billet {i} sur {len(billets)}  -  {b.numero}"), align="R")
+        pdf.cell(80, 10, _latin1(f"Billet {i} sur {len(billets)}  ·  {b.numero}".replace("·", "-")), align="R")
 
         # informations (colonne gauche)
         x, largeur = 18, 112
@@ -221,7 +221,7 @@ def _tronquer(pdf: FPDF, texte: str, largeur: float) -> str:
 
 
 def date_courte(d: datetime) -> str:
-    """« sam. 21 nov. 2026 - 21h00 », à l'heure de Madagascar."""
+    """'sam. 21 nov. 2026 - 21h00', à l'heure de Madagascar."""
     if d.tzinfo is not None:
         d = d.astimezone(FUSEAU)
     mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."][d.month - 1]

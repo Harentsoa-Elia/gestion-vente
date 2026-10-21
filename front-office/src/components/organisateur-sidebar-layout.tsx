@@ -37,7 +37,7 @@ import { cn } from "@/utils"
  *   la couleur du contenu et s'y raccorde par deux arrondis creusés (classe .gw-onglet-actif).
  * - Thème clair ou sombre, mémorisé dans le navigateur (clé organisateur_dark_mode),
  *   transmis aux pages via la prop darkMode (comme avant) et via la classe .dark.
- * - Sur mobile, la barre latérale s'ouvre en tiroir depuis un bouton « Menu ».
+ * - Sur mobile, la barre latérale s'ouvre en tiroir depuis un bouton "Menu".
  * - espace="admin" : même mise en page pour l'administrateur, avec ses propres liens.
  */
 
@@ -117,7 +117,7 @@ function BarreLaterale({
 
       <nav aria-label={espace === "admin" ? "Administration" : "Espace organisateur"} className="mt-6 flex-1 space-y-1 pl-5">
         {(espace === "admin" ? NAV_ADMIN : NAV_ITEMS).map(({ href, label, icon: Icone, disponible }) => {
-          // la fiche d'un événement (/organisateur/evenements/12) garde « Mes événements » actif
+          // la fiche d'un événement (/organisateur/evenements/12) garde "Mes événements" actif
           const actif = pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`))
           if (!disponible) {
             return (
@@ -155,7 +155,7 @@ function BarreLaterale({
       </nav>
 
       <div className="space-y-3 px-5 pt-4 pb-6">
-        {/* carte d'appel, à la place du « Go Pro » du modèle (organisateur seulement) */}
+        {/* carte d'appel, à la place du "Go Pro" du modèle (organisateur seulement) */}
         {espace === "organisateur" && (
         <Link
           href="/#avis"
@@ -170,7 +170,7 @@ function BarreLaterale({
         </Link>
         )}
 
-        {/* profil du compte connecté : photo, nom et rôle ; ouvre la fenêtre « Mon profil » */}
+        {/* profil du compte connecté : photo, nom et rôle ; ouvre la fenêtre "Mon profil" */}
         <button
           type="button"
           onClick={onProfil}
@@ -223,7 +223,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
   const [darkMode, setDarkMode] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [tiroirOuvert, setTiroirOuvert] = useState(false)
-  // profil du compte connecté (photo) : hooks déclarés avant tout « return » anticipé
+  // profil du compte connecté (photo) : hooks déclarés avant tout "return" anticipé
   const compte = useCompteEquipe()
   const [profilOuvert, setProfilOuvert] = useState(false)
   const ouvrirProfil = useCallback(() => {
@@ -237,7 +237,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
     setMounted(true)
   }, [])
 
-  // Une seule session « équipe » par navigateur : si on se connecte avec un autre compte (ou si on
+  // Une seule session "équipe" par navigateur : si on se connecte avec un autre compte (ou si on
   // se déconnecte) dans un autre onglet, on recharge la page pour afficher le bon espace
   // au lieu de laisser à l'écran des pages d'un compte qui n'est plus connecté.
   useEffect(() => {
@@ -269,7 +269,7 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
     localStorage.setItem("organisateur_dark_mode", String(suivant))
   }
 
-  // « Se déconnecter ? » : rien ne se passe tant que l'utilisateur n'a pas confirmé
+  // "Se déconnecter ?" : rien ne se passe tant que l'utilisateur n'a pas confirmé
   const { demander: deconnexion, fenetre: confirmationDeconnexion } = useConfirmationDeconnexion(async () => {
     // logout() retire toujours le jeton du navigateur, même en cas d'erreur du serveur
     await logout()

@@ -11,8 +11,8 @@ import { API_BASE_URL } from "@/services/apiConfig"
  *
  * installerRafraichissement() enveloppe window.fetch une seule fois :
  *  - avant un appel, si le jeton d'accès expire dans moins de 30 s, il est d'abord renouvelé ;
- *  - si l'API répond « jeton expiré » malgré tout, le jeton est renouvelé et l'appel relancé une fois.
- * Les services existants (getAuthHeaders, getParticipantAuthHeaders…) n'ont donc rien à changer.
+ *  - si l'API répond "jeton expiré" malgré tout, le jeton est renouvelé et l'appel relancé une fois.
+ * Les services existants (getAuthHeaders, getParticipantAuthHeaders...) n'ont donc rien à changer.
  * Un minuteur renouvelle aussi le jeton un peu avant son expiration tant que la page est ouverte.
  * Entre plusieurs onglets, un verrou (navigator.locks) évite deux rafraîchissements simultanés.
  */
@@ -170,7 +170,7 @@ export function installerRafraichissement() {
     const res = await origine(e, i)
     if (res.status !== 401 && res.status !== 403) return res
 
-    // « jeton expiré / révoqué » : on renouvelle et on relance une fois
+    // "jeton expiré / révoqué" : on renouvelle et on relance une fois
     const detail = await res
       .clone()
       .json()

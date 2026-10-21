@@ -18,13 +18,13 @@ from app.utils.crypto import decrypt_data
 from app.auth.roles import est_admin
 
 MOTIF_NUMERO = re.compile(r"^(?:(BLT|BHL)-?)?([0-9A-F]{10})$", re.IGNORECASE)
-# billets achetés en ligne (BLT-…) et billets hors ligne générés par l'organisateur (BHL-…)
+# billets achetés en ligne (BLT-...) et billets hors ligne générés par l'organisateur (BHL-...)
 PREFIXES_BILLET = ("BLT-", "BHL-")
 LIBELLES_LOT = {"depot": "Dépôt-vente", "guichet": "Vente au guichet", "invitation": "Invitation"}
 
 
 def numero_depuis_code(code: str) -> Optional[str]:
-    """QR code (numéro chiffré) ou numéro tapé à la main -> « BLT-XXXXXXXXXX » ou « BHL-XXXXXXXXXX »."""
+    """QR code (numéro chiffré) ou numéro tapé à la main -> "BLT-XXXXXXXXXX" ou "BHL-XXXXXXXXXX"."""
     brut = (code or "").strip()
     saisi = MOTIF_NUMERO.match(brut.replace(" ", ""))
     if saisi:
@@ -202,7 +202,7 @@ class ControleEntreeService:
         }
 
     async def _scanner_hors_ligne(self, evenement: Evenement, numero: Optional[str], code: str) -> Optional[dict]:
-        """Billet généré par l'organisateur (BHL-…) : None si le code n'en est pas un."""
+        """Billet généré par l'organisateur (BHL-...) : None si le code n'en est pas un."""
         requete = select(BilletHorsLigne, LotHorsLigne, CategorieBillet, Evenement).join(
             LotHorsLigne, BilletHorsLigne.lot_id == LotHorsLigne.id
         ).join(CategorieBillet, LotHorsLigne.categorie_billet_id == CategorieBillet.id).join(
@@ -224,7 +224,7 @@ class ControleEntreeService:
             return {"statut": statut, "message": message, "billet": infos(), "evenement_billet": autre}
 
         if e.id != evenement.id:
-            return reponse("autre_evenement", f"Ce billet est pour « {e.titre} ».", e.titre)
+            return reponse("autre_evenement", f"Ce billet est pour '{e.titre}'.", e.titre)
         if b.annule:
             return reponse("annule", "Billet annulé : il a été rendu invendu par le revendeur.")
         passe = (
@@ -262,7 +262,7 @@ class ControleEntreeService:
         else:
             infos = await self._billet_scanne(billet_id)
             if infos["evenement_id"] != evenement.id:
-                resultat = reponse("autre_evenement", f"Ce billet est pour « {infos['evenement_titre']} ».", infos, infos["evenement_titre"])
+                resultat = reponse("autre_evenement", f"Ce billet est pour '{infos['evenement_titre']}'.", infos, infos["evenement_titre"])
             else:
                 # une seule requête : deux scans simultanés du même billet ne peuvent pas passer tous les deux
                 passe = (

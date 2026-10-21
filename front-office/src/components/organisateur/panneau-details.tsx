@@ -5,7 +5,7 @@ import { ChevronRight, X, type LucideIcon } from "lucide-react"
 import { cn } from "@/utils"
 
 /*
- * Panneau « Détails » qui glisse depuis la droite : les tableaux restent compacts
+ * Panneau "Détails" qui glisse depuis la droite : les tableaux restent compacts
  * (nom, statut, actions) et tout le reste s'affiche ici. Se ferme avec la croix,
  * Échap ou un clic à côté. Utilisé par l'admin (équipe, participants) et l'organisateur
  * (participants, réservations).
@@ -42,7 +42,7 @@ export function PanneauDetails({
   badge?: ReactNode
   chiffres?: ChiffreDetail[]
   lignes: LigneDetail[]
-  /** boutons d'action en bas (« Fermer » est ajouté d'office) */
+  /** boutons d'action en bas ("Fermer" est ajouté d'office) */
   pied?: ReactNode
 }) {
   useEffect(() => {
@@ -110,7 +110,7 @@ export function PanneauDetails({
   )
 }
 
-/** Bouton « Détails › » des lignes de tableau. */
+/** Bouton "Détails ›" des lignes de tableau. */
 export function BoutonDetails({ onClick }: { onClick: () => void }) {
   return (
     <button

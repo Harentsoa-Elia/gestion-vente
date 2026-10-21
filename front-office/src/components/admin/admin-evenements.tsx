@@ -37,7 +37,7 @@ import { BadgeStatut, Bouton, Modale, STATUTS, classeChamp } from "@/components/
 /*
  * Administration : validation des événements soumis par les organisateurs.
  * - onglets par statut dans l'ordre de vie d'un événement : Tous, En préparation, À valider,
- *   Validés, Rejetés ; « À valider » est ouvert d'office s'il y a des demandes en attente ;
+ *   Validés, Rejetés ; "À valider" est ouvert d'office s'il y a des demandes en attente ;
  * - pour chaque événement : affiche, date, lieu, organisateur, et un détail dépliable
  *   (description, propositions soumises au public, tarifs) avec une liste de points à vérifier ;
  * - Valider (l'événement devient public) ou Rejeter avec un motif : dans les deux cas
@@ -91,7 +91,7 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
   const [chargement, setChargement] = useState(true)
   const [erreur, setErreur] = useState<string | null>(null)
   const [filtre, setFiltre] = useState<Filtre>("tous")
-  // au premier chargement seulement : « À valider » s'il y a des demandes, sinon « Tous »
+  // au premier chargement seulement : "À valider" s'il y a des demandes, sinon "Tous"
   const premierChoix = useRef(true)
 
   const [aValider, setAValider] = useState<Evenement | null>(null)
@@ -145,7 +145,7 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
     setEnvoi(true)
     try {
       remplacer(await validerEvenement(aValider.id))
-      toast.success(`« ${aValider.titre} » est validé : il est visible sur le site. L'organisateur est prévenu par e-mail.`)
+      toast.success(`"${aValider.titre}" est validé : il est visible sur le site. L'organisateur est prévenu par e-mail.`)
       setAValider(null)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "La validation a échoué.")
@@ -159,7 +159,7 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
     setEnvoi(true)
     try {
       remplacer(await rejeterEvenement(aRejeter.id, motif.trim()))
-      toast.success(`« ${aRejeter.titre} » est renvoyé à l'organisateur, avec votre motif.`)
+      toast.success(`"${aRejeter.titre}" est renvoyé à l'organisateur, avec votre motif.`)
       setARejeter(null)
       setMotif("")
     } catch (e) {
@@ -262,7 +262,7 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
       {/* confirmation de validation */}
       <Modale ouverte={aValider !== null} titre="Valider l'événement ?" onFermer={() => setAValider(null)}>
         <p className="text-sm text-gw-texte-doux dark:text-white/70">
-          « {aValider?.titre} » apparaîtra sur le site public et le public pourra réserver ses billets. L&apos;organisateur sera
+          "{aValider?.titre}" apparaîtra sur le site public et le public pourra réserver ses billets. L&apos;organisateur sera
           prévenu par e-mail.
         </p>
         <div className="mt-6 flex justify-end gap-2">
@@ -286,7 +286,7 @@ export function AdminEvenements(_props: { darkMode?: boolean }) {
           className="space-y-4"
         >
           <p className="text-sm text-gw-texte-doux dark:text-white/70">
-            « {aRejeter?.titre} » retournera à l&apos;organisateur, qui pourra le corriger et vous le soumettre à nouveau. Il recevra
+            "{aRejeter?.titre}" retournera à l&apos;organisateur, qui pourra le corriger et vous le soumettre à nouveau. Il recevra
             ce motif par e-mail et le verra dans sa fiche.
           </p>
           <div>
@@ -501,7 +501,7 @@ function CarteAValider({
                 <Ticket className="h-4 w-4" aria-hidden /> Tarifs
               </h3>
               {!details ? (
-                <p className="mt-1.5 text-sm text-gw-texte-doux">Chargement…</p>
+                <p className="mt-1.5 text-sm text-gw-texte-doux">Chargement...</p>
               ) : details.tarifs.length === 0 ? (
                 <p className="mt-1.5 text-sm text-amber-700 dark:text-amber-300">Aucun tarif défini.</p>
               ) : (
@@ -525,7 +525,7 @@ function CarteAValider({
           <section>
             <h3 className="text-xs font-semibold tracking-wide text-gw-texte-doux uppercase dark:text-white/55">Propositions soumises au public</h3>
             {!details ? (
-              <p className="mt-1.5 text-sm text-gw-texte-doux">Chargement…</p>
+              <p className="mt-1.5 text-sm text-gw-texte-doux">Chargement...</p>
             ) : (
               <div className="mt-1.5 space-y-3">
                 {TYPES.map(({ type, titre, icone: Icone }) => {

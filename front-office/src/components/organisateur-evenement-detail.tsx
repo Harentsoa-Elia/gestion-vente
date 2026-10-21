@@ -54,7 +54,7 @@ import { estRegionEntreprise, villeEtRegion } from "@/lib/regions"
 import { VignetteImage, ZoneImage } from "@/components/organisateur/zone-image"
 
 /*
- * Fiche d'un événement de l'organisateur (cas d'utilisation « Gérer un événement ») :
+ * Fiche d'un événement de l'organisateur (cas d'utilisation "Gérer un événement") :
  *  - parcours de publication : brouillon -> soumis à l'administrateur -> validé (ou rejeté) ;
  *  - propositions soumises au public (lieux, artistes, types d'événement) : le libellé reprend
  *    automatiquement le nom de l'élément choisi ;
@@ -73,9 +73,9 @@ const TYPES: {
   aide: string
   recherche: string
 }[] = [
-  { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?", recherche: "Rechercher un lieu, une ville ou une région…" },
-  { type: "ARTISTE", titre: "Artistes", icone: Mic2, cle: "artiste_id", aide: "Qui programmer ?", recherche: "Rechercher un artiste ou un genre…" },
-  { type: "CATEGORIE", titre: "Types d'événement", icone: Tags, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement…" },
+  { type: "LIEU", titre: "Lieux", icone: MapPin, cle: "lieu_id", aide: "Où organiser l'événement ?", recherche: "Rechercher un lieu, une ville ou une région..." },
+  { type: "ARTISTE", titre: "Artistes", icone: Mic2, cle: "artiste_id", aide: "Qui programmer ?", recherche: "Rechercher un artiste ou un genre..." },
+  { type: "CATEGORIE", titre: "Types d'événement", icone: Tags, cle: "categorie_id", aide: "Quel type d'événement ?", recherche: "Rechercher un type d'événement..." },
 ]
 
 const entier = new Intl.NumberFormat("fr-FR")
@@ -179,7 +179,7 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
   if (chargement) {
     return (
       <div className="flex items-center justify-center gap-2 px-8 py-24 text-gw-texte-doux dark:text-white/60">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de l&apos;événement…
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de l&apos;événement...
       </div>
     )
   }
@@ -413,7 +413,7 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
 
       <Modale ouverte={suppression} titre="Supprimer l'événement ?" onFermer={() => setSuppression(false)}>
         <p className="text-sm text-gw-texte-doux dark:text-white/70">
-          « {evenement.titre} » sera supprimé définitivement, avec ses {propositions.length} proposition
+          "{evenement.titre}" sera supprimé définitivement, avec ses {propositions.length} proposition
           {propositions.length > 1 ? "s" : ""}, les réactions du public et ses tarifs.
         </p>
         <div className="mt-6 flex justify-end gap-2">
@@ -461,7 +461,7 @@ function OngletPropositions({
     LIEU: lieux.map((l) => ({
       id: l.id,
       nom: l.nom,
-      // ville, région (recherche possible par région, ex. « haute matsiatra »), capacité
+      // ville, région (recherche possible par région, ex. "haute matsiatra"), capacité
       detail: [villeEtRegion(l), l.capacite ? `${entier.format(l.capacite)} places` : null].filter(Boolean).join(" · "),
       priorite: estRegionEntreprise(l) ? 1 : 0,
     })),
@@ -469,13 +469,13 @@ function OngletPropositions({
     CATEGORIE: categories.map((c) => ({ id: c.id, nom: c.nom })),
   }
 
-  // appelée dès qu'un élément est choisi dans la recherche : pas de bouton « Ajouter » séparé
+  // appelée dès qu'un élément est choisi dans la recherche : pas de bouton "Ajouter" séparé
   const ajouter = async (type: PropositionType, cle: "lieu_id" | "artiste_id" | "categorie_id", id: number, nom: string) => {
     setAjout(type)
     try {
       await createProposition({ evenement_id: evenementId, type, [cle]: id })
       await onChangement()
-      toast.success(`« ${nom} » est proposé au public.`)
+      toast.success(`"${nom}" est proposé au public.`)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "La proposition n'a pas été ajoutée.")
     } finally {
@@ -547,7 +547,7 @@ function OngletPropositions({
                         onEnvoyer={async (fichier) => {
                           await envoyerImageProposition(p.id, fichier)
                           await onChangement()
-                          toast.success(`Image ajoutée à « ${p.libelle} ».`)
+                          toast.success(`Image ajoutée à "${p.libelle}".`)
                         }}
                         onRetirer={async () => {
                           await retirerImageProposition(p.id)
@@ -585,7 +585,7 @@ function OngletPropositions({
                   vide={type === "CATEGORIE" ? "Tous les types d'événement sont déjà proposés" : "Tout est déjà proposé"}
                   onChoisir={(o) => ajouter(type, cle, o.id, o.nom)}
                   onCreer={creer}
-                  libelleCreer={(t) => (type === "LIEU" ? `Créer le lieu « ${t} »` : `Créer l'artiste « ${t} »`)}
+                  libelleCreer={(t) => (type === "LIEU" ? `Créer le lieu "${t}"` : `Créer l'artiste "${t}"`)}
                 />
                 <p className="mt-1.5 text-xs text-gw-texte-doux dark:text-white/50">
                   {type === "CATEGORIE"
@@ -621,7 +621,7 @@ function OngletPropositions({
 
       <Modale ouverte={aRetirer !== null} titre="Retirer la proposition ?" onFermer={() => setARetirer(null)}>
         <p className="text-sm text-gw-texte-doux dark:text-white/70">
-          « {aRetirer?.libelle} » ne sera plus proposé au public.
+          "{aRetirer?.libelle}" ne sera plus proposé au public.
           {aRetirer && aRetirer.score > 0 && (
             <>
               {" "}
@@ -667,7 +667,7 @@ function ModaleNouvelArtiste({
     setEnvoi(true)
     try {
       const artiste = await createArtiste({ nom: nom.trim(), genre_artistique: genre.trim() || null, description: null })
-      toast.success(`Artiste « ${artiste.nom} » créé.`)
+      toast.success(`Artiste "${artiste.nom}" créé.`)
       setNom("")
       setGenre("")
       onCree(artiste)
@@ -736,7 +736,7 @@ function OngletBillets({
         <div>
           <h2 className="font-titre text-lg font-semibold">Catégories de billets</h2>
           <p className="text-sm text-gw-texte-doux dark:text-white/60">
-            Le prix le plus bas s&apos;affiche sur le site (« À partir de … »). Ajoutez un fond d&apos;image pour
+            Le prix le plus bas s&apos;affiche sur le site ("À partir de ..."). Ajoutez un fond d&apos;image pour
             personnaliser les billets de chaque tarif.
           </p>
         </div>
@@ -749,7 +749,7 @@ function OngletBillets({
       {billets.length === 0 ? (
         <div className="mt-6 flex flex-col items-center gap-2 rounded-2xl border border-dashed border-gw-lavande px-6 py-10 text-center dark:border-white/15">
           <Ticket className="h-7 w-7 text-gw-violet dark:text-gw-lavande" aria-hidden />
-          <p className="text-sm text-gw-texte-doux dark:text-white/60">Aucun tarif. Ajoutez par exemple « Simple » et « VIP ».</p>
+          <p className="text-sm text-gw-texte-doux dark:text-white/60">Aucun tarif. Ajoutez par exemple "Simple" et "VIP".</p>
         </div>
       ) : (
         <div className="mt-5 overflow-x-auto">
@@ -824,7 +824,7 @@ function OngletBillets({
 
       <Modale ouverte={aSupprimer !== null} titre="Supprimer ce tarif ?" onFermer={() => setASupprimer(null)}>
         <p className="text-sm text-gw-texte-doux dark:text-white/70">
-          La catégorie « {aSupprimer?.nom} » ne sera plus en vente. Si des billets ont déjà été réservés dans cette
+          La catégorie "{aSupprimer?.nom}" ne sera plus en vente. Si des billets ont déjà été réservés dans cette
           catégorie, la suppression peut être refusée.
         </p>
         <div className="mt-6 flex justify-end gap-2">

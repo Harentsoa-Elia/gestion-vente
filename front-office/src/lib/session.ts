@@ -27,7 +27,7 @@ export async function staffConnecte(): Promise<RoleStaff | null> {
 /**
  * Pages de connexion : si l'utilisateur est déjà connecté, on l'envoie directement à son espace
  * au lieu d'afficher le formulaire. Renvoie true quand le formulaire peut s'afficher.
- *  - participant : la page demandée (?redirect=…) ou « Mes billets » ;
+ *  - participant : la page demandée (?redirect=...) ou "Mes billets" ;
  *  - organisateur / administrateur : son tableau de bord.
  * (Un organisateur connecté peut quand même ouvrir la connexion participant pour acheter des billets.)
  */

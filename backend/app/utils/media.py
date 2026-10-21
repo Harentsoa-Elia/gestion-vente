@@ -1,7 +1,7 @@
 """Enregistrement des images envoyées par les organisateurs (affiches, visuels des propositions).
 
 Les fichiers sont ré-encodés avec Pillow avant d'être écrits : on n'enregistre jamais tel quel
-un fichier reçu, ce qui écarte les faux fichiers image et retire les métadonnées (position GPS…).
+un fichier reçu, ce qui écarte les faux fichiers image et retire les métadonnées (position GPS...).
 Ils sont servis par FastAPI sous /media (voir main.py) ; le dossier media/ n'est pas versionné.
 """
 from io import BytesIO

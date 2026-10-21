@@ -61,7 +61,7 @@ export async function logoutParticipant(): Promise<void> {
     throw new Error(data?.detail || `Failed to logout: ${res.statusText}`);
   }
 }
-/** Page « Mon profil » : prénom, nom, téléphone, genre, date de naissance (l'e-mail ne change pas ici). */
+/** Page "Mon profil" : prénom, nom, téléphone, genre, date de naissance (l'e-mail ne change pas ici). */
 export async function updateParticipantMe(
   champs: Partial<Pick<Participant, "nom" | "prenom" | "telephone" | "genre" | "date_naissance">>,
 ): Promise<Participant> {

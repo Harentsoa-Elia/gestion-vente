@@ -14,7 +14,7 @@ import { cn } from "@/utils"
 
 const TYPES = "image/jpeg,image/png,image/webp"
 
-/** Vignette + boutons « Ajouter / Changer » et « Retirer ». */
+/** Vignette + boutons "Ajouter / Changer" et "Retirer". */
 export function ChoixFond({
   url,
   libelle,
@@ -22,7 +22,7 @@ export function ChoixFond({
   compact,
 }: {
   url: string | null | undefined
-  /** pour l'accessibilité : « fond des billets VIP » */
+  /** pour l'accessibilité : "fond des billets VIP" */
   libelle: string
   onChanger: (fichier: File | null) => Promise<void>
   compact?: boolean
@@ -138,7 +138,7 @@ export function ApercuBillet({
       </div>
       <div className="absolute top-[8%] right-[3.5%] flex w-[40%] flex-col items-center rounded-[3px] bg-white p-[2%]">
         <QrCode className="aspect-square h-auto w-full text-gw-nuit" strokeWidth={1.2} aria-hidden />
-        <span className="mt-0.5 font-mono text-[7px] font-bold">BHL-…</span>
+        <span className="mt-0.5 font-mono text-[7px] font-bold">BHL-...</span>
       </div>
     </div>
   )

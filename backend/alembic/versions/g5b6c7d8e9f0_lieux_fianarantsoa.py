@@ -5,7 +5,7 @@ Revises: f4a5b6c7d8e9
 Create Date: 2026-09-28 12:30:00.000000
 
 - Renomme les lieux ajoutés par f4a5b6c7d8e9 avec les noms utilisés sur place.
-- Retire 'Discothèque du Soafia' (seulement si aucun événement, proposition ou
+- Retire "Discothèque du Soafia" (seulement si aucun événement, proposition ou
   recommandation ne l'utilise).
 - Ajoute les lieux de la liste ; idempotent (un nom déjà présent, sans tenir compte
   de la casse, n'est pas réinséré).
