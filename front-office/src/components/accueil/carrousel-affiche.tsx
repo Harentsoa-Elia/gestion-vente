@@ -52,7 +52,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
       onMouseEnter={() => setSurvol(true)}
       onMouseLeave={() => setSurvol(false)}
     >
-      <h2 id="affiche-titre" className="text-center text-sm font-semibold tracking-[0.2em] text-[#F59BC7] uppercase">
+      <h2 id="affiche-titre" className="mx-auto w-fit rounded-full bg-gw-surface/90 px-3 py-1 text-center text-sm font-semibold tracking-[0.2em] text-gw-rose-action uppercase dark:bg-transparent dark:text-[#F59BC7]">
         À l&apos;affiche
       </h2>
 
@@ -131,7 +131,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
               type="button"
               onClick={() => aller(-1)}
               aria-label="Événement précédent"
-              className="absolute top-1/2 left-0 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 backdrop-blur transition-colors hover:bg-white/25"
+              className="absolute top-1/2 left-0 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-gw-violet text-white backdrop-blur transition-colors hover:bg-gw-violet-fonce dark:bg-white/15 dark:hover:bg-white/25"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>

@@ -50,7 +50,7 @@ export function Logo({ ton = "sombre", className }: LogoProps) {
         <span
           className={cn(
             "font-script -ml-0.5 -rotate-6 text-[1.85rem] leading-none",
-            ton === "sombre" ? "text-gw-rose-action" : "text-gw-rose-pale",
+            ton === "sombre" ? "text-gw-rose-action dark:text-gw-rose" : "text-gw-rose-pale",
           )}
         >
           web

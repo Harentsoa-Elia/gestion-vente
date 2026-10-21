@@ -161,7 +161,7 @@ export function CatalogueEvenements() {
                 <span
                   className={cn(
                     "rounded-full px-2 py-0.5 text-xs",
-                    onglet === o.id ? "bg-gw-violet text-white" : "bg-[#F6F4FC] text-gw-texte-doux",
+                    onglet === o.id ? "bg-gw-violet text-white" : "bg-gw-fond text-gw-texte-doux",
                   )}
                 >
                   {o.nombre}

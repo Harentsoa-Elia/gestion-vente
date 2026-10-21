@@ -213,7 +213,7 @@ export function PropositionsEmpilees({
         {/* colonne droite : les propositions, en cartes empilées */}
         <div>
           {chargement ? (
-            <div className="h-[26rem] animate-pulse rounded-[1.75rem] bg-[#EBE6FA]" aria-hidden />
+            <div className="h-[26rem] animate-pulse rounded-[1.75rem] bg-gw-bordure" aria-hidden />
           ) : propositions.length === 0 ? (
             <div className="flex flex-col items-start gap-4 rounded-[1.75rem] bg-gw-lavande p-8 sm:p-10">
               <Vote className="h-8 w-8 text-gw-violet-fonce" aria-hidden />

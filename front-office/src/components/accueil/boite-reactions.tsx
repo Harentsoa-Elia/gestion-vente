@@ -287,9 +287,9 @@ export function BoiteReactions({
   const active = maReaction ? PAR_TYPE[maReaction.type] : null
 
   return (
-    <div className="rounded-2xl bg-gw-surface text-[#2A1A5E] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]">
+    <div className="rounded-2xl bg-gw-surface text-gw-encre shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]">
       {/* résumé : pastilles, total, nombre de commentaires */}
-      <div className="flex items-center justify-between gap-3 px-3 pt-2.5 pb-2 text-sm text-[#6B5F99]">
+      <div className="flex items-center justify-between gap-3 px-3 pt-2.5 pb-2 text-sm text-gw-texte-doux">
         {total > 0 ? (
           <span className="flex items-center gap-1.5">
             <span className="flex -space-x-1">
@@ -323,7 +323,7 @@ export function BoiteReactions({
       </div>
 
       {/* barre d'actions */}
-      <div className="mx-3 flex border-y border-[#EBE6FA] py-1">
+      <div className="mx-3 flex border-y border-gw-bordure py-1">
         <div
           ref={zone}
           className="relative flex flex-1"
@@ -384,7 +384,7 @@ export function BoiteReactions({
             onPointerUp={() => window.clearTimeout(m.appui)}
             onPointerCancel={() => window.clearTimeout(m.appui)}
             onContextMenu={(e) => e.preventDefault()}
-            className="flex flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-[#6B5F99] transition-colors select-none hover:bg-[#F6F4FC] focus-visible:outline-2 focus-visible:outline-[#6C5CE7] disabled:opacity-60"
+            className="flex flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-gw-texte-doux transition-colors select-none hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet disabled:opacity-60"
             style={active ? { color: active.couleur } : undefined}
           >
             {active ? (
@@ -404,7 +404,7 @@ export function BoiteReactions({
             setCommentairesOuverts(true)
             champ.current?.focus()
           }}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-[#6B5F99] transition-colors hover:bg-[#F6F4FC] focus-visible:outline-2 focus-visible:outline-[#6C5CE7]"
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-gw-texte-doux transition-colors hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet"
         >
           <MessageCircle className="h-5 w-5" aria-hidden />
           Commenter
@@ -416,11 +416,11 @@ export function BoiteReactions({
         <ul className="max-h-44 space-y-2 overflow-y-auto px-3 pt-3">
           {commentaires.map((c) => (
             <li key={c.id} className="flex gap-2">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EBE6FA]">
-                <UserRound className="h-4 w-4 text-[#6B5F99]" aria-hidden />
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gw-bordure">
+                <UserRound className="h-4 w-4 text-gw-texte-doux" aria-hidden />
               </span>
               <div className="min-w-0">
-                <div className="rounded-2xl bg-[#F6F4FC] px-3 py-2">
+                <div className="rounded-2xl bg-gw-fond px-3 py-2">
                   <p className="text-[13px] font-semibold">
                     {moi != null && c.participant_id === moi
                       ? "Vous"
@@ -430,7 +430,7 @@ export function BoiteReactions({
                   </p>
                   <p className="text-sm break-words">{c.contenu}</p>
                 </div>
-                <p className="mt-0.5 pl-3 text-xs text-[#6B5F99]">{ilYa(c.date_interaction)}</p>
+                <p className="mt-0.5 pl-3 text-xs text-gw-texte-doux">{ilYa(c.date_interaction)}</p>
               </div>
             </li>
           ))}
@@ -446,8 +446,8 @@ export function BoiteReactions({
         }}
         className="flex items-center gap-2 p-3"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EBE6FA]">
-          <UserRound className="h-4 w-4 text-[#6B5F99]" aria-hidden />
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gw-bordure">
+          <UserRound className="h-4 w-4 text-gw-texte-doux" aria-hidden />
         </span>
         <div className="relative flex-1">
           <input
@@ -457,13 +457,13 @@ export function BoiteReactions({
             maxLength={500}
             placeholder="Écrivez un commentaire..."
             aria-label={`Commenter ${libelle}`}
-            className="h-9 w-full rounded-full bg-[#F6F4FC] pr-10 pl-4 text-sm placeholder:text-[#6B5F99] focus:outline-2 focus:outline-[#6C5CE7]"
+            className="h-9 w-full rounded-full bg-gw-fond pr-10 pl-4 text-sm placeholder:text-gw-texte-doux focus:outline-2 focus:outline-gw-violet"
           />
           <button
             type="submit"
             disabled={!commentaire.trim() || envoi}
             aria-label="Publier le commentaire"
-            className="absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-[#6C5CE7] transition-opacity hover:bg-[#EBE6FA] disabled:opacity-30"
+            className="absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gw-violet transition-opacity hover:bg-gw-bordure disabled:opacity-30"
           >
             <SendHorizontal className="h-4 w-4" aria-hidden />
           </button>

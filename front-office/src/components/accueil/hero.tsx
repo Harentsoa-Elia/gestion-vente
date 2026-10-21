@@ -80,26 +80,27 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
       {/* fond : photos en fondu enchaîné (le fond "scène" reste visible pendant le chargement) */}
       <div className="scene relative overflow-hidden" style={{ "--accent": "var(--color-gw-rose)" } as CSSProperties}>
         <FondDiaporama {...diaporama} />
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[#1D1245]/90 via-[#1D1245]/55 to-[#1D1245]/10" />
+        {/* mode jour : voile clair à gauche et texte foncé ; mode nuit : voile sombre et texte blanc */}
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/0 dark:from-[#1D1245]/90 dark:via-[#1D1245]/55 dark:to-[#1D1245]/10" />
 
         <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-40 sm:px-6 sm:pt-20 sm:pb-48 lg:pb-52">
 
-          <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-            <Music className="h-4 w-4 text-[#F59BC7]" aria-hidden />
+          <p className="inline-flex items-center gap-2 rounded-full bg-gw-violet/10 px-3.5 py-1.5 text-sm font-medium text-gw-encre backdrop-blur-sm dark:bg-white/15 dark:text-white">
+            <Music className="h-4 w-4 text-gw-rose-action dark:text-[#F59BC7]" aria-hidden />
             Concerts, cabarets, sport et soirées
           </p>
 
           <h1
             id="hero-titre"
-            className="font-titre mt-5 max-w-2xl text-[2.6rem] leading-[1.05] font-bold tracking-[-0.03em] text-white sm:text-6xl"
+            className="font-titre mt-5 max-w-2xl text-[2.6rem] leading-[1.05] font-bold tracking-[-0.03em] text-gw-encre sm:text-6xl dark:text-white"
           >
             Trouvez votre prochaine{" "}
-            <span className="font-script inline-block pr-2 text-[1.15em] font-normal tracking-normal text-[#F59BC7]">
+            <span className="font-script inline-block pr-2 text-[1.15em] font-normal tracking-normal text-gw-rose-action dark:text-[#F59BC7]">
               sortie
             </span>{" "}
             sur {NOM_PLATEFORME}
           </h1>
-          <p className="mt-5 max-w-md text-lg leading-relaxed text-white/85">
+          <p className="mt-5 max-w-md text-lg leading-relaxed text-gw-texte dark:text-white/85">
             Réservez vos billets en quelques clics, et votez pour les artistes, les lieux et les événements que vous voulez voir.
           </p>
 
@@ -113,12 +114,12 @@ export function Hero({ lieux, categories, catalogue }: HeroProps) {
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </span>
             </Link>
-            <span aria-hidden className="hidden h-8 w-px bg-white/30 sm:block" />
+            <span aria-hidden className="hidden h-8 w-px bg-gw-encre/20 sm:block dark:bg-white/30" />
             <Link
               href="#avis"
-              className="group inline-flex items-center gap-3 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="group inline-flex items-center gap-3 font-semibold text-gw-encre focus-visible:outline-2 dark:text-white focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gw-surface text-gw-violet transition-transform group-hover:scale-105">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gw-violet text-white transition-transform group-hover:scale-105 dark:bg-white dark:text-gw-violet">
                 <Vote className="h-5 w-5" aria-hidden />
               </span>
               Donner mon avis
