@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { lireRafraichissement } from "@/lib/jetons"
 import { Suspense, useEffect, useState } from "react"
 import Link from "next/link"
@@ -38,23 +40,20 @@ function Contenu() {
       sousEntete
       onglets={[{ libelle: "Vérification", actif: true }]}
       icone={MailCheck}
-      surtitre="Dernière étape"
-      titre="Confirmez votre e-mail"
-      sousTitre="Vos billets et leurs QR codes seront envoyés à cette adresse : vérifions qu'elle est bien la vôtre."
+      surtitre={t("Dernière étape")}
+      titre={t("Confirmez votre e-mail")}
+      sousTitre={t("Vos billets et leurs QR codes seront envoyés à cette adresse : vérifions qu'elle est bien la vôtre.")}
       pied={
         <>
-          <span>Pas maintenant ?</span>
-          <LienPied href={redirectTo}>Continuer sans confirmer</LienPied>
-          <span className="w-full text-center text-xs sm:w-auto">(la confirmation sera demandée avant de réserver)</span>
+          <span>{t("Pas maintenant ?")}</span>
+          <LienPied href={redirectTo}>{t("Continuer sans confirmer")}</LienPied>
+          <span className="w-full text-center text-xs sm:w-auto">{t("(la confirmation sera demandée avant de réserver)")}</span>
         </>
       }
     >
       <VerificationEmail email={email} onConfirme={() => router.push(redirectTo)} />
-      <p className="mt-6 text-center text-xs text-gw-texte-doux">
-        Mauvaise adresse ?{" "}
-        <Link href="/participants/signup" className="font-semibold text-gw-violet hover:underline">
-          Créer le compte avec une autre adresse
-        </Link>
+      <p className="mt-6 text-center text-xs text-gw-texte-doux">{t("Mauvaise adresse ?")}{" "}
+        <Link href="/participants/signup" className="font-semibold text-gw-violet hover:underline">{t("Créer le compte avec une autre adresse")}</Link>
       </p>
     </CadreAuth>
   )

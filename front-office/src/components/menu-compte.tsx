@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useId, useRef, useState } from "react"
@@ -69,7 +71,7 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
         onClick={() => setOuvert((v) => !v)}
         aria-expanded={ouvert}
         aria-controls={idMenu}
-        aria-label={`Mon compte : ${nomComplet}`}
+        aria-label={t("Mon compte : {nom}", { nom: nomComplet })}
         className={cn(
           "flex h-10 items-center gap-2 rounded-full pr-2 pl-1 text-sm font-semibold text-gw-encre hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet sm:pr-3",
           ouvert && "bg-gw-fond",
@@ -98,12 +100,10 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
             <p className="truncate text-xs text-gw-texte-doux">{compte.email}</p>
             {compte.email_verifie ? (
               <p className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-gw-violet-fonce">
-                <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> Adresse confirmée
-              </p>
+                <BadgeCheck className="h-3.5 w-3.5" aria-hidden />{" "}{t("Adresse confirmée")}</p>
             ) : (
               <p className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-gw-rose-action-fonce">
-                <MailWarning className="h-3.5 w-3.5" aria-hidden /> Adresse à confirmer
-              </p>
+                <MailWarning className="h-3.5 w-3.5" aria-hidden />{" "}{t("Adresse à confirmer")}</p>
             )}
             </div>
           </div>
@@ -111,25 +111,21 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
           <ul className="p-2">
             <li>
               <Link href="/participants/mes-reservations" className={element}>
-                <Ticket className="h-4 w-4 text-gw-violet" aria-hidden />
-                Mes billets
-              </Link>
+                <Ticket className="h-4 w-4 text-gw-violet" aria-hidden />{t("Mes billets")}</Link>
             </li>
             <li>
               <Link href="/participants/profil" className={element}>
                 <UserPen className="h-4 w-4 text-gw-violet" aria-hidden />
-                <span className="flex-1">Mon profil</span>
+                <span className="flex-1">{t("Mon profil")}</span>
                 {profilIncomplet(compte) && (
-                  <span className="rounded-full bg-gw-rose-pale px-2 py-0.5 text-[11px] font-semibold text-gw-rose-action-fonce">à compléter</span>
+                  <span className="rounded-full bg-gw-rose-pale px-2 py-0.5 text-[11px] font-semibold text-gw-rose-action-fonce">{t("à compléter")}</span>
                 )}
               </Link>
             </li>
             {!compte.email_verifie && (
               <li>
                 <Link href={`/participants/verifier-email?redirect=${encodeURIComponent(pathname || "/")}`} className={element}>
-                  <MailWarning className="h-4 w-4 text-gw-rose-action" aria-hidden />
-                  Confirmer mon adresse e-mail
-                </Link>
+                  <MailWarning className="h-4 w-4 text-gw-rose-action" aria-hidden />{t("Confirmer mon adresse e-mail")}</Link>
               </li>
             )}
             <li className="mt-1 border-t border-gw-bordure pt-1">
@@ -141,9 +137,7 @@ export function MenuCompte({ compte, onDeconnexion }: { compte: CompteParticipan
                 }}
                 className={cn(element, "hover:text-gw-rose-action")}
               >
-                <LogOut className="h-4 w-4" aria-hidden />
-                Déconnexion
-              </button>
+                <LogOut className="h-4 w-4" aria-hidden />{t("Déconnexion")}</button>
             </li>
           </ul>
         </div>

@@ -1,3 +1,4 @@
+import { t, dateLongue, heure as heureI18n, nombre } from "@/lib/i18n"
 import type { ModePaiement } from "@/types"
 
 /*
@@ -41,25 +42,24 @@ export function formaterTelephone(valeur: string) {
 export function erreurTelephone(mode: ModePaiement, valeur: string): string | null {
   const numero = normaliserTelephone(valeur)
   const op = operateur(mode)!
-  if (numero.length < 10) return `Saisissez les 10 chiffres du numéro ${op.nom}.`
-  if (!/^03[2-8]\d{7}$/.test(numero)) return "Ce numéro n'est pas un numéro mobile malgache."
+  if (numero.length < 10) return t("Saisissez les 10 chiffres du numéro {operateur}.", { operateur: op.nom })
+  if (!/^03[2-8]\d{7}$/.test(numero)) return t("Ce numéro n'est pas un numéro mobile malgache.")
   if (!op.prefixes.some((p) => numero.startsWith(p)))
-    return `Un numéro ${op.nom} commence par ${op.prefixes.join(" ou ")}.`
+    return t("Un numéro {operateur} commence par {prefixes}.", { operateur: op.nom, prefixes: op.prefixes.join(t(" ou ")) })
   return null
 }
 
 /** 15000 -> "15 000 Ar", 0 -> "Gratuit" */
 export function ariary(montant: number) {
-  if (montant === 0) return "Gratuit"
-  return `${Math.round(montant).toLocaleString("fr-FR")} Ar`
+  if (montant === 0) return t("Gratuit")
+  return `${nombre(Math.round(montant))} Ar`
 }
 
 /** "Samedi 14 mars 2027 à 19 h 00" */
 export function dateEvenement(iso: string) {
   const d = new Date(iso)
-  const jour = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
-  const heure = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }).replace(":", " h ")
-  return `${jour.charAt(0).toUpperCase()}${jour.slice(1)} à ${heure}`
+  const jour = dateLongue(d)
+  return t("{jour} à {heure}", { jour: `${jour.charAt(0).toUpperCase()}${jour.slice(1)}`, heure: heureI18n(d) })
 }
 
 export const pluriel = (n: number, singulier: string, plurielForme = `${singulier}s`) => `${n} ${n > 1 ? plurielForme : singulier}`

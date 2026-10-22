@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useRedirectionSiConnecte } from "@/lib/session"
@@ -56,11 +58,11 @@ function ParticipantSignupForm() {
     // étape 1 : les champs requis sont vérifiés par le navigateur, le genre ici
     if (etape === 0) {
       if (!genre) {
-        setErreur("Choisissez votre genre pour continuer.")
+        setErreur(t("Choisissez votre genre pour continuer."))
         return
       }
       if (telephone && !/^03[2-8]\d{7}$/.test(normaliserTelephone(telephone))) {
-        setErreur("Numéro invalide : 10 chiffres, ex. 034 12 345 67 (ou laissez vide).")
+        setErreur(t("Numéro invalide : 10 chiffres, ex. 034 12 345 67 (ou laissez vide)."))
         return
       }
       setEtape(1)
@@ -68,12 +70,12 @@ function ParticipantSignupForm() {
     }
 
     if (motDePasse !== confirmation) {
-      setErreur("Les deux mots de passe ne sont pas identiques.")
+      setErreur(t("Les deux mots de passe ne sont pas identiques."))
       return
     }
     if (!dateNaissance || !genre) {
       setEtape(0)
-      setErreur("La date de naissance et le genre sont obligatoires.")
+      setErreur(t("La date de naissance et le genre sont obligatoires."))
       return
     }
 
@@ -89,15 +91,15 @@ function ParticipantSignupForm() {
         genre,
       })
       saveParticipantToken(result.access_token, result.refresh_token)
-      toast.success(`Bienvenue sur guichetweb, ${prenom.trim()} ! Un code vient de vous être envoyé par e-mail.`)
+      toast.success(t("Bienvenue sur guichetweb, {prenom} ! Un code vient de vous être envoyé par e-mail.", { prenom: prenom.trim() }))
       router.push(`/participants/verifier-email?redirect=${encodeURIComponent(redirectTo)}`)
     } catch (err) {
       setErreur(
         err instanceof TypeError
-          ? "Le serveur ne répond pas. Réessayez dans un instant."
+          ? t("Le serveur ne répond pas. Réessayez dans un instant.")
           : err instanceof Error && err.message
             ? err.message
-            : "L'inscription a échoué.",
+            : t("L'inscription a échoué."),
       )
     } finally {
       setLoading(false)
@@ -120,20 +122,20 @@ function ParticipantSignupForm() {
         { libelle: "Inscription", actif: true },
       ]}
       icone={UserPlus}
-      surtitre={`Étape ${etape + 1} sur ${ETAPES.length}`}
-      titre={etape === 0 ? "Faisons connaissance" : "Votre compte"}
+      surtitre={t("Étape {n} sur {total}", { n: etape + 1, total: ETAPES.length })}
+      titre={etape === 0 ? t("Faisons connaissance") : t("Votre compte")}
       sousTitre={
         etape === 0
-          ? "Ces informations aident les organisateurs à proposer des événements qui vous ressemblent."
-          : "Votre e-mail servira à vous connecter et à recevoir vos billets : nous vous enverrons un code pour le confirmer."
+          ? t("Ces informations aident les organisateurs à proposer des événements qui vous ressemblent.")
+          : t("Votre e-mail servira à vous connecter et à recevoir vos billets : nous vous enverrons un code pour le confirmer.")
       }
     >
       {/* barre de progression */}
-      <ol className="mx-auto mb-7 flex max-w-sm items-center gap-2" aria-label="Progression">
+      <ol className="mx-auto mb-7 flex max-w-sm items-center gap-2" aria-label={t("Progression")}>
         {ETAPES.map((libelle, i) => (
           <li key={libelle} className="flex flex-1 flex-col gap-1.5" aria-current={i === etape ? "step" : undefined}>
             <span className={cn("h-1.5 rounded-full transition-colors", i <= etape ? "bg-gw-rose-action" : "bg-gw-bordure")} />
-            <span className={cn("text-[11px] font-semibold", i === etape ? "text-gw-encre" : "text-gw-texte-doux")}>{libelle}</span>
+            <span className={cn("text-[11px] font-semibold", i === etape ? "text-gw-encre" : "text-gw-texte-doux")}>{t(libelle)}</span>
           </li>
         ))}
       </ol>
@@ -143,26 +145,26 @@ function ParticipantSignupForm() {
           <>
             <div className="grid gap-6 sm:grid-cols-2">
               <ChampAuth
-                libelle="Prénom"
+                libelle={t("Prénom")}
                 icone={User}
                 value={prenom}
                 onChange={(e) => setPrenom(e.target.value)}
-                placeholder="Ex. Hery"
+                placeholder={t("Ex. Hery")}
                 autoComplete="given-name"
                 required
               />
               <ChampAuth
-                libelle="Nom"
+                libelle={t("Nom")}
                 icone={User}
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
-                placeholder="Ex. Rakoto"
+                placeholder={t("Ex. Rakoto")}
                 autoComplete="family-name"
                 required
               />
             </div>
             <ChampAuth
-              libelle="Date de naissance"
+              libelle={t("Date de naissance")}
               icone={CalendarDays}
               type="date"
               value={dateNaissance}
@@ -172,7 +174,7 @@ function ParticipantSignupForm() {
               required
             />
             <ChampAuth
-              libelle="Téléphone (facultatif)"
+              libelle={t("Téléphone (facultatif)")}
               icone={Phone}
               type="tel"
               inputMode="tel"
@@ -182,7 +184,7 @@ function ParticipantSignupForm() {
               autoComplete="tel-national"
             />
             <ChoixSegmente
-              libelle="Genre"
+              libelle={t("Genre")}
               options={GENRES}
               valeur={genre}
               onChange={(g) => {
@@ -194,7 +196,7 @@ function ParticipantSignupForm() {
         ) : (
           <>
             <ChampAuth
-              libelle="Adresse e-mail"
+              libelle={t("Adresse e-mail")}
               icone={Mail}
               type="email"
               value={email}
@@ -205,23 +207,23 @@ function ParticipantSignupForm() {
               required
             />
             <ChampAuth
-              libelle="Mot de passe"
+              libelle={t("Mot de passe")}
               icone={Lock}
               type="password"
               value={motDePasse}
               onChange={(e) => setMotDePasse(e.target.value)}
-              placeholder="6 caractères minimum"
+              placeholder={t("6 caractères minimum")}
               autoComplete="new-password"
               minLength={6}
               required
             />
             <ChampAuth
-              libelle="Confirmer le mot de passe"
+              libelle={t("Confirmer le mot de passe")}
               icone={KeyRound}
               type="password"
               value={confirmation}
               onChange={(e) => setConfirmation(e.target.value)}
-              placeholder="Retapez le mot de passe"
+              placeholder={t("Retapez le mot de passe")}
               autoComplete="new-password"
               minLength={6}
               required
@@ -235,19 +237,15 @@ function ParticipantSignupForm() {
       {/* barre Retour / Continuer, en bas du formulaire */}
       <div className="mx-auto mt-8 flex max-w-sm items-center justify-between gap-3 border-t border-gw-bordure pt-6">
         <BoutonAuth type="button" variante="contour" onClick={retour} disabled={loading}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Retour
-        </BoutonAuth>
+          <ArrowLeft className="h-4 w-4" aria-hidden />{t("Retour")}</BoutonAuth>
         <BoutonAuth type="submit" form="form-inscription" chargement={loading}>
           {etape === 0 ? (
-            <>
-              Continuer
-              <ArrowRight className="h-4 w-4" aria-hidden />
+            <>{t("Continuer")}<ArrowRight className="h-4 w-4" aria-hidden />
             </>
           ) : loading ? (
-            "Inscription..."
+            t("Inscription...")
           ) : (
-            "Créer mon compte"
+            t("Créer mon compte")
           )}
         </BoutonAuth>
       </div>

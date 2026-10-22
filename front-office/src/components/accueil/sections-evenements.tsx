@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { useState } from "react"
 import Link from "next/link"
 import { CalendarHeart, CalendarX, History } from "lucide-react"
@@ -16,15 +18,15 @@ export function EvenementsAVenir({ catalogue }: { catalogue: Catalogue }) {
   const { aVenir, lieuxParId, categoriesParId, chargement, erreur } = catalogue
   const [periode, setPeriode] = useState<Periode>("tout")
   const filtres = aVenir.filter((e) => dansPeriode(e, periode)).slice(0, NB_A_VENIR)
-  const libellePeriode = PERIODES.find((p) => p.valeur === periode)?.libelle.toLowerCase()
+  const libellePeriode = PERIODES.find((p) => p.valeur === periode)?.libelle
 
   return (
     <section aria-labelledby="a-venir-titre" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
       <TitreSection
         id="a-venir-titre"
-        titre="Événements à venir"
+        titre={t("Événements à venir")}
         icone={CalendarHeart}
-        lien={{ href: "/evenements", libelle: "Voir tous les événements" }}
+        lien={{ href: "/evenements", libelle: t("Voir tous les événements") }}
       >
         <FiltrePeriode valeur={periode} onChange={setPeriode} />
       </TitreSection>
@@ -35,28 +37,24 @@ export function EvenementsAVenir({ catalogue }: { catalogue: Catalogue }) {
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-gw-lavande px-6 py-12 text-center">
           <CalendarX className="h-8 w-8 text-[#B5A8F5]" aria-hidden />
           <p className="font-titre text-lg font-semibold text-gw-encre">
-            {periode === "tout" ? "Aucun événement à venir pour le moment" : `Rien de prévu ${libellePeriode}`}
+            {periode === "tout" ? t("Aucun événement à venir pour le moment") : t("Rien de prévu {periode}", { periode: t(libellePeriode ?? "").toLowerCase() })}
           </p>
           <p className="max-w-md text-sm text-gw-texte-doux">
             {periode === "tout"
-              ? "Créez un compte pour être prévenu dès qu'une billetterie ouvre."
-              : "Essayez une autre période, ou affichez toutes les dates."}
+              ? t("Créez un compte pour être prévenu dès qu'une billetterie ouvre.")
+              : t("Essayez une autre période, ou affichez toutes les dates.")}
           </p>
           {periode === "tout" ? (
             <Link
               href="/participants/signup"
               className="mt-2 rounded-full bg-gw-rose-action px-5 py-2.5 text-sm font-semibold text-white hover:bg-gw-rose-action-fonce"
-            >
-              Créer mon compte
-            </Link>
+            >{t("Créer mon compte")}</Link>
           ) : (
             <button
               type="button"
               onClick={() => setPeriode("tout")}
               className="mt-2 rounded-full border border-gw-violet px-5 py-2.5 text-sm font-semibold text-gw-violet"
-            >
-              Afficher toutes les dates
-            </button>
+            >{t("Afficher toutes les dates")}</button>
           )}
         </div>
       ) : (
@@ -79,10 +77,10 @@ export function EvenementsPasses({ catalogue }: { catalogue: Catalogue }) {
     <section aria-labelledby="passes-titre" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
       <TitreSection
         id="passes-titre"
-        titre="Événements passés"
+        titre={t("Événements passés")}
         icone={History}
-        description="Ils ont eu lieu sur la plateforme. Retrouvez leurs informations et vos billets."
-        lien={{ href: "/evenements?onglet=passes", libelle: "Voir les archives" }}
+        description={t("Ils ont eu lieu sur la plateforme. Retrouvez leurs informations et vos billets.")}
+        lien={{ href: "/evenements?onglet=passes", libelle: t("Voir les archives") }}
       />
       <GrilleEvenements
         evenements={passes.slice(0, NB_PASSES)}

@@ -1,3 +1,4 @@
+import { t, dateCourte, dateSimple, heure, nombre } from "@/lib/i18n"
 import type { Evenement } from "@/types"
 
 export type Periode = "tout" | "aujourdhui" | "week-end" | "mois"
@@ -69,28 +70,27 @@ export function dansPeriode(e: Evenement, periode: Periode, maintenant = new Dat
 export function repereTemporel(e: Evenement, maintenant = new Date()): string | null {
   if (estPasse(e, maintenant)) return null
   const debut = new Date(e.date_debut)
-  if (debut <= maintenant) return "En cours"
+  if (debut <= maintenant) return t("En cours")
   const ecartJours = Math.round((+debutJour(debut) - +debutJour(maintenant)) / 86_400_000)
-  if (ecartJours === 0) return "Aujourd'hui"
-  if (ecartJours === 1) return "Demain"
-  if (dansPeriode(e, "week-end", maintenant)) return "Ce week-end"
-  if (ecartJours <= 7) return "Cette semaine"
+  if (ecartJours === 0) return t("Aujourd'hui")
+  if (ecartJours === 1) return t("Demain")
+  if (dansPeriode(e, "week-end", maintenant)) return t("Ce week-end")
+  if (ecartJours <= 7) return t("Cette semaine")
   return null
 }
 
 export function formatDateLongue(iso: string) {
   const d = new Date(iso)
-  const jour = d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }).replace(/\./g, "")
-  const heure = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
-  return `${jour.charAt(0).toUpperCase()}${jour.slice(1)}, ${heure}`
+  const jour = dateCourte(d)
+  return `${jour.charAt(0).toUpperCase()}${jour.slice(1)}, ${heure(d, "deux-points")}`
 }
 
 export function formatDateCourte(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+  return dateSimple(new Date(iso))
 }
 
 export function formatPrix(prix: number | null) {
   if (prix == null) return null
-  if (prix === 0) return "Gratuit"
-  return `À partir de ${prix.toLocaleString("fr-FR")} Ar`
+  if (prix === 0) return t("Gratuit")
+  return t("À partir de {prix} Ar", { prix: nombre(prix) })
 }

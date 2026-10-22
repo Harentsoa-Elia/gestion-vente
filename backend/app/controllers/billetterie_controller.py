@@ -1,8 +1,10 @@
 """Billetterie côté participant : réserver plusieurs billets, payer (simulation Mobile Money),
 recevoir les billets par e-mail (PDF + QR codes) et les retrouver dans "Mes billets"."""
-from typing import List
+import json
+from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response
+from cryptography.fernet import InvalidToken
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Query, Response
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +14,8 @@ from app.models.participant import Participant
 from app.schemas.billetterie import BilletParticipant, LotReserve, PaiementConfirme, PaiementLot, ReservationLot, TarifDisponible
 from app.services.billetterie_service import DUREE_RESERVATION, BilletterieService, ErreurBilletterie
 from app.utils.billet_pdf import InfosBillet, date_francaise, generer_pdf_billets, qr_png
-from app.utils.email import email_billets, envoyer_email_sans_erreur, lien_site
+from app.utils.crypto import encrypt_data, fernet
+from app.utils.email import email_billets, envoyer_email_sans_erreur, lien_api, lien_site
 
 router = APIRouter(tags=["billetterie"])
 
@@ -38,9 +41,18 @@ def infos_pdf(billets: List[dict], participant: Participant) -> List[InfosBillet
 
 
 QR_DANS_EMAIL = 10
+# le lien de téléchargement de l'e-mail reste valable un an
+VALIDITE_LIEN_PDF = 365 * 24 * 3600
 
 
-def envoyer_billets(participant_email: str, prenom: str, billets: List[InfosBillet]) -> None:
+def lien_pdf_signe(participant_id: int, reservation_ids: List[int]) -> str:
+    """Lien de téléchargement du PDF sans connexion : le jeton chiffré (Fernet) contient le participant
+    et ses réservations, il ne peut être ni lu ni modifié sans la clé du serveur."""
+    jeton = encrypt_data(json.dumps({"p": participant_id, "r": reservation_ids}))
+    return lien_api(f"/billets/telecharger?jeton={jeton}")
+
+
+def envoyer_billets(participant_email: str, prenom: str, billets: List[InfosBillet], lien_pdf: Optional[str] = None) -> None:
     """Tâche de fond : e-mail avec les QR codes (images inline) et le PDF en pièce jointe."""
     if not billets:
         return
@@ -55,6 +67,7 @@ def envoyer_billets(participant_email: str, prenom: str, billets: List[InfosBill
         [(b.numero, f"{b.categorie} - {int(b.prix):,} Ar".replace(",", " "), cid) for b, (cid, _) in zip(billets, images)],
         lien_site("/participants/mes-reservations"),
         total=len(billets),
+        lien_pdf=lien_pdf,
     )
     pdf = generer_pdf_billets(billets)
     envoyer_email_sans_erreur(
@@ -109,7 +122,7 @@ async def payer_lot(
         raise HTTPException(status_code=400, detail=str(e))
     participant = await service.participant(auth_data["participant_id"])
     billets = await service.billets_participant(participant.id, ids)
-    taches.add_task(envoyer_billets, participant.email, participant.prenom, infos_pdf(billets, participant))
+    taches.add_task(envoyer_billets, participant.email, participant.prenom, infos_pdf(billets, participant), lien_pdf_signe(participant.id, ids))
     return PaiementConfirme(montant_total=total, mode_paiement=saisie.mode_paiement, reference=reference, email=participant.email, billets=billets)
 
 
@@ -134,6 +147,27 @@ async def billet_pdf(reservation_id: int, auth_data: dict = Depends(ParticipantB
     )
 
 
+@router.get("/billets/telecharger", summary="Télécharger le PDF depuis le lien de l'e-mail (sans connexion)", response_class=Response)
+async def telecharger_par_lien(jeton: str = Query(..., min_length=20), db: AsyncSession = Depends(get_db)):
+    try:
+        donnees = json.loads(fernet.decrypt(jeton.encode(), ttl=VALIDITE_LIEN_PDF).decode())
+        participant_id, reservation_ids = int(donnees["p"]), [int(r) for r in donnees["r"]]
+    except (InvalidToken, ValueError, KeyError, TypeError):
+        raise HTTPException(status_code=404, detail="Lien de téléchargement invalide ou expiré. Retrouvez vos billets dans 'Mes billets'.")
+    service = BilletterieService(db)
+    participant = await service.participant(participant_id)
+    billets = await service.billets_participant(participant_id, reservation_ids) if participant else []
+    infos = infos_pdf(billets, participant) if participant else []
+    if not infos:
+        raise HTTPException(status_code=404, detail="Billet introuvable.")
+    pdf = await run_in_threadpool(generer_pdf_billets, infos)
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="billets-guichetweb-{infos[0].numero}.pdf"'},
+    )
+
+
 @router.post("/reservations/{reservation_id}/renvoyer-billet", summary="Renvoyer le billet par e-mail")
 async def renvoyer_billet(
     reservation_id: int, taches: BackgroundTasks, auth_data: dict = Depends(ParticipantBearer()), db: AsyncSession = Depends(get_db)
@@ -144,7 +178,7 @@ async def renvoyer_billet(
     infos = infos_pdf(billets, participant) if participant else []
     if not infos:
         raise HTTPException(status_code=404, detail="Billet introuvable.")
-    taches.add_task(envoyer_billets, participant.email, participant.prenom, infos)
+    taches.add_task(envoyer_billets, participant.email, participant.prenom, infos, lien_pdf_signe(participant.id, [reservation_id]))
     return {"message": f"Billet renvoyé à {participant.email}."}
 
 

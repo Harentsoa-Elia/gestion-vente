@@ -96,7 +96,8 @@ def qr_png(valeur: str, taille_module: int = 10) -> bytes:
 
 def _latin1(texte: str) -> str:
     """Les polices intégrées du PDF ne couvrent que le latin-1 : on remplace le reste."""
-    remplacements = {"’": "'", "‘": "'", "“": '"', "”": '"', "–": "-", "—": "-", "…": "...", " ": " ", " ": " ", "œ": "oe", "Œ": "OE"}
+    # apostrophes, guillemets, tirets et points de suspension typographiques saisis par les utilisateurs (codes Unicode)
+    remplacements = {"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"', "\u2013": "-", "\u2014": "-", "\u2026": "...", "\u00a0": " ", "\u202f": " ", "\u0153": "oe", "\u0152": "OE"}
     for a, b in remplacements.items():
         texte = texte.replace(a, b)
     return texte.encode("latin-1", "replace").decode("latin-1")

@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n"
 import { Heart, Star, ThumbsUp, Vote } from "lucide-react"
 import { WaouhFace } from "@/components/ui/WaouhFace"
 import { cn } from "@/utils"
@@ -36,9 +37,7 @@ export function DecorationVote() {
         <figcaption className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-gw-surface/95 py-1.5 pr-3.5 pl-1.5 text-xs font-semibold text-gw-encre shadow">
           <span className="grid h-6 w-6 place-items-center rounded-full bg-gw-rose-action text-white">
             <Vote className="h-3.5 w-3.5" strokeWidth={2.2} />
-          </span>
-          Votre avis compte
-        </figcaption>
+          </span>{t("Votre avis compte")}</figcaption>
       </figure>
 
       {/* bulles de réactions, avec leur poids, qui flottent en décalé */}
@@ -54,8 +53,7 @@ export function DecorationVote() {
             >
               {Icone ? <Icone className="h-7 w-7 text-white" strokeWidth={2} /> : <WaouhFace size={40} />}
             </div>
-            <span className="font-titre absolute -right-2 -bottom-1 rounded-full bg-gw-surface px-2 py-0.5 text-sm font-bold text-gw-encre shadow-sm">
-              ×{poids}
+            <span className="font-titre absolute -right-2 -bottom-1 rounded-full bg-gw-surface px-2 py-0.5 text-sm font-bold text-gw-encre shadow-sm">{t("×")}{poids}
             </span>
           </div>
         </div>

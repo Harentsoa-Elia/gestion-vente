@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import type React from "react"
 
 import { useEffect, useState } from "react"
@@ -45,7 +47,7 @@ export default function ParticipantAuthWrapper({ children }: ParticipantAuthWrap
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6C5CE7] mx-auto"></div>
-          <p className="mt-4 text-gw-texte">Chargement...</p>
+          <p className="mt-4 text-gw-texte">{t("Chargement...")}</p>
         </div>
       </div>
     )

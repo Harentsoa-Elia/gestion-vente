@@ -170,6 +170,12 @@ def lien_site(chemin: str) -> str:
     return f"{base}{chemin}"
 
 
+def lien_api(chemin: str) -> str:
+    """Adresse complète d'une route de l'API (API_URL dans backend/.env, par défaut l'API locale)."""
+    base = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
+    return f"{base}/api/v1{chemin}"
+
+
 def _gabarit_message(titre: str, paragraphes: list, bouton: Optional[tuple] = None, encadre: Optional[str] = None) -> str:
     corps = "".join(
         f'<p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#4A3D7A">{escape(p)}</p>' for p in paragraphes
@@ -228,16 +234,20 @@ def email_decision_evenement(prenom: str, titre_evenement: str, valide: bool, mo
     return sujet, texte, html
 
 
-def email_billets(prenom: str, evenement: str, date_texte: str, lieu: Optional[str], billets: list, lien: str, total: Optional[int] = None) -> tuple:
+def email_billets(
+    prenom: str, evenement: str, date_texte: str, lieu: Optional[str], billets: list, lien: str, total: Optional[int] = None, lien_pdf: Optional[str] = None
+) -> tuple:
     """billets : [(numero, categorie, cid_qr), ...] ; les QR codes sont joints en images inline (cid).
-    total : nombre de billets achetés quand seuls les premiers sont recopiés dans l'e-mail (gros achats)."""
+    total : nombre de billets achetés quand seuls les premiers sont recopiés dans l'e-mail (gros achats).
+    lien_pdf : lien signé de téléchargement du PDF, sans connexion (bouton "Télécharger le PDF")."""
     n = total or len(billets)
     sujet = f"Vos billets pour '{evenement}'" if n > 1 else f"Votre billet pour '{evenement}'"
     intro = [
         f"Bonjour {prenom}, merci pour votre réservation ! Votre paiement est confirmé.",
         f"{evenement} : {date_texte}" + (f", {lieu}." if lieu else "."),
         (f"Voici vos {n} billets" if n > 1 else "Voici votre billet")
-        + " : présentez le QR code à l'entrée, sur votre téléphone ou imprimé. Le billet PDF est aussi en pièce jointe.",
+        + " : présentez le QR code à l'entrée, sur votre téléphone ou imprimé. Le billet PDF est en pièce jointe, en bas de cet e-mail"
+        + (", et se télécharge aussi avec le bouton ci-dessous." if lien_pdf else "."),
     ]
     blocs = "".join(
         f'<div style="margin:0 0 14px;padding:16px;border-radius:14px;background:#F6F4FC;text-align:center">'
@@ -254,6 +264,13 @@ def email_billets(prenom: str, evenement: str, date_texte: str, lieu: Optional[s
     html = _gabarit_message("Votre billet est prêt" if n == 1 else "Vos billets sont prêts", intro, ("Voir mes billets", lien))
     # les QR codes s'insèrent juste avant le bouton
     html = html.replace('<p style="margin:8px 0 0"><a href=', blocs + '<p style="margin:8px 0 0"><a href=', 1)
+    if lien_pdf:
+        # second bouton, à côté de "Voir mes billets" : téléchargement direct du PDF
+        bouton_pdf = (
+            f'<a href="{escape(lien_pdf)}" style="display:inline-block;margin:8px 0 0 8px;padding:11px 20px;border-radius:999px;'
+            'border:1px solid #6C5CE7;color:#6C5CE7;font-weight:700;font-size:14px;text-decoration:none">Télécharger le PDF</a>'
+        )
+        html = html.replace(f"{escape('Voir mes billets')}</a></p>", f"{escape('Voir mes billets')}</a>{bouton_pdf}</p>", 1)
     autres = [f"... et {n - len(billets)} autres billets (tous dans le PDF joint)."] if n > len(billets) else []
-    texte = "\n\n".join(intro + [f"Billet {numero} ({categorie})" for numero, categorie, _ in billets] + autres + [f"Vos billets : {lien}"]) + "\n"
+    texte = "\n\n".join(intro + [f"Billet {numero} ({categorie})" for numero, categorie, _ in billets] + autres + [f"Vos billets : {lien}"] + ([f"Télécharger le PDF : {lien_pdf}"] if lien_pdf else [])) + "\n"
     return sujet, texte, html

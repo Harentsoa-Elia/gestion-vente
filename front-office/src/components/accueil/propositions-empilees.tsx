@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t, nombre } from "@/lib/i18n"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import Link from "next/link"
 import { MapPin, MessageCircleHeart, Mic2, Tags, Vote, type LucideIcon } from "lucide-react"
@@ -56,7 +58,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
       {/* aplat de couleur : le texte, en grand, comme HelloAsso */}
       <div className={cn("flex flex-col p-7 sm:p-8", texte)}>
         <p className={cn("text-sm font-medium", texteDoux)}>
-          {type.libelle}{" "}
+          {t(type.libelle)}{" "}
           <Link href={`/evenements/${proposition.evenement.id}`} className="underline underline-offset-4 hover:no-underline">
             {proposition.evenement.titre}
           </Link>
@@ -65,10 +67,10 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
           {proposition.libelle}
         </h3>
         <p className={cn("mt-4 text-sm", texteDoux)}>
-          <span className={cn("font-semibold", texte)}>{score.toLocaleString("fr-FR")} points</span>
+          <span className={cn("font-semibold", texte)}>{nombre(score)}{" "}{t("points")}</span>
           {proposition.concurrentes > 0
-            ? ` face à ${proposition.concurrentes} autre${proposition.concurrentes > 1 ? "s" : ""} proposition${proposition.concurrentes > 1 ? "s" : ""}`
-            : " pour l'instant seule en lice"}
+            ? (proposition.concurrentes > 1 ? t(" face à {n} autres propositions", { n: proposition.concurrentes }) : t(" face à 1 autre proposition"))
+            : t(" pour l'instant seule en lice")}
         </p>
 
         <div className="mt-auto pt-6">
@@ -102,9 +104,7 @@ function CarteProposition({ proposition, index }: { proposition: PropositionEnVo
             {proposition.part}
             <span className="text-4xl"> %</span>
           </p>
-          <p className="mt-2 max-w-[16rem] text-sm text-white/85">
-            des points parmi les {proposition.type === "LIEU" ? "lieux" : proposition.type === "ARTISTE" ? "artistes" : "types d'événement"} proposés
-          </p>
+          <p className="mt-2 max-w-[16rem] text-sm text-white/85">{t("des points parmi les")}{" "}{proposition.type === t("LIEU") ? "lieux" : proposition.type === t("ARTISTE") ? "artistes" : t("types d'événement")}{" "}{t("proposés")}</p>
         </div>
         <p className="absolute top-4 left-4 rounded-full bg-gw-nuit/75 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
           {formatDateLongue(proposition.evenement.date_debut)}
@@ -199,15 +199,12 @@ export function PropositionsEmpilees({
         <div className="lg:sticky lg:top-24 lg:self-start">
           <TitreSection
             id="avis-titre"
-            titre="Donnez votre avis"
+            titre={t("Donnez votre avis")}
             icone={MessageCircleHeart}
-            description="Les organisateurs hésitent entre plusieurs artistes, lieux ou événements. Réagissez : vos réactions pèsent dans leur décision."
+            description={t("Les organisateurs hésitent entre plusieurs artistes, lieux ou événements. Réagissez : vos réactions pèsent dans leur décision.")}
           />
           <DecorationVote />
-          <p className="mx-auto mt-4 max-w-sm text-center text-sm text-gw-texte-doux">
-            Chaque réaction ajoute des points à la proposition. Un "J&apos;adore" compte trois fois
-            plus qu&apos;un "J&apos;aime".
-          </p>
+          <p className="mx-auto mt-4 max-w-sm text-center text-sm text-gw-texte-doux">{t("Chaque réaction ajoute des points à la proposition. Un \"J'adore\" compte trois fois plus qu'un \"J'aime\".")}</p>
         </div>
 
         {/* colonne droite : les propositions, en cartes empilées */}
@@ -217,12 +214,8 @@ export function PropositionsEmpilees({
           ) : propositions.length === 0 ? (
             <div className="flex flex-col items-start gap-4 rounded-[1.75rem] bg-gw-lavande p-8 sm:p-10">
               <Vote className="h-8 w-8 text-gw-violet-fonce" aria-hidden />
-              <p className="font-titre max-w-lg text-3xl leading-tight font-bold tracking-[-0.03em] text-gw-encre">
-                Aucun vote en cours pour le moment
-              </p>
-              <p className="max-w-md text-gw-encre/70">
-                Dès qu&apos;un organisateur soumet des artistes ou des lieux au public, ils apparaissent ici.
-              </p>
+              <p className="font-titre max-w-lg text-3xl leading-tight font-bold tracking-[-0.03em] text-gw-encre">{t("Aucun vote en cours pour le moment")}</p>
+              <p className="max-w-md text-gw-encre/70">{t("Dès qu'un organisateur soumet des artistes ou des lieux au public, ils apparaissent ici.")}</p>
             </div>
           ) : (
             <ol className="space-y-6 md:space-y-10">

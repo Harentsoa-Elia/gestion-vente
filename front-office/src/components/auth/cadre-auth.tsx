@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import Link from "next/link"
 import { useId, useState, type InputHTMLAttributes, type ReactNode } from "react"
 import { Eye, EyeOff, Loader2, type LucideIcon } from "lucide-react"
@@ -121,18 +123,13 @@ function PanneauVisuel({ onglets }: { onglets: OngletAuth[] }) {
       </div>
 
       <div className="relative z-10 mt-auto hidden px-8 pb-10 md:block md:pr-36">
-        <p className="font-titre text-3xl leading-tight font-bold">
-          Vos soirées commencent
-          <br />
-          au <span className="font-script text-4xl font-normal text-gw-lavande">guichet</span>.
+        <p className="font-titre text-3xl leading-tight font-bold">{t("Vos soirées commencent")}<br />{t("au")}{" "}<span className="font-script text-4xl font-normal text-gw-lavande">{t("guichet")}</span>.
         </p>
-        <p className="mt-3 max-w-[16rem] text-sm text-white/75">
-          Réservez vos billets, votez pour les prochains événements et suivez-les en un seul endroit.
-        </p>
+        <p className="mt-3 max-w-[16rem] text-sm text-white/75">{t("Réservez vos billets, votez pour les prochains événements et suivez-les en un seul endroit.")}</p>
       </div>
 
       <nav
-        aria-label="Choix du formulaire"
+        aria-label={t("Choix du formulaire")}
         className={cn(
           // téléphone : onglets horizontaux collés au bas du bandeau
           "relative z-10 mt-auto flex justify-center gap-1 px-4",
@@ -141,7 +138,7 @@ function PanneauVisuel({ onglets }: { onglets: OngletAuth[] }) {
         )}
       >
         {onglets.map((o) => (
-          <Onglet key={o.libelle} {...o} />
+          <Onglet key={t(o.libelle)} {...o} />
         ))}
       </nav>
     </div>
@@ -157,7 +154,7 @@ function Onglet({ libelle, href, onClick, actif }: OngletAuth) {
 
   const contenu = (
     <>
-      {libelle}
+      {t(libelle)}
       {actif && (
         <>
           {/* coins creusés : la couleur du panneau déborde en arrondi concave autour de l'onglet actif */}
@@ -205,7 +202,7 @@ export function ChampAuth({
   return (
     <div className={cn("group", className)}>
       <label htmlFor={id} className="mb-1 block text-xs font-semibold text-gw-texte-doux transition-colors group-focus-within:text-gw-violet">
-        {libelle}
+        {t(libelle)}
       </label>
       <div className="relative">
         <Icone
@@ -225,7 +222,7 @@ export function ChampAuth({
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
-            aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+            aria-label={visible ? t("Masquer le mot de passe") : t("Afficher le mot de passe")}
             className="absolute top-1/2 right-0 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full text-gw-texte-doux hover:bg-gw-fond hover:text-gw-violet"
           >
             {visible ? <EyeOff className="h-4 w-4" aria-hidden /> : <Eye className="h-4 w-4" aria-hidden />}
@@ -252,7 +249,7 @@ export function ChoixSegmente<T extends string>({
   return (
     <div role="radiogroup" aria-labelledby={id}>
       <p id={id} className="mb-2 text-xs font-semibold text-gw-texte-doux">
-        {libelle}
+        {t(libelle)}
       </p>
       <div className="grid grid-cols-3 gap-2">
         {options.map((o) => {
@@ -271,7 +268,7 @@ export function ChoixSegmente<T extends string>({
                   : "border-gw-bordure text-gw-encre hover:border-gw-violet/50 hover:bg-gw-fond",
               )}
             >
-              {o.libelle}
+              {t(o.libelle)}
             </button>
           )
         })}

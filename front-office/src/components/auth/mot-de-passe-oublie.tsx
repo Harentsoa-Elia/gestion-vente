@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { KeyRound, Lock, Mail } from "lucide-react"
@@ -32,7 +34,7 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
   const [erreur, setErreur] = useState("")
 
   const message = (e: unknown, defaut: string) =>
-    e instanceof TypeError ? "Le serveur ne répond pas. Réessayez dans un instant." : e instanceof Error ? e.message : defaut
+    e instanceof TypeError ? t("Le serveur ne répond pas. Réessayez dans un instant.") : e instanceof Error ? t(e.message) : t(defaut)
 
   const demanderCode = async (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -41,7 +43,7 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
     try {
       await demanderCodeMotDePasse(espace, email.trim())
       setEtape("code")
-      toast.success("Si un compte existe avec cette adresse, un code vient d'y être envoyé.")
+      toast.success(t("Si un compte existe avec cette adresse, un code vient d'y être envoyé."))
     } catch (err) {
       setErreur(message(err, "La demande a échoué."))
     } finally {
@@ -53,11 +55,11 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
     e.preventDefault()
     setErreur("")
     if (code.length !== 6) {
-      setErreur("Saisissez les 6 chiffres du code reçu.")
+      setErreur(t("Saisissez les 6 chiffres du code reçu."))
       return
     }
     if (motDePasse !== confirmation) {
-      setErreur("Les deux mots de passe ne sont pas identiques.")
+      setErreur(t("Les deux mots de passe ne sont pas identiques."))
       return
     }
     setChargement(true)
@@ -65,10 +67,10 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
       const r = await reinitialiserMotDePasse(espace, { email: email.trim(), code, nouveau_mot_de_passe: motDePasse })
       if (participant && r.access_token) {
         saveParticipantToken(r.access_token, r.refresh_token)
-        toast.success("Mot de passe modifié. Vous êtes connecté.")
+        toast.success(t("Mot de passe modifié. Vous êtes connecté."))
         router.push(redirectTo)
       } else {
-        toast.success("Mot de passe modifié. Connectez-vous avec le nouveau.")
+        toast.success(t("Mot de passe modifié. Connectez-vous avec le nouveau."))
         router.push(`${pageConnexion}?email=${encodeURIComponent(email.trim())}`)
       }
     } catch (err) {
@@ -87,24 +89,24 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
         { libelle: "Mot de passe", actif: true },
       ]}
       icone={KeyRound}
-      surtitre={participant ? "Espace participant" : "Espace organisateur"}
-      titre="Mot de passe oublié"
+      surtitre={participant ? t("Espace participant") : t("Espace organisateur")}
+      titre={t("Mot de passe oublié")}
       sousTitre={
         etape === "email"
-          ? "Indiquez l'adresse de votre compte : nous y enverrons un code pour choisir un nouveau mot de passe."
-          : "Saisissez le code reçu par e-mail, puis votre nouveau mot de passe."
+          ? t("Indiquez l'adresse de votre compte : nous y enverrons un code pour choisir un nouveau mot de passe.")
+          : t("Saisissez le code reçu par e-mail, puis votre nouveau mot de passe.")
       }
       pied={
         <>
-          <span>Vous vous en souvenez ?</span>
-          <LienPied href={pageConnexion}>Retour à la connexion</LienPied>
+          <span>{t("Vous vous en souvenez ?")}</span>
+          <LienPied href={pageConnexion}>{t("Retour à la connexion")}</LienPied>
         </>
       }
     >
       {etape === "email" ? (
         <form onSubmit={demanderCode} className="mx-auto max-w-sm space-y-6">
           <ChampAuth
-            libelle="Adresse e-mail du compte"
+            libelle={t("Adresse e-mail du compte")}
             icone={Mail}
             type="email"
             value={email}
@@ -116,45 +118,38 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
           />
           <MessageErreur>{erreur}</MessageErreur>
           <div className="flex justify-center pt-1">
-            <BoutonAuth type="submit" chargement={chargement} className="w-full sm:w-auto sm:min-w-[220px]">
-              Recevoir un code
-            </BoutonAuth>
+            <BoutonAuth type="submit" chargement={chargement} className="w-full sm:w-auto sm:min-w-[220px]">{t("Recevoir un code")}</BoutonAuth>
           </div>
         </form>
       ) : (
         <form onSubmit={changer} className="mx-auto max-w-sm space-y-6">
-          <p className="rounded-2xl bg-gw-fond px-4 py-3 text-center text-sm text-gw-texte-doux">
-            Code envoyé à <strong className="font-semibold text-gw-encre">{email}</strong>, s&apos;il correspond à un compte.
-            Pensez aux indésirables (spams).
-          </p>
+          <p className="rounded-2xl bg-gw-fond px-4 py-3 text-center text-sm text-gw-texte-doux">{t("Code envoyé à")}{" "}<strong className="font-semibold text-gw-encre">{email}</strong>{t(", s'il correspond à un compte. Pensez aux indésirables (spams).")}</p>
           <SaisieCode valeur={code} onChange={setCode} erreur={!!erreur && code.length === 0} />
           <ChampAuth
-            libelle="Nouveau mot de passe"
+            libelle={t("Nouveau mot de passe")}
             icone={Lock}
             type="password"
             value={motDePasse}
             onChange={(e) => setMotDePasse(e.target.value)}
-            placeholder="6 caractères minimum"
+            placeholder={t("6 caractères minimum")}
             autoComplete="new-password"
             minLength={6}
             required
           />
           <ChampAuth
-            libelle="Confirmer le mot de passe"
+            libelle={t("Confirmer le mot de passe")}
             icone={KeyRound}
             type="password"
             value={confirmation}
             onChange={(e) => setConfirmation(e.target.value)}
-            placeholder="Retapez le mot de passe"
+            placeholder={t("Retapez le mot de passe")}
             autoComplete="new-password"
             minLength={6}
             required
           />
           <MessageErreur>{erreur}</MessageErreur>
           <div className="flex flex-col items-center gap-3 pt-1">
-            <BoutonAuth type="submit" chargement={chargement} className="w-full sm:w-auto sm:min-w-[220px]">
-              Changer le mot de passe
-            </BoutonAuth>
+            <BoutonAuth type="submit" chargement={chargement} className="w-full sm:w-auto sm:min-w-[220px]">{t("Changer le mot de passe")}</BoutonAuth>
             <button
               type="button"
               onClick={() => {
@@ -163,9 +158,7 @@ export function MotDePasseOublie({ espace }: { espace: EspaceCompte }) {
                 setCode("")
               }}
               className="text-sm font-semibold text-gw-violet hover:text-gw-rose-action"
-            >
-              Pas reçu de code ? Changer d&apos;adresse ou renvoyer
-            </button>
+            >{t("Pas reçu de code ? Changer d'adresse ou renvoyer")}</button>
           </div>
         </form>
       )}

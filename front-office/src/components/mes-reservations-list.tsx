@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -55,10 +57,10 @@ function EnAttente({ groupe, onAnnule }: { groupe: Groupe; onAnnule: () => void 
     setAnnulation(true)
     try {
       await Promise.all(ids.map((id) => annulerReservation(id)))
-      toast.success("Réservation annulée.")
+      toast.success(t("Réservation annulée."))
       onAnnule()
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "L'annulation n'a pas abouti.")
+      toast.error(e instanceof Error ? e.message : t("L'annulation n'a pas abouti."))
       setAnnulation(false)
     }
   }
@@ -68,23 +70,21 @@ function EnAttente({ groupe, onAnnule }: { groupe: Groupe; onAnnule: () => void 
       <div className="min-w-0 flex-1">
         <p className="font-titre truncate text-lg font-bold text-gw-encre">{groupe.titre}</p>
         <p className="text-sm text-gw-texte">
-          {groupe.billets.length} × {groupe.billets[0].categorie_nom} · <strong className="font-semibold">{ariary(total)}</strong>
+          {groupe.billets.length}{" "}{t("×")}{" "}{groupe.billets[0].categorie_nom} · <strong className="font-semibold">{ariary(total)}</strong>
         </p>
         <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-gw-rose-action-fonce">
           <Clock className="h-3.5 w-3.5" aria-hidden />
-          {minutes > 0 ? `Places gardées encore ${pluriel(minutes, "minute")}` : "Délai dépassé : places non garanties"}
+          {minutes > 0 ? (minutes > 1 ? t("Places gardées encore {n} minutes", { n: minutes }) : t("Places gardées encore 1 minute")) : t("Délai dépassé : places non garanties")}
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-3">
         <button type="button" onClick={annuler} disabled={annulation} className="text-sm font-semibold text-gw-texte-doux hover:text-gw-rose-action disabled:opacity-50">
-          {annulation ? "Annulation..." : "Annuler"}
+          {annulation ? t("Annulation...") : t("Annuler")}
         </button>
         <Link
           href={`/evenements/${groupe.evenementId}/reserver?reservations=${ids.join(",")}`}
           className="inline-flex h-10 items-center rounded-full bg-gw-rose-action px-5 text-sm font-semibold text-white hover:bg-gw-rose-action-fonce"
-        >
-          Finaliser le paiement
-        </Link>
+        >{t("Finaliser le paiement")}</Link>
       </div>
     </li>
   )
@@ -102,7 +102,7 @@ export function MesReservationsList() {
         setBillets(b)
         setErreur(null)
       })
-      .catch((e) => setErreur(e instanceof Error ? e.message : "Impossible de charger vos billets."))
+      .catch((e) => setErreur(e instanceof Error ? e.message : t("Impossible de charger vos billets.")))
       .finally(() => setChargement(false))
   }, [])
 
@@ -124,26 +124,23 @@ export function MesReservationsList() {
   if (chargement) {
     return (
       <p className="flex items-center gap-2 py-16 text-gw-texte-doux">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de vos billets...
-      </p>
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden />{" "}{t("Chargement de vos billets...")}</p>
     )
   }
   if (erreur) return <p className="rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">{erreur}</p>
 
   const groupes = onglet === "a-venir" ? aVenir : passes
   const onglets: { cle: Onglet; libelle: string; nombre: number }[] = [
-    { cle: "a-venir", libelle: "À venir", nombre: aVenir.reduce((s, g) => s + g.billets.length, 0) },
-    { cle: "passes", libelle: "Passés", nombre: passes.reduce((s, g) => s + g.billets.length, 0) },
+    { cle: "a-venir", libelle: t("À venir"), nombre: aVenir.reduce((s, g) => s + g.billets.length, 0) },
+    { cle: "passes", libelle: t("Passés"), nombre: passes.reduce((s, g) => s + g.billets.length, 0) },
   ]
 
   return (
     <div>
       {attente.length > 0 && (
         <section aria-labelledby="titre-attente" className="mb-10 rounded-3xl bg-gw-rose-pale p-5 sm:p-6">
-          <h2 id="titre-attente" className="font-titre text-lg font-bold text-gw-rose-action-fonce">
-            Paiement à finaliser
-          </h2>
-          <p className="mt-1 text-sm text-gw-rose-action-fonce">Ces places sont gardées 15 minutes après la réservation, le temps de payer.</p>
+          <h2 id="titre-attente" className="font-titre text-lg font-bold text-gw-rose-action-fonce">{t("Paiement à finaliser")}</h2>
+          <p className="mt-1 text-sm text-gw-rose-action-fonce">{t("Ces places sont gardées 15 minutes après la réservation, le temps de payer.")}</p>
           <ul className="mt-4 space-y-3">
             {attente.map((g) => (
               <EnAttente key={g.cle} groupe={g} onAnnule={charger} />
@@ -152,7 +149,7 @@ export function MesReservationsList() {
         </section>
       )}
 
-      <div role="tablist" aria-label="Période" className="inline-flex rounded-full bg-gw-surface p-1 ring-1 ring-gw-bordure">
+      <div role="tablist" aria-label={t("Période")} className="inline-flex rounded-full bg-gw-surface p-1 ring-1 ring-gw-bordure">
         {onglets.map((o) => (
           <button
             key={o.cle}
@@ -173,16 +170,14 @@ export function MesReservationsList() {
       {groupes.length === 0 ? (
         <div className="mt-8 rounded-3xl bg-gw-surface px-6 py-14 text-center ring-1 ring-gw-bordure">
           <TicketX className="mx-auto h-10 w-10 text-gw-lavande" aria-hidden />
-          <p className="font-titre mt-3 text-xl font-bold text-gw-encre">{onglet === "a-venir" ? "Aucun billet à venir" : "Aucun événement passé"}</p>
+          <p className="font-titre mt-3 text-xl font-bold text-gw-encre">{onglet === "a-venir" ? t("Aucun billet à venir") : t("Aucun événement passé")}</p>
           {onglet === "a-venir" && (
             <>
-              <p className="mt-1 text-sm text-gw-texte-doux">Vos billets apparaîtront ici dès le paiement accepté.</p>
+              <p className="mt-1 text-sm text-gw-texte-doux">{t("Vos billets apparaîtront ici dès le paiement accepté.")}</p>
               <Link
                 href="/evenements"
                 className="mt-5 inline-flex h-11 items-center rounded-full bg-gw-rose-action px-6 text-sm font-semibold text-white hover:bg-gw-rose-action-fonce"
-              >
-                Découvrir les événements
-              </Link>
+              >{t("Découvrir les événements")}</Link>
             </>
           )}
         </div>

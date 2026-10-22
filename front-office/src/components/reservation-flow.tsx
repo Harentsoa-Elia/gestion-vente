@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t as tr, nombre } from "@/lib/i18n"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -73,7 +75,7 @@ const DUREE_SIMULATION = 2600
 function Etapes({ courante }: { courante: Etape }) {
   const index = ETAPES.findIndex((e) => e.cle === courante)
   return (
-    <ol className="flex items-center gap-2 sm:gap-3" aria-label="Étapes de la réservation">
+    <ol className="flex items-center gap-2 sm:gap-3" aria-label={tr("Étapes de la réservation")}>
       {ETAPES.map((e, i) => {
         // à la confirmation, toutes les étapes sont terminées
         const faite = i < index || courante === "confirmation"
@@ -112,15 +114,11 @@ function Compteur({ expireLe }: { expireLe: number }) {
   if (reste === 0)
     return (
       <p className="flex items-start gap-2 rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">
-        <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-        Le délai de 15 minutes est dépassé : vos places ne sont plus garanties. Vous pouvez tout de même payer s&apos;il en reste.
-      </p>
+        <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />{tr("Le délai de 15 minutes est dépassé : vos places ne sont plus garanties. Vous pouvez tout de même payer s'il en reste.")}</p>
     )
   return (
     <p className={cn("flex items-center gap-2 rounded-2xl px-4 py-3 text-sm", min < 3 ? "bg-gw-rose-pale text-gw-rose-action-fonce" : "bg-gw-fond text-gw-texte")}>
-      <Clock className="h-4 w-4 shrink-0" aria-hidden />
-      Vos places sont gardées encore
-      <strong className="font-mono text-base tabular-nums" aria-live="off">
+      <Clock className="h-4 w-4 shrink-0" aria-hidden />{tr("Vos places sont gardées encore")}<strong className="font-mono text-base tabular-nums" aria-live="off">
         {String(min).padStart(2, "0")}:{String(sec).padStart(2, "0")}
       </strong>
     </p>
@@ -147,8 +145,8 @@ function ChoixQuantite({ valeur, max, onChange }: { valeur: number; max: number;
   const raccourcis = RACCOURCIS.filter((n) => n <= max)
   return (
     <div className="flex flex-col items-end gap-2">
-      <div className="flex items-center gap-2" role="group" aria-label="Nombre de billets">
-        <button type="button" className={bouton} onClick={() => onChange(valeur - 1)} disabled={valeur <= 1} aria-label="Un billet de moins">
+      <div className="flex items-center gap-2" role="group" aria-label={tr("Nombre de billets")}>
+        <button type="button" className={bouton} onClick={() => onChange(valeur - 1)} disabled={valeur <= 1} aria-label={tr("Un billet de moins")}>
           <Minus className="h-4 w-4" aria-hidden />
         </button>
         <input
@@ -163,15 +161,15 @@ function ChoixQuantite({ valeur, max, onChange }: { valeur: number; max: number;
             if (e.target.value !== "" && Number.isFinite(n) && n >= 1) onChange(Math.min(max, n))
           }}
           onBlur={(e) => valider(e.target.value)}
-          aria-label="Nombre de billets (saisie libre)"
+          aria-label={tr("Nombre de billets (saisie libre)")}
           className="font-titre h-10 w-20 [appearance:textfield] rounded-xl bg-gw-surface text-center text-xl font-bold text-gw-encre tabular-nums ring-1 ring-gw-bordure focus:ring-2 focus:ring-gw-violet focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
-        <button type="button" className={bouton} onClick={() => onChange(valeur + 1)} disabled={valeur >= max} aria-label="Un billet de plus">
+        <button type="button" className={bouton} onClick={() => onChange(valeur + 1)} disabled={valeur >= max} aria-label={tr("Un billet de plus")}>
           <Plus className="h-4 w-4" aria-hidden />
         </button>
       </div>
       {raccourcis.length > 1 && (
-        <div className="flex flex-wrap justify-end gap-1.5" aria-label="Choix rapide">
+        <div className="flex flex-wrap justify-end gap-1.5" aria-label={tr("Choix rapide")}>
           {raccourcis.map((n) => (
             <button
               key={n}
@@ -228,7 +226,7 @@ function Recapitulatif({ evenement, lieu, lignes }: { evenement: Evenement; lieu
               </div>
             ))}
             <div className="flex justify-between gap-3 border-t border-gw-bordure pt-2.5 text-base">
-              <dt className="font-semibold text-gw-encre">Total</dt>
+              <dt className="font-semibold text-gw-encre">{tr("Total")}</dt>
               <dd className="font-titre text-xl font-bold text-gw-encre">{ariary(total ?? 0)}</dd>
             </div>
           </dl>
@@ -280,7 +278,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
     ]).then(([ev, ta, li, me, mb]) => {
       if (!actif) return
       if (ev.status !== "fulfilled") {
-        setErreurChargement("Cet événement est introuvable.")
+        setErreurChargement(tr("Cet événement est introuvable."))
         setChargement(false)
         return
       }
@@ -350,7 +348,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
       })
       allerA("paiement")
     } catch (e) {
-      const message = e instanceof Error ? e.message : "La réservation n'a pas abouti."
+      const message = e instanceof Error ? e.message : tr("La réservation n'a pas abouti.")
       if (message.startsWith("EMAIL_NON_VERIFIE")) setEmailVerifie(false)
       else setErreur(message)
       fetchTarifs(evenementId).then(setTarifs).catch(() => undefined)
@@ -370,9 +368,9 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
       const [r] = await Promise.all([payerLot(lot.ids, mode, normaliserTelephone(telephone)), new Promise((ok) => setTimeout(ok, DUREE_SIMULATION))])
       setResultat(r)
       allerA("confirmation")
-      toast.success("Paiement accepté : vos billets sont prêts.")
+      toast.success(tr("Paiement accepté : vos billets sont prêts."))
     } catch (e) {
-      setErreur(e instanceof Error ? e.message : "Le paiement n'a pas abouti.")
+      setErreur(e instanceof Error ? e.message : tr("Le paiement n'a pas abouti."))
     } finally {
       setSimulation(false)
       setEnvoi(false)
@@ -384,7 +382,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
     setEnvoi(true)
     try {
       await Promise.all(lot.ids.map((id) => annulerReservation(id)))
-      toast.success("Réservation annulée : les places sont libérées.")
+      toast.success(tr("Réservation annulée : les places sont libérées."))
     } catch {
       // déjà payée ou supprimée : on revient simplement au choix
     } finally {
@@ -399,8 +397,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
   if (chargement) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center gap-2 text-gw-texte-doux">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement de la billetterie...
-      </div>
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden />{" "}{tr("Chargement de la billetterie...")}</div>
     )
   }
 
@@ -408,9 +405,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
     return (
       <div className="py-24 text-center">
         <p className="font-titre text-2xl font-bold text-gw-encre">{erreurChargement}</p>
-        <Link href="/evenements" className="mt-4 inline-block font-semibold text-gw-violet">
-          Voir les événements
-        </Link>
+        <Link href="/evenements" className="mt-4 inline-block font-semibold text-gw-violet">{tr("Voir les événements")}</Link>
       </div>
     )
   }
@@ -421,10 +416,9 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
   return (
     <div ref={haut} className="scroll-mt-24">
       <Link href={`/evenements/${evenementId}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-gw-texte-doux hover:text-gw-encre">
-        <ArrowLeft className="h-4 w-4" aria-hidden /> Retour à l&apos;événement
-      </Link>
+        <ArrowLeft className="h-4 w-4" aria-hidden />{" "}{tr("Retour à l'événement")}</Link>
       <h1 className="font-titre mt-3 text-3xl font-bold tracking-[-0.02em] text-gw-encre sm:text-4xl">
-        {etape === "confirmation" ? "Vos billets" : "Réserver mes billets"}
+        {etape === "confirmation" ? tr("Vos billets") : tr("Réserver mes billets")}
       </h1>
       <div className="mt-6 max-w-xl">
         <Etapes courante={etape} />
@@ -436,28 +430,24 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
           {etape === "billets" && emailVerifie === false && (
             <section className="rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8">
               <p className="mb-6 flex items-start gap-3 rounded-2xl bg-gw-rose-pale px-4 py-3 text-sm text-gw-rose-action-fonce">
-                <MailWarning className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
-                Avant de réserver, confirmez votre adresse e-mail : c&apos;est là que vous recevrez vos billets et leurs QR codes.
-              </p>
+                <MailWarning className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />{tr("Avant de réserver, confirmez votre adresse e-mail : c'est là que vous recevrez vos billets et leurs QR codes.")}</p>
               <VerificationEmail email={email} envoyerAuDemarrage onConfirme={() => setEmailVerifie(true)} />
             </section>
           )}
 
           {etape === "billets" && emailVerifie !== false && (
             <section className="rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8" aria-labelledby="titre-tarifs">
-              <h2 id="titre-tarifs" className="font-titre text-xl font-bold text-gw-encre">
-                Choisissez vos billets
-              </h2>
+              <h2 id="titre-tarifs" className="font-titre text-xl font-bold text-gw-encre">{tr("Choisissez vos billets")}</h2>
 
               {fermee ? (
-                <p className="mt-4 rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte">La billetterie de cet événement est fermée.</p>
+                <p className="mt-4 rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte">{tr("La billetterie de cet événement est fermée.")}</p>
               ) : tarifs.length === 0 ? (
-                <p className="mt-4 rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte">Les tarifs ne sont pas encore annoncés.</p>
+                <p className="mt-4 rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte">{tr("Les tarifs ne sont pas encore annoncés.")}</p>
               ) : ouverts.length === 0 ? (
-                <p className="mt-4 rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte">Complet : toutes les places ont été vendues.</p>
+                <p className="mt-4 rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte">{tr("Complet : toutes les places ont été vendues.")}</p>
               ) : (
                 <>
-                  <div className="mt-5 space-y-3" role="radiogroup" aria-label="Tarif">
+                  <div className="mt-5 space-y-3" role="radiogroup" aria-label={tr("Tarif")}>
                     {tarifs.map((t) => {
                       const complet = t.restantes === 0
                       const choisi = t.id === tarifId
@@ -491,22 +481,21 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                               <span className="block font-semibold text-gw-encre">{t.nom}</span>
                               <span className={cn("text-xs", t.restantes != null && t.restantes <= 20 ? "font-semibold text-gw-rose-action" : "text-gw-texte-doux")}>
                                 {complet
-                                  ? "Complet"
+                                  ? tr("Complet")
                                   : t.restantes == null
-                                    ? "Disponible"
+                                    ? tr("Disponible")
                                     : t.restantes === 1
-                                      ? "Dernière place"
-                                      : `${t.restantes.toLocaleString("fr-FR")} places restantes`}
+                                      ? tr("Dernière place")
+                                      : tr("{n} places restantes", { n: nombre(t.restantes) })}
                               </span>
                             </span>
                             <span className="font-titre text-lg font-bold text-gw-encre">{ariary(t.prix)}</span>
                           </button>
                           {choisi && (
                             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-gw-bordure pt-4">
-                              <span className="text-sm text-gw-texte">
-                                Nombre de billets{" "}
+                              <span className="text-sm text-gw-texte">{tr("Nombre de billets")}{" "}
                                 <span className="text-gw-texte-doux">
-                                  ({t.restantes == null ? "sans limite" : `${t.restantes.toLocaleString("fr-FR")} place${t.restantes > 1 ? "s" : ""} restante${t.restantes > 1 ? "s" : ""}`})
+                                  ({t.restantes == null ? tr("sans limite") : (t.restantes > 1 ? tr("{n} places restantes", { n: nombre(t.restantes) }) : tr("1 place restante"))})
                                 </span>
                               </span>
                               <ChoixQuantite valeur={quantite} max={maxQuantite} onChange={(n) => setQuantite(Math.max(1, Math.min(maxQuantite, n)))} />
@@ -525,12 +514,9 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
 
                   <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                     <p className="flex items-center gap-2 text-sm text-gw-texte-doux">
-                      <Info className="h-4 w-4" aria-hidden /> Un billet et un QR code par personne.
-                    </p>
+                      <Info className="h-4 w-4" aria-hidden />{" "}{tr("Un billet et un QR code par personne.")}</p>
                     <button type="button" onClick={reserver} disabled={!tarif || envoi} className={boutonPrincipal}>
-                      {envoi && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-                      Continuer vers le paiement
-                    </button>
+                      {envoi && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}{tr("Continuer vers le paiement")}</button>
                   </div>
                 </>
               )}
@@ -540,15 +526,13 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
           {/* --- 2. Paiement --- */}
           {etape === "paiement" && lot && (
             <section className="relative rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8" aria-labelledby="titre-paiement">
-              <h2 id="titre-paiement" className="font-titre text-xl font-bold text-gw-encre">
-                Payer par Mobile Money
-              </h2>
+              <h2 id="titre-paiement" className="font-titre text-xl font-bold text-gw-encre">{tr("Payer par Mobile Money")}</h2>
               <div className="mt-4">
                 <Compteur expireLe={lot.expireLe} />
               </div>
 
               <fieldset className="mt-6">
-                <legend className="mb-3 text-sm font-semibold text-gw-encre">Opérateur</legend>
+                <legend className="mb-3 text-sm font-semibold text-gw-encre">{tr("Opérateur")}</legend>
                 <div className="grid gap-3 sm:grid-cols-3">
                   {OPERATEURS.map((o) => {
                     const choisi = mode === o.mode
@@ -591,8 +575,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
 
               {mode && op && (
                 <div className="mt-6">
-                  <label htmlFor="telephone" className="text-sm font-semibold text-gw-encre">
-                    Numéro {op.nom}
+                  <label htmlFor="telephone" className="text-sm font-semibold text-gw-encre">{tr("Numéro")}{" "}{op.nom}
                   </label>
                   <div
                     className={cn(
@@ -618,7 +601,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                     />
                   </div>
                   <p id="aide-telephone" className={cn("mt-2 text-xs", telephoneTouche && erreurTel ? "text-gw-rose-action" : "text-gw-texte-doux")}>
-                    {telephoneTouche && erreurTel ? erreurTel : `La demande de paiement sera envoyée sur ce numéro.`}
+                    {telephoneTouche && erreurTel ? erreurTel : tr("La demande de paiement sera envoyée sur ce numéro.")}
                   </p>
                 </div>
               )}
@@ -626,9 +609,7 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
               <p className="mt-6 flex items-start gap-2 rounded-2xl border border-dashed border-gw-lavande bg-gw-fond/60 px-4 py-3 text-xs text-gw-texte">
                 <Info className="mt-0.5 h-4 w-4 shrink-0 text-gw-violet" aria-hidden />
                 <span>
-                  <strong className="font-semibold text-gw-encre">Paiement simulé.</strong> Aucun opérateur n&apos;est contacté et aucun montant n&apos;est débité : le
-                  paiement est accepté dès que le numéro correspond à l&apos;opérateur choisi.
-                </span>
+                  <strong className="font-semibold text-gw-encre">{tr("Paiement simulé.")}</strong>{" "}{tr("Aucun opérateur n'est contacté et aucun montant n'est débité : le paiement est accepté dès que le numéro correspond à l'opérateur choisi.")}</span>
               </p>
 
               {erreur && (
@@ -638,12 +619,9 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
               )}
 
               <div className="mt-6 flex flex-wrap-reverse items-center justify-between gap-4">
-                <button type="button" onClick={abandonner} disabled={envoi} className="text-sm font-semibold text-gw-texte-doux hover:text-gw-rose-action disabled:opacity-50">
-                  Annuler la réservation
-                </button>
+                <button type="button" onClick={abandonner} disabled={envoi} className="text-sm font-semibold text-gw-texte-doux hover:text-gw-rose-action disabled:opacity-50">{tr("Annuler la réservation")}</button>
                 <button type="button" onClick={payer} disabled={!mode || envoi} className={boutonPrincipal}>
-                  {envoi && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-                  Payer {ariary(lot.total)}
+                  {envoi && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}{tr("Payer")}{" "}{ariary(lot.total)}
                 </button>
               </div>
 
@@ -658,14 +636,12 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                     >
                       <Smartphone className="h-7 w-7" />
                     </span>
-                    <p className="font-titre mt-4 text-lg font-bold text-gw-encre">Validez sur votre téléphone</p>
-                    <p className="mt-1 text-sm text-gw-texte">
-                      Demande de paiement {op.nom} de <strong>{ariary(lot.total)}</strong> envoyée au{" "}
+                    <p className="font-titre mt-4 text-lg font-bold text-gw-encre">{tr("Validez sur votre téléphone")}</p>
+                    <p className="mt-1 text-sm text-gw-texte">{tr("Demande de paiement")}{" "}{op.nom}{" "}{tr("de")}{" "}<strong>{ariary(lot.total)}</strong>{" "}{tr("envoyée au")}{" "}
                       <span className="font-mono whitespace-nowrap">{formaterTelephone(telephone)}</span>.
                     </p>
                     <p className="mt-4 inline-flex items-center gap-2 text-xs text-gw-texte-doux">
-                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> En attente de confirmation (simulation)...
-                    </p>
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />{" "}{tr("En attente de confirmation (simulation)...")}</p>
                   </div>
                 </div>
               )}
@@ -680,19 +656,15 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                   <Check className="h-7 w-7" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h2 id="titre-confirmation" className="font-titre text-2xl font-bold text-gw-violet-fonce">
-                    Paiement accepté
-                  </h2>
+                  <h2 id="titre-confirmation" className="font-titre text-2xl font-bold text-gw-violet-fonce">{tr("Paiement accepté")}</h2>
                   <p className="mt-1 text-sm text-gw-violet-fonce">
-                    {ariary(resultat.montant_total)} payés avec {operateur(resultat.mode_paiement)?.nom} · référence{" "}
+                    {ariary(resultat.montant_total)}{" "}{tr("payés avec")}{" "}{operateur(resultat.mode_paiement)?.nom}{" "}{tr("· référence")}{" "}
                     <span className="font-mono font-semibold">{resultat.reference}</span>
                   </p>
                   <p className="mt-2 flex items-start gap-2 text-sm text-gw-violet-fonce">
                     <MailCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                     <span>
-                      {resultat.billets.length > 1 ? "Vos billets ont été envoyés" : "Votre billet a été envoyé"} à <strong>{resultat.email}</strong> (PDF
-                      en pièce jointe). Pensez à regarder dans les indésirables.
-                    </span>
+                      {resultat.billets.length > 1 ? tr("Vos billets ont été envoyés") : tr("Votre billet a été envoyé")}{" "}{tr("à")}{" "}<strong>{resultat.email}</strong>{" "}{tr("(PDF en pièce jointe). Pensez à regarder dans les indésirables.")}</span>
                   </p>
                 </div>
               </div>
@@ -707,15 +679,11 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
               </div>
 
               {resultat.billets.length > BILLETS_AFFICHES && (
-                <p className="mt-4 rounded-2xl bg-gw-surface px-4 py-3 text-sm text-gw-texte ring-1 ring-gw-bordure">
-                  ... et {resultat.billets.length - BILLETS_AFFICHES} autres billets, tous dans votre e-mail et dans "Mes billets".
-                </p>
+                <p className="mt-4 rounded-2xl bg-gw-surface px-4 py-3 text-sm text-gw-texte ring-1 ring-gw-bordure">{tr("... et")}{" "}{resultat.billets.length - BILLETS_AFFICHES}{" "}{tr("autres billets, tous dans votre e-mail et dans \"Mes billets\".")}</p>
               )}
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/participants/mes-reservations" className={boutonPrincipal}>
-                  Voir tous mes billets
-                </Link>
+                <Link href="/participants/mes-reservations" className={boutonPrincipal}>{tr("Voir tous mes billets")}</Link>
                 <button
                   type="button"
                   onClick={() => {
@@ -732,14 +700,11 @@ export default function ReservationFlow({ evenementId }: { evenementId: number }
                   }}
                   className="inline-flex h-12 items-center gap-2 rounded-full px-6 font-semibold text-gw-encre ring-1 ring-gw-bordure hover:bg-gw-surface"
                 >
-                  <Plus className="h-4 w-4" aria-hidden /> Acheter d&apos;autres billets
-                </button>
+                  <Plus className="h-4 w-4" aria-hidden />{" "}{tr("Acheter d'autres billets")}</button>
                 <Link
                   href={`/evenements/${evenementId}`}
                   className="inline-flex h-12 items-center rounded-full px-6 font-semibold text-gw-encre ring-1 ring-gw-bordure hover:bg-gw-surface"
-                >
-                  Retour à l&apos;événement
-                </Link>
+                >{tr("Retour à l'événement")}</Link>
               </div>
             </section>
           )}

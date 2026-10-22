@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t as tr, heure, nombre, dateSimple } from "@/lib/i18n"
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, CalendarDays, Clock, Eye, MapPin, Mic2, Tags, ShieldCheck, Ticket, Users, Vote, type LucideIcon } from "lucide-react"
@@ -10,6 +12,7 @@ import { fetchCategories, fetchLieux } from "@/services/referentielService"
 import type { Categorie, Evenement, Lieu, PropositionAvecScore, PropositionType, TarifDisponible } from "@/types"
 import { cn } from "@/utils"
 import { estPasse, repereTemporel } from "@/lib/evenements"
+import { AjoutAgenda } from "@/components/ajout-agenda"
 import { imageTestEvenement, imageTestProposition, urlMedia } from "@/lib/media"
 import { ariary, dateEvenement } from "@/lib/billetterie"
 import { BoiteReactions } from "@/components/accueil/boite-reactions"
@@ -37,22 +40,21 @@ function etatBilletterie(evenement: Evenement, tarifs: TarifDisponible[]): EtatB
 
 function Disponibilite({ tarif }: { tarif: TarifDisponible }) {
   if (tarif.restantes == null) return null
-  if (tarif.restantes === 0) return <span className="text-xs font-semibold text-gw-texte-pale">Complet</span>
+  if (tarif.restantes === 0) return <span className="text-xs font-semibold text-gw-texte-pale">{tr("Complet")}</span>
   if (tarif.restantes <= 20)
     return (
       <span className="text-xs font-semibold text-gw-rose-action">
-        {tarif.restantes === 1 ? "Dernière place" : `Plus que ${tarif.restantes} places`}
+        {tarif.restantes === 1 ? tr("Dernière place") : tr("Plus que {n} places", { n: tarif.restantes })}
       </span>
     )
-  return <span className="text-xs text-gw-texte-doux">{tarif.restantes.toLocaleString("fr-FR")} places disponibles</span>
+  return <span className="text-xs text-gw-texte-doux">{nombre(tarif.restantes)}{" "}{tr("places disponibles")}</span>
 }
 
 function CarteBilletterie({ evenement, tarifs, etat }: { evenement: Evenement; tarifs: TarifDisponible[]; etat: EtatBilletterie }) {
   return (
     <section aria-labelledby="titre-billets" className="rounded-3xl bg-gw-surface p-6 shadow-[0_24px_48px_-30px_rgba(42,26,94,0.5)] ring-1 ring-gw-bordure">
       <h2 id="titre-billets" className="font-titre flex items-center gap-2 text-xl font-bold text-gw-encre">
-        <Ticket className="h-5 w-5 text-gw-violet" aria-hidden /> Billets
-      </h2>
+        <Ticket className="h-5 w-5 text-gw-violet" aria-hidden />{" "}{tr("Billets")}</h2>
 
       {tarifs.length > 0 && (
         <ul className="mt-4 divide-y divide-gw-bordure">
@@ -77,20 +79,16 @@ function CarteBilletterie({ evenement, tarifs, etat }: { evenement: Evenement; t
             <Link
               href={`/evenements/${evenement.id}/reserver`}
               className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gw-rose-action font-semibold text-white shadow-[0_12px_24px_-12px_rgba(201,42,122,0.8)] transition-colors hover:bg-gw-rose-action-fonce focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet"
-            >
-              Réserver mes billets
-            </Link>
+            >{tr("Réserver mes billets")}</Link>
             <p className="mt-3 flex items-start gap-2 text-xs text-gw-texte-doux">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gw-violet" aria-hidden />
-              Paiement par MVola, Orange Money ou Airtel Money. Vos billets et leurs QR codes arrivent par e-mail.
-            </p>
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gw-violet" aria-hidden />{tr("Paiement par MVola, Orange Money ou Airtel Money. Vos billets et leurs QR codes arrivent par e-mail.")}</p>
           </>
         ) : (
           <p className="rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte">
-            {etat.type === "terminee" && "Cet événement est terminé : la billetterie est fermée."}
-            {etat.type === "complet" && "Complet : toutes les places ont été vendues."}
-            {etat.type === "sans-tarif" && "Les tarifs seront bientôt annoncés. Revenez un peu plus tard."}
-            {etat.type === "non-publiee" && "Aperçu : cet événement n'est pas encore publié, la billetterie n'est pas ouverte."}
+            {etat.type === "terminee" && tr("Cet événement est terminé : la billetterie est fermée.")}
+            {etat.type === "complet" && tr("Complet : toutes les places ont été vendues.")}
+            {etat.type === "sans-tarif" && tr("Les tarifs seront bientôt annoncés. Revenez un peu plus tard.")}
+            {etat.type === "non-publiee" && tr("Aperçu : cet événement n'est pas encore publié, la billetterie n'est pas ouverte.")}
           </p>
         )}
       </div>
@@ -121,7 +119,7 @@ function CarteProposition({ proposition, part }: { proposition: PropositionAvecS
         )}
         <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(29,18,69,0.1)_20%,rgba(29,18,69,0.92)_100%)]" />
         <p className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-gw-nuit/75 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
-          <type.icone className="h-3.5 w-3.5" aria-hidden /> {type.libelle}
+          <type.icone className="h-3.5 w-3.5" aria-hidden /> {tr(type.libelle)}
         </p>
         <div className="absolute right-4 bottom-3 left-4 flex items-end justify-between gap-3">
           <h3 className="font-titre line-clamp-2 text-2xl leading-tight font-bold">{proposition.libelle}</h3>
@@ -133,8 +131,7 @@ function CarteProposition({ proposition, part }: { proposition: PropositionAvecS
       </div>
       <div className="p-4">
         <p className="mb-3 text-sm text-white/75">
-          <span className="font-semibold text-white">{score.toLocaleString("fr-FR")} points</span> · réagissez pour la soutenir
-        </p>
+          <span className="font-semibold text-white">{nombre(score)}{" "}{tr("points")}</span>{" "}{tr("· réagissez pour la soutenir")}</p>
         <BoiteReactions propositionId={proposition.id} libelle={proposition.libelle} onScore={(d) => setScore((v) => v + d)} />
       </div>
     </article>
@@ -143,7 +140,7 @@ function CarteProposition({ proposition, part }: { proposition: PropositionAvecS
 
 function Squelette() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6" aria-busy="true" aria-label="Chargement de l'événement">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6" aria-busy="true" aria-label={tr("Chargement de l'événement")}>
       <div className="aspect-[2/1] max-h-[26rem] w-full animate-pulse rounded-3xl bg-gw-bordure" />
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_22rem]">
         <div className="space-y-3">
@@ -178,7 +175,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
     ]).then(([ev, ta, li, ca, pr]) => {
       if (!actif) return
       if (ev.status !== "fulfilled") {
-        setErreur("Cet événement est introuvable. Il a peut-être été retiré.")
+        setErreur(tr("Cet événement est introuvable. Il a peut-être été retiré."))
         setChargement(false)
         return
       }
@@ -207,11 +204,10 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
   if (erreur || !evenement) {
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
-        <p className="font-titre text-2xl font-bold text-gw-encre">Événement introuvable</p>
+        <p className="font-titre text-2xl font-bold text-gw-encre">{tr("Événement introuvable")}</p>
         <p className="mt-2 text-gw-texte-doux">{erreur}</p>
         <Link href="/evenements" className="mt-6 inline-flex items-center gap-2 font-semibold text-gw-violet hover:text-gw-rose-action">
-          <ArrowLeft className="h-4 w-4" aria-hidden /> Voir tous les événements
-        </Link>
+          <ArrowLeft className="h-4 w-4" aria-hidden />{" "}{tr("Voir tous les événements")}</Link>
       </div>
     )
   }
@@ -223,9 +219,9 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
   const lieuTexte = lieu ? [lieu.nom, lieu.adresse, lieu.ville].filter(Boolean).join(", ") : null
   const duree =
     evenement.date_fin && new Date(evenement.date_fin).toDateString() === new Date(evenement.date_debut).toDateString()
-      ? `Jusqu'à ${new Date(evenement.date_fin).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }).replace(":", " h ")}`
+      ? tr("Jusqu'à {heure}", { heure: heure(new Date(evenement.date_fin)) })
       : evenement.date_fin
-        ? `Jusqu'au ${dateEvenement(evenement.date_fin).toLowerCase()}`
+        ? tr("Jusqu'au {date}", { date: dateEvenement(evenement.date_fin) })
         : null
 
   return (
@@ -238,8 +234,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
         )}
         <div className="relative mx-auto max-w-6xl px-4 pt-6 pb-8 sm:px-6">
           <Link href="/evenements" className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/85 hover:text-white">
-            <ArrowLeft className="h-4 w-4" aria-hidden /> Tous les événements
-          </Link>
+            <ArrowLeft className="h-4 w-4" aria-hidden />{" "}{tr("Tous les événements")}</Link>
           <div className="mt-4 aspect-[2/1] max-h-[28rem] w-full overflow-hidden rounded-3xl bg-gw-nuit shadow-[0_30px_60px_-30px_rgba(0,0,0,0.7)]">
             {!erreurImage ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -256,7 +251,7 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
           <div className="flex flex-wrap items-center gap-2">
             {categorie && <span className="rounded-full bg-gw-lavande/60 px-3 py-1 text-xs font-semibold text-gw-encre">{categorie.nom}</span>}
             {repere && <span className="text-sm font-semibold text-gw-rose-action">{repere}</span>}
-            {passe && <span className="rounded-full bg-gw-nuit px-3 py-1 text-xs font-semibold text-white">Terminé</span>}
+            {passe && <span className="rounded-full bg-gw-nuit px-3 py-1 text-xs font-semibold text-white">{tr("Terminé")}</span>}
           </div>
           <h1 className="font-titre mt-3 text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-gw-encre sm:text-5xl">{evenement.titre}</h1>
 
@@ -268,6 +263,19 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
               <span>
                 <span className="block font-semibold text-gw-encre">{dateEvenement(evenement.date_debut)}</span>
                 {duree && <span className="text-sm text-gw-texte-doux">{duree}</span>}
+                {!passe && (
+                  <AjoutAgenda
+                    className="mt-2 block"
+                    evenement={{
+                      titre: evenement.titre,
+                      debut: evenement.date_debut,
+                      fin: evenement.date_fin,
+                      lieu: lieuTexte,
+                      description: evenement.description,
+                      lien: typeof window !== "undefined" ? window.location.href : undefined,
+                    }}
+                  />
+                )}
               </span>
             </li>
             {lieuTexte && (
@@ -286,35 +294,29 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gw-fond text-gw-violet">
                   <Users className="h-5 w-5" aria-hidden />
                 </span>
-                <span className="font-semibold text-gw-encre">{evenement.capacite.toLocaleString("fr-FR")} places au total</span>
+                <span className="font-semibold text-gw-encre">{nombre(evenement.capacite)}{" "}{tr("places au total")}</span>
               </li>
             )}
           </ul>
 
           {evenement.description && (
             <section className="mt-10" aria-labelledby="titre-apropos">
-              <h2 id="titre-apropos" className="font-titre text-2xl font-bold text-gw-encre">
-                À propos
-              </h2>
+              <h2 id="titre-apropos" className="font-titre text-2xl font-bold text-gw-encre">{tr("À propos")}</h2>
               <p className="mt-3 leading-relaxed whitespace-pre-line text-gw-texte">{evenement.description}</p>
             </section>
           )}
 
           {!!evenement.nombre_vues && (
             <p className="mt-6 flex items-center gap-1.5 text-sm text-gw-texte-doux">
-              <Eye className="h-4 w-4" aria-hidden /> {evenement.nombre_vues.toLocaleString("fr-FR")} vues
-              <Clock className="ml-3 h-4 w-4" aria-hidden /> Publié le {new Date(evenement.date_creation).toLocaleDateString("fr-FR")}
+              <Eye className="h-4 w-4" aria-hidden /> {nombre(evenement.nombre_vues)}{" "}{tr("vues")}<Clock className="ml-3 h-4 w-4" aria-hidden />{" "}{tr("Publié le")}{" "}{dateSimple(new Date(evenement.date_creation))}
             </p>
           )}
 
           {propositions.length > 0 && (
             <section className="mt-12" aria-labelledby="titre-vote">
               <h2 id="titre-vote" className="font-titre flex items-center gap-2 text-2xl font-bold text-gw-encre">
-                <Vote className="h-6 w-6 text-gw-rose" aria-hidden /> Le public donne son avis
-              </h2>
-              <p className="mt-2 text-gw-texte-doux">
-                L&apos;organisateur hésite encore. Réagissez aux propositions : les plus soutenues l&apos;aideront à décider.
-              </p>
+                <Vote className="h-6 w-6 text-gw-rose" aria-hidden />{" "}{tr("Le public donne son avis")}</h2>
+              <p className="mt-2 text-gw-texte-doux">{tr("L'organisateur hésite encore. Réagissez aux propositions : les plus soutenues l'aideront à décider.")}</p>
               <div className="mt-6 grid gap-5 md:grid-cols-2">
                 {propositions.map((p) => (
                   <CarteProposition key={p.id} proposition={p} part={parts.get(p.id) ?? 0} />
@@ -332,15 +334,12 @@ export function EvenementDetail({ evenementId }: { evenementId: number }) {
       {/* mobile : barre de réservation toujours visible */}
       {etat.type === "ouverte" && (
         <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-gw-bordure bg-gw-surface/95 px-4 py-3 backdrop-blur lg:hidden">
-          <p className="text-sm text-gw-texte-doux">
-            À partir de <span className="font-titre block text-lg font-bold text-gw-encre">{ariary(etat.prixMin)}</span>
+          <p className="text-sm text-gw-texte-doux">{tr("À partir de")}{" "}<span className="font-titre block text-lg font-bold text-gw-encre">{ariary(etat.prixMin)}</span>
           </p>
           <Link
             href={`/evenements/${evenement.id}/reserver`}
             className="inline-flex h-11 items-center rounded-full bg-gw-rose-action px-6 font-semibold text-white hover:bg-gw-rose-action-fonce"
-          >
-            Réserver
-          </Link>
+          >{tr("Réserver")}</Link>
         </div>
       )}
     </div>

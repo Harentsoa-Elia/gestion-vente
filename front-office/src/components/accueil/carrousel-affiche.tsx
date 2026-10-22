@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t, moisCourt } from "@/lib/i18n"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react"
@@ -17,7 +19,6 @@ import { cn } from "@/utils"
  * a demandé à réduire les animations.
  */
 
-const MOIS = ["JANV", "FÉVR", "MARS", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"]
 const NB_MAX = 7
 const ECART = 150 // décalage horizontal entre deux affiches (px)
 const DELAI = 6000
@@ -52,9 +53,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
       onMouseEnter={() => setSurvol(true)}
       onMouseLeave={() => setSurvol(false)}
     >
-      <h2 id="affiche-titre" className="mx-auto w-fit rounded-full bg-gw-surface/90 px-3 py-1 text-center text-sm font-semibold tracking-[0.2em] text-gw-rose-action uppercase dark:bg-transparent dark:text-[#F59BC7]">
-        À l&apos;affiche
-      </h2>
+      <h2 id="affiche-titre" className="mx-auto w-fit rounded-full bg-gw-surface/90 px-3 py-1 text-center text-sm font-semibold tracking-[0.2em] text-gw-rose-action uppercase dark:bg-transparent dark:text-[#F59BC7]">{t("À l'affiche")}</h2>
 
       <div className="relative mt-4 h-[310px]">
         {evenements.map((e, i) => {
@@ -94,7 +93,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
               />
               <div className="absolute top-4 left-4 rounded-xl bg-gw-surface/95 px-3 py-1.5 text-center leading-none text-gw-encre shadow">
                 <span className="font-titre block text-xl font-bold">{date.getDate()}</span>
-                <span className="mt-0.5 block text-[10px] font-semibold tracking-wider">{MOIS[date.getMonth()]}</span>
+                <span className="mt-0.5 block text-[10px] font-semibold tracking-wider">{moisCourt(date).toUpperCase()}</span>
               </div>
               {centre && e.prix_a_partir_de != null && (
                 <span className="absolute top-4 right-4 rounded-full bg-gw-nuit/80 px-3 py-1 text-xs font-semibold backdrop-blur">
@@ -115,9 +114,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
                     <Link
                       href={`/evenements/${e.id}`}
                       className="mt-4 inline-flex rounded-full bg-gw-surface px-5 py-2 text-sm font-semibold text-gw-rose-action transition-colors hover:bg-gw-rose-pale"
-                    >
-                      Réserver
-                    </Link>
+                    >{t("Réserver")}</Link>
                   </>
                 )}
               </div>
@@ -130,7 +127,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
             <button
               type="button"
               onClick={() => aller(-1)}
-              aria-label="Événement précédent"
+              aria-label={t("Événement précédent")}
               className="absolute top-1/2 left-0 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-gw-violet text-white backdrop-blur transition-colors hover:bg-gw-violet-fonce dark:bg-white/15 dark:hover:bg-white/25"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -138,7 +135,7 @@ export function CarrouselAffiche({ catalogue }: { catalogue: Catalogue }) {
             <button
               type="button"
               onClick={() => aller(1)}
-              aria-label="Événement suivant"
+              aria-label={t("Événement suivant")}
               className="absolute top-1/2 right-0 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-gw-rose-action transition-colors hover:bg-gw-rose-action-fonce"
             >
               <ChevronRight className="h-5 w-5" />

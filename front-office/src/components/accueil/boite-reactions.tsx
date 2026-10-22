@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t as tr, ilYa as ilYaI18n } from "@/lib/i18n"
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { toast } from "sonner"
 import { Heart, MessageCircle, SendHorizontal, Star, ThumbsUp, UserRound } from "lucide-react"
@@ -27,7 +29,7 @@ import { participantCourantId } from "@/lib/participant-courant"
  * mais doit se connecter pour changer d'avis (sa réaction est retenue dans le navigateur).
  */
 
-type Reaction = Exclude<InteractionType, "COMMENTAIRE">
+export type Reaction = Exclude<InteractionType, "COMMENTAIRE">
 
 const REACTIONS: {
   type: Reaction
@@ -49,7 +51,7 @@ const DELAI_APPUI_LONG = 400
 const cleStockage = (propositionId: number) => `guichetweb:reaction:${propositionId}`
 
 /** Pastille ronde d'une réaction (icône blanche sur dégradé, ou visage Waouh). */
-function Pastille({ type, taille }: { type: Reaction; taille: number }) {
+export function Pastille({ type, taille }: { type: Reaction; taille: number }) {
   const r = PAR_TYPE[type]
   if (type === "WAOUH") return <WaouhFace size={taille} />
   const Icone = type === "LIKE" ? ThumbsUp : type === "JADORE" ? Heart : Star
@@ -69,20 +71,8 @@ function Pastille({ type, taille }: { type: Reaction; taille: number }) {
 }
 
 function ilYa(iso: string) {
-  const secondes = Math.round((new Date(iso).getTime() - Date.now()) / 1000)
-  const rtf = new Intl.RelativeTimeFormat("fr", { numeric: "auto" })
-  const paliers: [Intl.RelativeTimeFormatUnit, number][] = [
-    ["year", 31536000],
-    ["month", 2592000],
-    ["week", 604800],
-    ["day", 86400],
-    ["hour", 3600],
-    ["minute", 60],
-  ]
-  for (const [unite, duree] of paliers) {
-    if (Math.abs(secondes) >= duree) return rtf.format(Math.round(secondes / duree), unite)
-  }
-  return "à l'instant"
+  const secondes = (Date.now() - new Date(iso).getTime()) / 1000
+  return secondes < 60 ? tr("à l'instant") : ilYaI18n(new Date(iso))
 }
 
 export function BoiteReactions({
@@ -178,7 +168,7 @@ export function BoiteReactions({
   const retirer = async (): Promise<boolean> => {
     if (!maReaction) return true
     if (moi == null || maReaction.id == null) {
-      toast.info("Connectez-vous pour retirer ou changer votre réaction.")
+      toast.info(tr("Connectez-vous pour retirer ou changer votre réaction."))
       return false
     }
     await supprimerInteraction(maReaction.id)
@@ -199,7 +189,7 @@ export function BoiteReactions({
       onScore(POIDS_REACTION[type])
       memoriser({ type, id: creee.id })
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "La réaction n'a pas été enregistrée.")
+      toast.error(e instanceof Error ? e.message : tr("La réaction n'a pas été enregistrée."))
     } finally {
       setEnvoi(false)
     }
@@ -216,7 +206,7 @@ export function BoiteReactions({
     try {
       await retirer()
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Impossible de retirer la réaction.")
+      toast.error(e instanceof Error ? e.message : tr("Impossible de retirer la réaction."))
     } finally {
       setEnvoi(false)
     }
@@ -233,7 +223,7 @@ export function BoiteReactions({
       setCommentairesOuverts(true)
       requestAnimationFrame(() => listeFin.current?.scrollIntoView({ block: "nearest" }))
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Le commentaire n'a pas été publié.")
+      toast.error(e instanceof Error ? e.message : tr("Le commentaire n'a pas été publié."))
     } finally {
       setEnvoi(false)
     }
@@ -301,14 +291,14 @@ export function BoiteReactions({
             </span>
             <span>
               {maReaction && total > 1
-                ? `Vous et ${total - 1} autre${total > 2 ? "s" : ""}`
+                ? (total > 2 ? tr("Vous et {n} autres", { n: total - 1 }) : tr("Vous et 1 autre"))
                 : maReaction
-                  ? "Vous"
+                  ? tr("Vous")
                   : total}
             </span>
           </span>
         ) : (
-          <span>Soyez le premier à réagir</span>
+          <span>{tr("Soyez le premier à réagir")}</span>
         )}
         {commentaires.length > 0 && (
           <button
@@ -317,7 +307,7 @@ export function BoiteReactions({
             aria-expanded={commentairesOuverts}
             className="hover:underline"
           >
-            {commentaires.length} commentaire{commentaires.length > 1 ? "s" : ""}
+            {commentaires.length}{" "}{tr("commentaire")}{commentaires.length > 1 ? "s" : ""}
           </button>
         )}
       </div>
@@ -333,7 +323,7 @@ export function BoiteReactions({
           {choixOuvert && (
             <div
               role="toolbar"
-              aria-label={`Choisir une réaction pour ${libelle}`}
+              aria-label={tr("Choisir une réaction pour {libelle}", { libelle })}
               onKeyDown={toucheChoix}
               onPointerEnter={garderOuvert}
               className="absolute bottom-full left-0 z-20 mb-2 flex items-center gap-1 rounded-full bg-gw-surface px-2 py-1.5 shadow-[0_6px_24px_rgba(0,0,0,0.22)]"
@@ -343,7 +333,7 @@ export function BoiteReactions({
                   key={type}
                   type="button"
                   data-reaction
-                  aria-label={nom}
+                  aria-label={tr(nom)}
                   aria-pressed={maReaction?.type === type}
                   onClick={() => reagir(type)}
                   className="group/reaction relative flex h-11 w-11 items-center justify-center rounded-full outline-none"
@@ -356,7 +346,7 @@ export function BoiteReactions({
                   </span>
                   {/* nom de la réaction au survol, comme Facebook (groupe nommé : la carte parente est aussi un "group") */}
                   <span className="pointer-events-none absolute -top-8 rounded-full bg-black/80 px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-white opacity-0 transition-opacity group-hover/reaction:opacity-100 group-focus-visible/reaction:opacity-100">
-                    {nom}
+                    {tr(nom)}
                   </span>
                 </button>
               ))}
@@ -370,7 +360,7 @@ export function BoiteReactions({
             aria-haspopup="true"
             aria-expanded={choixOuvert}
             aria-pressed={!!maReaction}
-            aria-label={active ? `${active.libelle} (cliquer pour retirer)` : "J'aime. Maintenir ou Flèche haut pour d'autres réactions"}
+            aria-label={active ? tr("{libelle} (cliquer pour retirer)", { libelle: tr(active.libelle) }) : tr("J'aime. Maintenir ou Flèche haut pour d'autres réactions")}
             onClick={clicPrincipal}
             onKeyDown={toucheBouton}
             onPointerDown={(e) => {
@@ -394,7 +384,7 @@ export function BoiteReactions({
             ) : (
               <ThumbsUp className="h-5 w-5" aria-hidden />
             )}
-            {active ? active.libelle : "J'aime"}
+            {active ? tr(active.libelle) : tr("J'aime")}
           </button>
         </div>
 
@@ -406,9 +396,7 @@ export function BoiteReactions({
           }}
           className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-[15px] font-semibold text-gw-texte-doux transition-colors hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet"
         >
-          <MessageCircle className="h-5 w-5" aria-hidden />
-          Commenter
-        </button>
+          <MessageCircle className="h-5 w-5" aria-hidden />{tr("Commenter")}</button>
       </div>
 
       {/* commentaires */}
@@ -423,10 +411,10 @@ export function BoiteReactions({
                 <div className="rounded-2xl bg-gw-fond px-3 py-2">
                   <p className="text-[13px] font-semibold">
                     {moi != null && c.participant_id === moi
-                      ? "Vous"
+                      ? tr("Vous")
                       : c.participant_id != null
-                        ? "Un participant"
-                        : "Un visiteur"}
+                        ? tr("Un participant")
+                        : tr("Un visiteur")}
                   </p>
                   <p className="text-sm break-words">{c.contenu}</p>
                 </div>
@@ -455,14 +443,14 @@ export function BoiteReactions({
             value={commentaire}
             onChange={(e) => setCommentaire(e.target.value)}
             maxLength={500}
-            placeholder="Écrivez un commentaire..."
-            aria-label={`Commenter ${libelle}`}
+            placeholder={tr("Écrivez un commentaire...")}
+            aria-label={tr("Commenter {libelle}", { libelle })}
             className="h-9 w-full rounded-full bg-gw-fond pr-10 pl-4 text-sm placeholder:text-gw-texte-doux focus:outline-2 focus:outline-gw-violet"
           />
           <button
             type="submit"
             disabled={!commentaire.trim() || envoi}
-            aria-label="Publier le commentaire"
+            aria-label={tr("Publier le commentaire")}
             className="absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-gw-violet transition-opacity hover:bg-gw-bordure disabled:opacity-30"
           >
             <SendHorizontal className="h-4 w-4" aria-hidden />

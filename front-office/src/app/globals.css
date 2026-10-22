@@ -235,3 +235,57 @@ body {
 ::view-transition-new(root) {
   z-index: 2;
 }
+
+/* Accueil : entrée du hero, compte à rebours et bandeau d'activité (en-direct.tsx) */
+@keyframes gw-entree {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.gw-entree {
+  animation: gw-entree 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes gw-tic {
+  from {
+    opacity: 0.2;
+    transform: translateY(-35%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.gw-tic {
+  animation: gw-tic 0.35s ease-out;
+}
+@keyframes gw-defile {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.gw-defile {
+  animation: gw-defile 60s linear infinite;
+}
+.gw-defile-zone:hover .gw-defile,
+.gw-defile-zone:focus-within .gw-defile {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gw-entree,
+  .gw-tic {
+    animation: none;
+  }
+  .gw-defile {
+    animation: none;
+  }
+  .gw-defile-zone {
+    overflow-x: auto;
+  }
+}

@@ -1,10 +1,11 @@
+import { t } from "@/lib/i18n"
 import { cn } from "@/utils"
 import { PERIODES, type Periode } from "@/lib/evenements"
 
 /** Onglets de période, comme "All / Today / This weekend" sur Eventbrite. */
 export function FiltrePeriode({ valeur, onChange }: { valeur: Periode; onChange: (p: Periode) => void }) {
   return (
-    <div role="group" aria-label="Filtrer par date" className="mt-5 flex gap-2 overflow-x-auto pb-1">
+    <div role="group" aria-label={t("Filtrer par date")} className="mt-5 flex gap-2 overflow-x-auto pb-1">
       {PERIODES.map((p) => (
         <button
           key={p.valeur}
@@ -18,7 +19,7 @@ export function FiltrePeriode({ valeur, onChange }: { valeur: Periode; onChange:
               : "border-gw-bordure text-gw-texte hover:border-gw-nuit",
           )}
         >
-          {p.libelle}
+          {t(p.libelle)}
         </button>
       ))}
     </div>

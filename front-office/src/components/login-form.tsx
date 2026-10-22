@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { enregistrerSession } from "@/lib/jetons"
 import type React from "react"
 import { useEffect, useState } from "react"
@@ -55,7 +57,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
     try {
       // /signup crée le compte sans renvoyer de jeton : on se connecte juste après
-      if (!isLogin) await appeler("/signup", { fullname: fullName, email, password }, "L'inscription a échoué.")
+      if (!isLogin) await appeler("/signup", { fullname: fullName, email, password }, t("L'inscription a échoué."))
       let data: { access_token?: string; refresh_token?: string }
       try {
         data = await appeler("/login", { email, password }, MESSAGE_IDENTIFIANTS)
@@ -67,7 +69,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
           const jetonParticipant = await connexionParticipant(email, password)
           if (jetonParticipant) {
             saveParticipantToken(jetonParticipant)
-            toast.success("Compte participant : vous êtes connecté. Retrouvez vos billets dans le menu à votre nom.")
+            toast.success(t("Compte participant : vous êtes connecté. Retrouvez vos billets dans le menu à votre nom."))
             router.push("/")
             return
           }
@@ -75,17 +77,17 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         }
         throw err
       }
-      if (!data.access_token) throw new Error("La connexion a échoué.")
+      if (!data.access_token) throw new Error(t("La connexion a échoué."))
 
       enregistrerSession("equipe", { access_token: data.access_token, refresh_token: data.refresh_token })
       onLoginSuccess(data.access_token)
     } catch (err) {
       setError(
         err instanceof TypeError
-          ? "Le serveur ne répond pas. Vérifiez que l'API est démarrée."
+          ? t("Le serveur ne répond pas. Vérifiez que l'API est démarrée.")
           : err instanceof Error
             ? err.message
-            : "Une erreur est survenue.",
+            : t("Une erreur est survenue."),
       )
     } finally {
       setLoading(false)
@@ -107,34 +109,34 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         { libelle: "Inscription", actif: !isLogin, onClick: () => changerMode(false) },
       ]}
       icone={isLogin ? User : UserPlus}
-      surtitre={isLogin ? "Organisateurs et administrateurs" : "Espace organisateur"}
-      titre={isLogin ? "Connexion" : "Créer un compte"}
+      surtitre={isLogin ? t("Organisateurs et administrateurs") : t("Espace organisateur")}
+      titre={isLogin ? t("Connexion") : t("Créer un compte")}
       sousTitre={
         isLogin
-          ? "Organisateurs : gérez vos événements et vos ventes. Administrateurs : validez les événements."
-          : "Un compte pour préparer vos événements et suivre vos ventes."
+          ? t("Organisateurs : gérez vos événements et vos ventes. Administrateurs : validez les événements.")
+          : t("Un compte pour préparer vos événements et suivre vos ventes.")
       }
       pied={
         <>
-          <span>Vous souhaitez acheter des billets ?</span>
-          <LienPied href="/participants/login">Espace participant</LienPied>
+          <span>{t("Vous souhaitez acheter des billets ?")}</span>
+          <LienPied href="/participants/login">{t("Espace participant")}</LienPied>
         </>
       }
     >
       <form onSubmit={handleSubmit} className="mx-auto max-w-sm space-y-6">
         {!isLogin && (
           <ChampAuth
-            libelle="Nom complet"
+            libelle={t("Nom complet")}
             icone={User}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Ex. Rakoto Jean"
+            placeholder={t("Ex. Rakoto Jean")}
             autoComplete="name"
             required
           />
         )}
         <ChampAuth
-          libelle="Adresse e-mail"
+          libelle={t("Adresse e-mail")}
           icone={Mail}
           type="email"
           value={email}
@@ -144,7 +146,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
           required
         />
         <ChampAuth
-          libelle="Mot de passe"
+          libelle={t("Mot de passe")}
           icone={isLogin ? Lock : KeyRound}
           type="password"
           value={password}
@@ -159,9 +161,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
             <Link
               href={email ? `/login/mot-de-passe-oublie?email=${encodeURIComponent(email)}` : "/login/mot-de-passe-oublie"}
               className="text-xs font-semibold text-gw-violet hover:text-gw-rose-action hover:underline"
-            >
-              Mot de passe oublié ?
-            </Link>
+            >{t("Mot de passe oublié ?")}</Link>
           </p>
         )}
 
@@ -169,7 +169,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
         <div className="flex justify-center pt-1">
           <BoutonAuth type="submit" chargement={loading} className="w-full sm:w-auto sm:min-w-[200px]">
-            {isLogin ? (loading ? "Connexion..." : "Se connecter") : loading ? "Création..." : "Créer mon compte"}
+            {isLogin ? (loading ? t("Connexion...") : t("Se connecter")) : loading ? t("Création...") : t("Créer mon compte")}
           </BoutonAuth>
         </div>
       </form>

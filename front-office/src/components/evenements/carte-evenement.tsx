@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t, moisCourt, nombre } from "@/lib/i18n"
 import { useState, type CSSProperties } from "react"
 import Link from "next/link"
 import { Eye, MapPin } from "lucide-react"
@@ -55,7 +57,7 @@ function Couverture({ evenement, categorie }: { evenement: Evenement; categorie?
       <div className="font-titre absolute right-4 bottom-3 text-right leading-none text-white">
         <span className="block text-4xl font-semibold">{d.getDate()}</span>
         <span className="text-sm text-white/80">
-          {d.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")}
+          {moisCourt(d)}
         </span>
       </div>
     </div>
@@ -78,9 +80,7 @@ export function CarteEvenement({ evenement, lieu, categorie, variante = "a-venir
           </span>
         )}
         {passe && (
-          <span className="absolute top-3 right-3 rounded-full bg-gw-nuit/80 px-2.5 py-1 text-xs font-medium text-white">
-            Terminé
-          </span>
+          <span className="absolute top-3 right-3 rounded-full bg-gw-nuit/80 px-2.5 py-1 text-xs font-medium text-white">{t("Terminé")}</span>
         )}
       </div>
 
@@ -108,12 +108,11 @@ export function CarteEvenement({ evenement, lieu, categorie, variante = "a-venir
 
         {!passe && (
           <div className="mt-2 flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-gw-encre">{prix ?? "Tarifs bientôt annoncés"}</p>
+            <p className="text-sm font-semibold text-gw-encre">{prix ?? t("Tarifs bientôt annoncés")}</p>
             {!!evenement.nombre_vues && (
               <p className="flex items-center gap-1 text-xs text-gw-texte-doux">
                 <Eye className="h-3.5 w-3.5" aria-hidden />
-                {evenement.nombre_vues.toLocaleString("fr-FR")} vues
-              </p>
+                {nombre(evenement.nombre_vues)}{" "}{t("vues")}</p>
             )}
           </div>
         )}

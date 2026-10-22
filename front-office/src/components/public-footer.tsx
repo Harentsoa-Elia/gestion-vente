@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n"
 import Link from "next/link"
 import { Logo, NOM_PLATEFORME } from "@/components/marque/logo"
 
@@ -34,18 +35,16 @@ export function PublicFooter() {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div>
           <Logo ton="clair" />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">
-            Réservez vos billets en ligne et votez pour les artistes et les lieux des prochains événements.
-          </p>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">{t("Réservez vos billets en ligne et votez pour les artistes et les lieux des prochains événements.")}</p>
         </div>
         {COLONNES.map((c) => (
-          <nav key={c.titre} aria-label={c.titre}>
-            <p className="font-titre font-semibold">{c.titre}</p>
+          <nav key={c.titre} aria-label={t(c.titre)}>
+            <p className="font-titre font-semibold">{t(c.titre)}</p>
             <ul className="mt-3 space-y-2">
               {c.liens.map((l) => (
                 <li key={l.libelle}>
                   <Link href={l.href} className="text-sm text-white/65 hover:text-white hover:underline">
-                    {l.libelle}
+                    {t(l.libelle)}
                   </Link>
                 </li>
               ))}
@@ -55,8 +54,7 @@ export function PublicFooter() {
       </div>
       <div className="border-t border-white/10">
         <p className="mx-auto max-w-7xl px-4 py-5 text-xs text-white/50 sm:px-6">
-          (c) {new Date().getFullYear()} {NOM_PLATEFORME}. Tous droits réservés.
-        </p>
+          © {new Date().getFullYear()} {NOM_PLATEFORME}{t(". Tous droits réservés.")}</p>
       </div>
     </footer>
   )

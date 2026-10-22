@@ -7,6 +7,7 @@ import { RangeeCategories } from "./categories"
 import { EvenementsAVenir, EvenementsPasses } from "./sections-evenements"
 import { PropositionsEmpilees } from "./propositions-empilees"
 import { BandeauOrganisateur } from "./bandeau-organisateur"
+import { EnDirect } from "./en-direct"
 
 /**
  * Page d'accueil. Les données sont chargées une seule fois ici,
@@ -20,6 +21,7 @@ export function Accueil() {
     <>
       <Hero lieux={catalogue.lieux} categories={catalogue.categories} catalogue={catalogue} />
       <RangeeCategories categories={catalogue.categories} />
+      <EnDirect catalogue={catalogue} />
       <EvenementsAVenir catalogue={catalogue} />
       <PropositionsEmpilees propositions={propositions} chargement={catalogue.chargement || chargement} />
       <EvenementsPasses catalogue={catalogue} />

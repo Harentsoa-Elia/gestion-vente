@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
@@ -53,7 +55,7 @@ export function RangeeCategories({ categories }: { categories: Categorie[] }) {
           : undefined
 
   return (
-    <nav aria-label="Catégories" className="relative mx-auto max-w-7xl px-4 pt-12 sm:px-6">
+    <nav aria-label={t("Catégories")} className="relative mx-auto max-w-7xl px-4 pt-12 sm:px-6">
       <div
         ref={rangee}
         onScroll={mesurer}
@@ -95,7 +97,7 @@ function FlecheDefilement({ sens, visible, onClick }: { sens: 1 | -1; visible: b
       onClick={onClick}
       tabIndex={visible ? 0 : -1}
       aria-hidden={!visible}
-      aria-label={sens === 1 ? "Voir les catégories suivantes" : "Voir les catégories précédentes"}
+      aria-label={sens === 1 ? t("Voir les catégories suivantes") : t("Voir les catégories précédentes")}
       className={cn(
         // centrée sur les pastilles rondes (h-20, sous le pt-12 de la rangée)
         "absolute top-[4.5rem] flex h-10 w-10 items-center justify-center rounded-full border border-gw-bordure bg-gw-surface text-gw-encre shadow-[0_4px_14px_-4px_rgba(42,26,94,0.35)] transition-all hover:scale-105 hover:border-gw-violet hover:text-gw-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-violet",

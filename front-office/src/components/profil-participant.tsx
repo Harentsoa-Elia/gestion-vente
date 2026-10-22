@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { useEffect, useRef, useState, type FormEvent } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -47,7 +49,7 @@ export function ProfilParticipant() {
   useEffect(() => {
     fetchParticipantMe()
       .then(remplir)
-      .catch((e) => setErreur(e instanceof Error ? e.message : "Chargement impossible."))
+      .catch((e) => setErreur(e instanceof Error ? e.message : t("Chargement impossible.")))
   }, [])
 
   if (!profil) {
@@ -55,36 +57,35 @@ export function ProfilParticipant() {
       <MessageErreur>{erreur}</MessageErreur>
     ) : (
       <p className="flex items-center gap-2 text-gw-texte-doux">
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Chargement...
-      </p>
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden />{" "}{t("Chargement...")}</p>
     )
   }
 
   const changerPhoto = async (fichier: File | null) => {
-    if (fichier && fichier.size > 8 * 1024 * 1024) return toast.error("Image trop lourde : 8 Mo maximum.")
+    if (fichier && fichier.size > 8 * 1024 * 1024) return toast.error(t("Image trop lourde : 8 Mo maximum."))
     setEnvoiPhoto(true)
     try {
       const p = await envoyerPhotoProfil(fichier)
       setProfil(p)
-      toast.success(fichier ? "Photo de profil enregistrée." : "Photo retirée.")
+      toast.success(fichier ? t("Photo de profil enregistrée.") : t("Photo retirée."))
       window.dispatchEvent(new Event("focus")) // l'en-tête affiche la nouvelle photo
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "La photo n'a pas été enregistrée.")
+      toast.error(err instanceof Error ? err.message : t("La photo n'a pas été enregistrée."))
     } finally {
       setEnvoiPhoto(false)
       if (champPhoto.current) champPhoto.current.value = ""
     }
   }
 
-  const manquants = [!profil.telephone && "téléphone", !profil.genre && "genre", !profil.date_naissance && "date de naissance"].filter(Boolean)
+  const manquants = [!profil.telephone && t("téléphone"), !profil.genre && t("genre"), !profil.date_naissance && t("date de naissance")].filter(Boolean)
   const aujourdhui = new Date().toISOString().slice(0, 10)
 
   const enregistrer = async (e: FormEvent) => {
     e.preventDefault()
     setErreur("")
     const numero = normaliserTelephone(telephone)
-    if (numero && !/^03[2-8]\d{7}$/.test(numero)) return setErreur("Numéro invalide : 10 chiffres, ex. 034 12 345 67.")
-    if (!prenom.trim() || !nom.trim()) return setErreur("Le prénom et le nom sont obligatoires.")
+    if (numero && !/^03[2-8]\d{7}$/.test(numero)) return setErreur(t("Numéro invalide : 10 chiffres, ex. 034 12 345 67."))
+    if (!prenom.trim() || !nom.trim()) return setErreur(t("Le prénom et le nom sont obligatoires."))
     setEnvoi(true)
     try {
       const p = await updateParticipantMe({
@@ -95,11 +96,11 @@ export function ProfilParticipant() {
         date_naissance: naissance || null,
       })
       remplir(p)
-      toast.success("Profil enregistré.")
+      toast.success(t("Profil enregistré."))
       // l'en-tête relit la session au retour sur l'onglet : on le prévient tout de suite
       window.dispatchEvent(new Event("focus"))
     } catch (err) {
-      setErreur(err instanceof Error ? err.message : "Le profil n'a pas été enregistré.")
+      setErreur(err instanceof Error ? err.message : t("Le profil n'a pas été enregistré."))
     } finally {
       setEnvoi(false)
     }
@@ -110,8 +111,7 @@ export function ProfilParticipant() {
       {manquants.length > 0 && (
         <div className="flex gap-3 rounded-2xl bg-gw-rose-pale p-4 text-sm text-gw-rose-action-fonce ring-1 ring-gw-rose-pale">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          <p>
-            Complétez votre profil : il manque <strong>{manquants.join(", ")}</strong>.
+          <p>{t("Complétez votre profil : il manque")}{" "}<strong>{manquants.join(", ")}</strong>.
           </p>
         </div>
       )}
@@ -124,7 +124,7 @@ export function ProfilParticipant() {
             type="button"
             onClick={() => champPhoto.current?.click()}
             disabled={envoiPhoto}
-            aria-label={profil.avatar ? "Changer la photo de profil" : "Ajouter une photo de profil"}
+            aria-label={profil.avatar ? t("Changer la photo de profil") : t("Ajouter une photo de profil")}
             className="absolute -right-1 -bottom-1 grid h-9 w-9 place-items-center rounded-full bg-gw-nuit text-white ring-4 ring-white transition-transform hover:scale-105"
           >
             {envoiPhoto ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Camera className="h-4 w-4" aria-hidden />}
@@ -134,7 +134,7 @@ export function ProfilParticipant() {
           <p className="font-titre text-xl font-semibold text-gw-encre">
             {profil.prenom} {profil.nom}
           </p>
-          <p className="mt-0.5 text-sm text-gw-texte-doux">JPEG, PNG ou WebP, 8 Mo maximum. Elle sera recadrée en carré.</p>
+          <p className="mt-0.5 text-sm text-gw-texte-doux">{t("JPEG, PNG ou WebP, 8 Mo maximum. Elle sera recadrée en carré.")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
@@ -142,7 +142,7 @@ export function ProfilParticipant() {
               disabled={envoiPhoto}
               className="inline-flex items-center gap-1.5 rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-encre hover:bg-gw-lavande/50 disabled:opacity-50"
             >
-              <Camera className="h-4 w-4" aria-hidden /> {profil.avatar ? "Changer la photo" : "Ajouter une photo"}
+              <Camera className="h-4 w-4" aria-hidden /> {profil.avatar ? t("Changer la photo") : t("Ajouter une photo")}
             </button>
             {profil.avatar && (
               <button
@@ -151,8 +151,7 @@ export function ProfilParticipant() {
                 disabled={envoiPhoto}
                 className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-gw-rose-action hover:bg-gw-rose-pale disabled:opacity-50"
               >
-                <Trash2 className="h-4 w-4" aria-hidden /> Retirer
-              </button>
+                <Trash2 className="h-4 w-4" aria-hidden />{" "}{t("Retirer")}</button>
             )}
           </div>
         </div>
@@ -172,28 +171,26 @@ export function ProfilParticipant() {
       <form onSubmit={enregistrer} className="space-y-7 rounded-3xl bg-gw-surface p-6 ring-1 ring-gw-bordure sm:p-8">
         {/* e-mail : identifiant de connexion, non modifiable ici */}
         <div>
-          <p className="mb-1 text-xs font-semibold text-gw-texte-doux">Adresse e-mail</p>
+          <p className="mb-1 text-xs font-semibold text-gw-texte-doux">{t("Adresse e-mail")}</p>
           <p className="flex items-center gap-2 text-[15px] text-gw-encre">
             <Mail className="h-[18px] w-[18px] text-gw-texte-doux/70" aria-hidden />
             {profil.email}
           </p>
           {profil.email_verifie ? (
             <p className="mt-1 inline-flex items-center gap-1 pl-7 text-xs font-semibold text-gw-violet-fonce">
-              <BadgeCheck className="h-3.5 w-3.5" aria-hidden /> Adresse confirmée
-            </p>
+              <BadgeCheck className="h-3.5 w-3.5" aria-hidden />{" "}{t("Adresse confirmée")}</p>
           ) : (
             <Link href="/participants/verifier-email?redirect=/participants/profil" className="mt-1 inline-flex items-center gap-1 pl-7 text-xs font-semibold text-gw-rose-action-fonce hover:underline">
-              <MailWarning className="h-3.5 w-3.5" aria-hidden /> Confirmer mon adresse
-            </Link>
+              <MailWarning className="h-3.5 w-3.5" aria-hidden />{" "}{t("Confirmer mon adresse")}</Link>
           )}
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">
-          <ChampAuth libelle="Prénom" icone={User} value={prenom} onChange={(e) => setPrenom(e.target.value)} autoComplete="given-name" required />
-          <ChampAuth libelle="Nom" icone={User} value={nom} onChange={(e) => setNom(e.target.value)} autoComplete="family-name" required />
+          <ChampAuth libelle={t("Prénom")} icone={User} value={prenom} onChange={(e) => setPrenom(e.target.value)} autoComplete="given-name" required />
+          <ChampAuth libelle={t("Nom")} icone={User} value={nom} onChange={(e) => setNom(e.target.value)} autoComplete="family-name" required />
         </div>
         <ChampAuth
-          libelle="Téléphone"
+          libelle={t("Téléphone")}
           icone={Phone}
           type="tel"
           inputMode="tel"
@@ -203,7 +200,7 @@ export function ProfilParticipant() {
           autoComplete="tel-national"
         />
         <ChampAuth
-          libelle="Date de naissance"
+          libelle={t("Date de naissance")}
           icone={CalendarDays}
           type="date"
           value={naissance}
@@ -211,13 +208,13 @@ export function ProfilParticipant() {
           max={aujourdhui}
           autoComplete="bday"
         />
-        <ChoixSegmente libelle="Genre" options={GENRES} valeur={genre} onChange={(g) => setGenre(g)} />
+        <ChoixSegmente libelle={t("Genre")} options={GENRES} valeur={genre} onChange={(g) => setGenre(g)} />
 
         <MessageErreur>{erreur}</MessageErreur>
 
         <div className="flex justify-end border-t border-gw-bordure pt-6">
           <BoutonAuth type="submit" chargement={envoi}>
-            {envoi ? "Enregistrement..." : "Enregistrer"}
+            {envoi ? t("Enregistrement...") : t("Enregistrer")}
           </BoutonAuth>
         </div>
       </form>

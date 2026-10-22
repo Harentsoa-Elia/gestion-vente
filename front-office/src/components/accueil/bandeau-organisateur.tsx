@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n"
 import Link from "next/link"
 import type { CSSProperties } from "react"
 import { QrCode, Vote, TrendingUp } from "lucide-react"
@@ -17,22 +18,14 @@ export function BandeauOrganisateur() {
         style={{ "--accent": "var(--color-gw-violet)" } as CSSProperties}
       >
         <div className="max-w-md">
-          <h2 id="organiser-titre" className="font-titre text-3xl font-bold tracking-[-0.02em]">
-            Vous organisez un événement ?
-          </h2>
-          <p className="mt-3 text-white/80">
-            Publiez-le, recueillez l&apos;avis du public, puis vendez vos billets au même endroit.
-          </p>
+          <h2 id="organiser-titre" className="font-titre text-3xl font-bold tracking-[-0.02em]">{t("Vous organisez un événement ?")}</h2>
+          <p className="mt-3 text-white/80">{t("Publiez-le, recueillez l'avis du public, puis vendez vos billets au même endroit.")}</p>
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <Link
               href="/login"
               className="rounded-full bg-gw-surface px-5 py-2.5 text-sm font-semibold text-gw-encre transition-colors hover:bg-gw-fond"
-            >
-              Publier un événement
-            </Link>
-            <Link href="/login" className="text-sm font-semibold text-white/85 underline-offset-4 hover:underline">
-              Accéder à mon espace
-            </Link>
+            >{t("Publier un événement")}</Link>
+            <Link href="/login" className="text-sm font-semibold text-white/85 underline-offset-4 hover:underline">{t("Accéder à mon espace")}</Link>
           </div>
         </div>
 
@@ -42,8 +35,8 @@ export function BandeauOrganisateur() {
               <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/40">
                 <Icone className="h-5 w-5" aria-hidden />
               </span>
-              <p className="font-titre mt-3 font-semibold">{titre}</p>
-              <p className="mt-1 text-sm text-white/70">{texte}</p>
+              <p className="font-titre mt-3 font-semibold">{t(titre)}</p>
+              <p className="mt-1 text-sm text-white/70">{t(texte)}</p>
             </li>
           ))}
         </ul>

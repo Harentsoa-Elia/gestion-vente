@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { useMemo, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { CalendarX, Search } from "lucide-react"
@@ -70,8 +72,8 @@ export function CatalogueEvenements() {
   const filtresActifs = Boolean(q || lieu || categorie || (onglet === "a-venir" && periode !== "tout"))
 
   const onglets = [
-    { id: "a-venir" as const, libelle: "À venir", nombre: resultatsAVenir.length },
-    { id: "passes" as const, libelle: "Passés", nombre: resultatsPasses.length },
+    { id: "a-venir" as const, libelle: t("À venir"), nombre: resultatsAVenir.length },
+    { id: "passes" as const, libelle: t("Passés"), nombre: resultatsPasses.length },
   ]
 
   const selectClasse =
@@ -81,10 +83,8 @@ export function CatalogueEvenements() {
     <div className="min-h-screen bg-gw-surface">
       <div className="scene pt-12 pb-10 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <h1 className="font-titre text-4xl font-bold tracking-[-0.03em] sm:text-5xl">Événements</h1>
-          <p className="mt-3 max-w-lg text-white/80">
-            Concerts, cabarets, sport et soirées : réservez les prochaines dates ou retrouvez celles qui ont eu lieu.
-          </p>
+          <h1 className="font-titre text-4xl font-bold tracking-[-0.03em] sm:text-5xl">{t("Événements")}</h1>
+          <p className="mt-3 max-w-lg text-white/80">{t("Concerts, cabarets, sport et soirées : réservez les prochaines dates ou retrouvez celles qui ont eu lieu.")}</p>
 
           <form
             role="search"
@@ -100,18 +100,18 @@ export function CatalogueEvenements() {
                 type="search"
                 value={saisie}
                 onChange={(e) => setSaisie(e.target.value)}
-                placeholder="Artiste, titre, lieu..."
-                aria-label="Rechercher un événement"
+                placeholder={t("Artiste, titre, lieu...")}
+                aria-label={t("Rechercher un événement")}
                 className="h-11 w-full rounded-full bg-gw-surface pr-4 pl-11 text-sm text-gw-encre placeholder:text-gw-texte-pale focus:outline-2 focus:outline-gw-rose"
               />
             </div>
             <select
-              aria-label="Lieu"
+              aria-label={t("Lieu")}
               value={lieu}
               onChange={(e) => majUrl({ lieu: e.target.value || null })}
               className={selectClasse}
             >
-              <option value="">Tous les lieux</option>
+              <option value="">{t("Tous les lieux")}</option>
               {lieux.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.ville ? `${l.nom} (${l.ville})` : l.nom}
@@ -119,12 +119,12 @@ export function CatalogueEvenements() {
               ))}
             </select>
             <select
-              aria-label="Catégorie"
+              aria-label={t("Catégorie")}
               value={categorie}
               onChange={(e) => majUrl({ categorie: e.target.value || null })}
               className={selectClasse}
             >
-              <option value="">Toutes les catégories</option>
+              <option value="">{t("Toutes les catégories")}</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.nom}
@@ -134,16 +134,14 @@ export function CatalogueEvenements() {
             <button
               type="submit"
               className="h-11 rounded-full bg-gw-violet px-6 text-sm font-semibold text-white transition-colors hover:bg-gw-violet-fonce"
-            >
-              Rechercher
-            </button>
+            >{t("Rechercher")}</button>
           </form>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         {/* onglets, soulignés comme sur Eventbrite */}
-        <div role="tablist" aria-label="Période des événements" className="flex gap-6 border-b border-gw-bordure">
+        <div role="tablist" aria-label={t("Période des événements")} className="flex gap-6 border-b border-gw-bordure">
           {onglets.map((o) => (
             <button
               key={o.id}
@@ -183,10 +181,10 @@ export function CatalogueEvenements() {
               <CalendarX className="h-8 w-8 text-[#B5A8F5]" aria-hidden />
               <p className="font-titre text-lg font-semibold text-gw-encre">
                 {filtresActifs
-                  ? "Aucun événement ne correspond à ces critères"
+                  ? t("Aucun événement ne correspond à ces critères")
                   : onglet === "a-venir"
-                    ? "Aucun événement à venir pour le moment"
-                    : "Aucun événement passé"}
+                    ? t("Aucun événement à venir pour le moment")
+                    : t("Aucun événement passé")}
               </p>
               {filtresActifs && (
                 <button
@@ -196,9 +194,7 @@ export function CatalogueEvenements() {
                     majUrl({ q: null, lieu: null, categorie: null, periode: null })
                   }}
                   className="mt-2 rounded-full border border-gw-violet px-5 py-2.5 text-sm font-semibold text-gw-violet"
-                >
-                  Effacer les filtres
-                </button>
+                >{t("Effacer les filtres")}</button>
               )}
             </div>
           ) : (
@@ -217,9 +213,7 @@ export function CatalogueEvenements() {
                     type="button"
                     onClick={() => setNbAffiches((n) => n + PAR_PAGE)}
                     className="rounded-full border border-gw-nuit px-6 py-3 text-sm font-semibold text-gw-encre transition-colors hover:bg-gw-nuit hover:text-white"
-                  >
-                    Afficher plus d&apos;événements
-                  </button>
+                  >{t("Afficher plus d'événements")}</button>
                 </div>
               )}
             </>

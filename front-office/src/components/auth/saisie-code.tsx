@@ -1,5 +1,6 @@
 "use client"
 
+import { t } from "@/lib/i18n"
 import { useRef, type ClipboardEvent, type KeyboardEvent } from "react"
 import { cn } from "@/utils"
 
@@ -67,7 +68,7 @@ export function SaisieCode({
 
   return (
     <fieldset className="border-0 p-0">
-      <legend className="mb-2 w-full text-center text-xs font-semibold text-gw-texte-doux">{libelle}</legend>
+      <legend className="mb-2 w-full text-center text-xs font-semibold text-gw-texte-doux">{t(libelle)}</legend>
       <div className="flex justify-center gap-2 sm:gap-2.5">
         {chiffres.map((c, i) => (
           <input
@@ -79,7 +80,7 @@ export function SaisieCode({
             inputMode="numeric"
             autoComplete={i === 0 ? "one-time-code" : "off"}
             maxLength={i === 0 ? LONGUEUR : 1}
-            aria-label={`Chiffre ${i + 1} sur ${LONGUEUR}`}
+            aria-label={t("Chiffre {n} sur {total}", { n: i + 1, total: LONGUEUR })}
             aria-invalid={erreur || undefined}
             disabled={desactive}
             onChange={(e) => saisir(i, e.target.value)}

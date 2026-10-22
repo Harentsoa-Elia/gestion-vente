@@ -11,6 +11,7 @@ from app.controllers import (
     interaction_publique_controller,
     recommandation_controller,
     ia_controller,
+    public_controller,
     dashboard_controller,
     reservation_controller,
     participant_controller,
@@ -51,6 +52,7 @@ app.include_router(evenement_controller.router, prefix="/api/v1")
 app.include_router(proposition_controller.router, prefix="/api/v1")
 app.include_router(interaction_publique_controller.router, prefix="/api/v1")
 app.include_router(recommandation_controller.router, prefix="/api/v1")
+app.include_router(public_controller.router, prefix="/api/v1")
 app.include_router(ia_controller.router, prefix="/api/v1")
 app.include_router(dashboard_controller.router, prefix="/api/v1")
 app.include_router(billetterie_controller.router, prefix="/api/v1")

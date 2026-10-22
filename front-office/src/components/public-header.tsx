@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect, useRef, useState, type FormEvent } from "react"
@@ -19,6 +21,7 @@ import {
 import { useModeNuit } from "@/lib/mode-nuit"
 import { changerThemeAnime, centreDe } from "@/lib/transition-theme"
 import { InterrupteurTheme } from "@/components/interrupteur-theme"
+import { ChoixLangue } from "@/components/choix-langue"
 import { Logo } from "@/components/marque/logo"
 import {
   getParticipantToken,
@@ -191,8 +194,8 @@ export function PublicHeader() {
         type="search"
         value={recherche}
         onChange={(e) => setRecherche(e.target.value)}
-        placeholder="Rechercher un événement"
-        aria-label="Rechercher un événement"
+        placeholder={t("Rechercher un événement")}
+        aria-label={t("Rechercher un événement")}
         className="h-10 w-full rounded-full border border-gw-bordure bg-gw-fond pr-4 pl-10 text-sm text-gw-encre placeholder:text-gw-texte-pale focus:border-gw-violet focus:bg-gw-surface focus:outline-none"
       />
     </form>
@@ -212,13 +215,14 @@ export function PublicHeader() {
           <button
             type="button"
             onClick={() => setRechercheMobile((v) => !v)}
-            aria-label="Rechercher"
+            aria-label={t("Rechercher")}
             aria-expanded={rechercheMobile}
             className="flex h-10 w-10 items-center justify-center rounded-full text-gw-encre hover:bg-gw-fond md:hidden"
           >
             <Search className="h-5 w-5" />
           </button>
 
+          <ChoixLangue />
           <InterrupteurTheme nuit={nuit} onBasculer={(e) => changerThemeAnime(basculer, centreDe(e.currentTarget))} />
 
           <button
@@ -230,7 +234,7 @@ export function PublicHeader() {
             className="flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond focus-visible:outline-2 focus-visible:outline-gw-violet"
           >
             {menuOuvert ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
-            <span className="hidden sm:inline">Menu</span>
+            <span className="hidden sm:inline">{t("Menu")}</span>
           </button>
 
           {roleStaff && (
@@ -241,10 +245,10 @@ export function PublicHeader() {
                   ? "hidden h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond lg:flex"
                   : "flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond"
               }
-              title="Vous êtes déjà connecté : retour direct à votre espace"
+              title={t("Vous êtes déjà connecté : retour direct à votre espace")}
             >
               <LayoutDashboard className="h-4 w-4 text-gw-rose" aria-hidden />
-              <span className="hidden sm:inline">{roleStaff === "admin" ? "Administration" : "Mon espace"}</span>
+              <span className="hidden sm:inline">{roleStaff === "admin" ? t("Administration") : t("Mon espace")}</span>
             </Link>
           )}
 
@@ -256,17 +260,13 @@ export function PublicHeader() {
               <Link
                 href="/participants/login"
                 className="hidden h-10 items-center rounded-full px-3 text-sm font-semibold text-gw-encre hover:bg-gw-fond sm:flex"
-              >
-                Connexion
-              </Link>
+              >{t("Connexion")}</Link>
             ))}
 
           <Link
             href={lienPublier(roleStaff)}
             className="hidden h-10 items-center rounded-full bg-gw-rose-action px-5 text-sm font-semibold text-white transition-colors hover:bg-gw-rose-action-fonce focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gw-rose lg:flex"
-          >
-            Publier un événement
-          </Link>
+          >{t("Publier un événement")}</Link>
         </div>
       </div>
 
@@ -280,17 +280,17 @@ export function PublicHeader() {
           className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-gw-bordure bg-gw-surface shadow-[0_24px_48px_-24px_rgba(42,26,94,0.35)]"
         >
           <nav
-            aria-label="Menu principal"
+            aria-label={t("Menu principal")}
             className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 md:grid-cols-2 md:gap-12"
           >
             <div>
-              <p className="font-titre text-lg font-semibold text-gw-encre">Espace participant</p>
+              <p className="font-titre text-lg font-semibold text-gw-encre">{t("Espace participant")}</p>
               <ul className="mt-3 space-y-1">
                 {ESPACE_PARTICIPANT.map(({ href, libelle, icone: Icone }) => (
                   <li key={libelle}>
                     <Link href={href} onClick={() => setMenuOuvert(false)} className={lienMenu}>
                       <Icone className="h-4 w-4 text-gw-violet" aria-hidden />
-                      {libelle}
+                      {t(libelle)}
                     </Link>
                   </li>
                 ))}
@@ -301,9 +301,7 @@ export function PublicHeader() {
                     <Link
                       href="/participants/mes-reservations"
                       className="rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-encre"
-                    >
-                      Mes réservations
-                    </Link>
+                    >{t("Mes réservations")}</Link>
                     <button
                       type="button"
                       onClick={() => {
@@ -312,37 +310,31 @@ export function PublicHeader() {
                       }}
                       className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-gw-texte hover:bg-gw-fond"
                     >
-                      <LogOut className="h-4 w-4" aria-hidden />
-                      Déconnexion
-                    </button>
+                      <LogOut className="h-4 w-4" aria-hidden />{t("Déconnexion")}</button>
                   </>
                 ) : (
                   <>
                     <Link
                       href="/participants/login"
                       className="rounded-full bg-gw-fond px-4 py-2 text-sm font-semibold text-gw-encre"
-                    >
-                      Connexion
-                    </Link>
+                    >{t("Connexion")}</Link>
                     <Link
                       href="/participants/signup"
                       className="rounded-full border border-gw-violet px-4 py-2 text-sm font-semibold text-gw-violet"
-                    >
-                      Créer mon compte
-                    </Link>
+                    >{t("Créer mon compte")}</Link>
                   </>
                 )}
               </div>
             </div>
 
             <div className="md:border-l md:border-gw-bordure md:pl-12">
-              <p className="font-titre text-lg font-semibold text-gw-encre">Espace organisateur</p>
+              <p className="font-titre text-lg font-semibold text-gw-encre">{t("Espace organisateur")}</p>
               <ul className="mt-3 space-y-1">
                 {espaceOrganisateur(roleStaff).map(({ href, libelle, icone: Icone }) => (
                   <li key={libelle}>
                     <Link href={href} onClick={() => setMenuOuvert(false)} className={lienMenu}>
                       <Icone className="h-4 w-4 text-gw-rose" aria-hidden />
-                      {libelle}
+                      {t(libelle)}
                     </Link>
                   </li>
                 ))}

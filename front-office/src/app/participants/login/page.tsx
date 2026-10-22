@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t } from "@/lib/i18n"
 import { Suspense, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -33,7 +35,7 @@ function ParticipantLoginForm() {
       const jeton = await connexionParticipant(email, motDePasse)
       if (jeton) {
         saveParticipantToken(jeton)
-        toast.success("Connexion réussie. Bon retour parmi nous !")
+        toast.success(t("Connexion réussie. Bon retour parmi nous !"))
         router.push(redirectTo)
         return
       }
@@ -44,20 +46,20 @@ function ParticipantLoginForm() {
         const role = roleDepuisJeton(lireJetonStaff())
         toast.success(
           role === "admin"
-            ? "Compte administrateur : vous êtes connecté à l'administration."
-            : "Compte organisateur : vous êtes connecté à votre espace organisateur.",
+            ? t("Compte administrateur : vous êtes connecté à l'administration.")
+            : t("Compte organisateur : vous êtes connecté à votre espace organisateur."),
         )
         router.push(accueilSelonRole(role))
         return
       }
-      setErreur(MESSAGE_IDENTIFIANTS)
+      setErreur(t(MESSAGE_IDENTIFIANTS))
     } catch (err) {
       setErreur(
         err instanceof TypeError
-          ? "Le serveur ne répond pas. Réessayez dans un instant."
+          ? t("Le serveur ne répond pas. Réessayez dans un instant.")
           : err instanceof Error && err.message
             ? err.message
-            : MESSAGE_IDENTIFIANTS,
+            : t(MESSAGE_IDENTIFIANTS),
       )
     } finally {
       setLoading(false)
@@ -74,23 +76,23 @@ function ParticipantLoginForm() {
         { libelle: "Inscription", href: `/participants/signup${suite}` },
       ]}
       icone={User}
-      surtitre="Espace participant"
-      titre="Connexion"
-      sousTitre="Retrouvez vos billets et donnez votre avis sur les prochains événements."
+      surtitre={t("Espace participant")}
+      titre={t("Connexion")}
+      sousTitre={t("Retrouvez vos billets et donnez votre avis sur les prochains événements.")}
       pied={
         <>
-          <span>Pas encore de compte ?</span>
-          <LienPied href={`/participants/signup${suite}`}>Créer un compte</LienPied>
+          <span>{t("Pas encore de compte ?")}</span>
+          <LienPied href={`/participants/signup${suite}`}>{t("Créer un compte")}</LienPied>
           <span aria-hidden className="hidden text-gw-bordure sm:inline">
             |
           </span>
-          <LienPied href="/login">Espace organisateurs et administrateurs</LienPied>
+          <LienPied href="/login">{t("Espace organisateurs et administrateurs")}</LienPied>
         </>
       }
     >
       <form onSubmit={handleSubmit} className="mx-auto max-w-sm space-y-6">
         <ChampAuth
-          libelle="Adresse e-mail"
+          libelle={t("Adresse e-mail")}
           icone={Mail}
           type="email"
           value={email}
@@ -100,7 +102,7 @@ function ParticipantLoginForm() {
           required
         />
         <ChampAuth
-          libelle="Mot de passe"
+          libelle={t("Mot de passe")}
           icone={Lock}
           type="password"
           value={motDePasse}
@@ -113,16 +115,14 @@ function ParticipantLoginForm() {
           <Link
             href={`/participants/mot-de-passe-oublie?${new URLSearchParams({ ...(email ? { email } : {}), ...(searchParams.get("redirect") ? { redirect: redirectTo } : {}) })}`}
             className="text-xs font-semibold text-gw-violet hover:text-gw-rose-action hover:underline"
-          >
-            Mot de passe oublié ?
-          </Link>
+          >{t("Mot de passe oublié ?")}</Link>
         </p>
 
         <MessageErreur>{erreur}</MessageErreur>
 
         <div className="flex justify-center pt-1">
           <BoutonAuth type="submit" chargement={loading} className="w-full sm:w-auto sm:min-w-[200px]">
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading ? t("Connexion...") : t("Se connecter")}
           </BoutonAuth>
         </div>
       </form>

@@ -1,5 +1,7 @@
 "use client"
 
+
+import { t as tr } from "@/lib/i18n"
 import { useEffect, useState } from "react"
 import { MailCheck, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
@@ -50,7 +52,7 @@ export function VerificationEmail({
       if (!silencieux) toast.success(r.message)
       setAttente(DELAI_RENVOI)
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Le code n'a pas pu être envoyé."
+      const message = e instanceof Error ? e.message : tr("Le code n'a pas pu être envoyé.")
       // "Patientez 42 s..." : on reprend le compte à rebours du serveur
       const secondes = Number(message.match(/(\d+)\s*s\b/)?.[1])
       if (secondes) setAttente(secondes)
@@ -71,10 +73,10 @@ export function VerificationEmail({
     setErreur("")
     try {
       await confirmerEmail(valeur)
-      toast.success("Adresse e-mail confirmée. Vous pouvez réserver vos billets.")
+      toast.success(tr("Adresse e-mail confirmée. Vous pouvez réserver vos billets."))
       onConfirme()
     } catch (e) {
-      setErreur(e instanceof Error ? e.message : "Code incorrect.")
+      setErreur(e instanceof Error ? e.message : tr("Code incorrect."))
       setCode("")
     } finally {
       setVerification(false)
@@ -92,14 +94,12 @@ export function VerificationEmail({
       <p className="flex items-start gap-3 rounded-2xl bg-gw-fond px-4 py-3 text-sm text-gw-texte-doux">
         <MailCheck className="mt-0.5 h-5 w-5 shrink-0 text-gw-violet" aria-hidden />
         <span>
-          {envoyerAuDemarrage && envoi ? "Envoi d'un code" : "Nous avons envoyé un code à 6 chiffres"}
+          {envoyerAuDemarrage && envoi ? tr("Envoi d'un code") : tr("Nous avons envoyé un code à 6 chiffres")}
           {email ? (
             <>
-              {" "}à <strong className="font-semibold text-gw-encre">{email}</strong>
+              {" "}{tr("à")}{" "}<strong className="font-semibold text-gw-encre">{email}</strong>
             </>
-          ) : null}
-          . Pensez à regarder dans les indésirables (spams).
-        </span>
+          ) : null}{tr(". Pensez à regarder dans les indésirables (spams).")}</span>
       </p>
 
       <SaisieCode valeur={code} onChange={setCode} onComplet={verifier} desactive={verification} erreur={!!erreur} />
@@ -107,9 +107,7 @@ export function VerificationEmail({
       <MessageErreur>{erreur}</MessageErreur>
 
       <div className="flex flex-col items-center gap-3">
-        <BoutonAuth type="submit" chargement={verification} disabled={code.length !== 6} className="w-full sm:w-auto sm:min-w-[220px]">
-          Confirmer mon adresse
-        </BoutonAuth>
+        <BoutonAuth type="submit" chargement={verification} disabled={code.length !== 6} className="w-full sm:w-auto sm:min-w-[220px]">{tr("Confirmer mon adresse")}</BoutonAuth>
         <button
           type="button"
           onClick={() => renvoyer()}
@@ -117,7 +115,7 @@ export function VerificationEmail({
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-gw-violet hover:text-gw-rose-action disabled:cursor-not-allowed disabled:text-gw-texte-doux"
         >
           <RefreshCw className={envoi ? "h-4 w-4 animate-spin" : "h-4 w-4"} aria-hidden />
-          {attente > 0 ? `Renvoyer un code dans ${attente} s` : "Renvoyer un code"}
+          {attente > 0 ? tr("Renvoyer un code dans {n} s", { n: attente }) : tr("Renvoyer un code")}
         </button>
       </div>
     </form>
