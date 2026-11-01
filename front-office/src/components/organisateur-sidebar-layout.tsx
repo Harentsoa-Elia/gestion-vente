@@ -29,6 +29,7 @@ import { logout } from "@/services/auth.service"
 import { useConfirmationDeconnexion } from "@/components/confirmation-deconnexion"
 import { Logo } from "@/components/marque/logo"
 import { AvatarEquipe, ModaleProfilEquipe, libelleRole, useCompteEquipe, useOuvertureProfil } from "@/components/profil-equipe"
+import { NotificationBell } from "@/components/notification-bell"
 import type { AuthUser } from "@/types"
 import { cn } from "@/utils"
 
@@ -153,6 +154,15 @@ function BarreLaterale({
             </Link>
           )
         })}
+        {/* profil du compte connecté : dans la liste, comme les autres pages ; ouvre la fenêtre "Mon profil" */}
+        <button
+          type="button"
+          onClick={onProfil}
+          className="relative flex w-full items-center gap-3 rounded-l-full py-2.5 pr-5 pl-3 text-left text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-white"
+        >
+          <AvatarEquipe compte={compte} className="h-7 w-7 text-[11px] ring-2 ring-white/60" />
+          Mon profil
+        </button>
       </nav>
 
       <div className="space-y-3 px-5 pt-4 pb-6">
@@ -170,19 +180,6 @@ function BarreLaterale({
           <p className="mt-1 text-xs text-white/75">Voyez vos propositions telles que le public les découvre.</p>
         </Link>
         )}
-
-        {/* profil du compte connecté : photo, nom et rôle ; ouvre la fenêtre "Mon profil" */}
-        <button
-          type="button"
-          onClick={onProfil}
-          className="flex w-full items-center gap-3 rounded-2xl px-2 py-2 text-left transition-colors hover:bg-white/10"
-        >
-          <AvatarEquipe compte={compte} className="h-10 w-10 text-sm ring-2 ring-white/60" />
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold">{compte?.fullname ?? "Mon profil"}</span>
-            <span className="block text-xs text-white/70">{libelleRole(compte?.role ?? (espace === "admin" ? "admin" : "organisateur"))}</span>
-          </span>
-        </button>
 
         <button
           type="button"
@@ -340,6 +337,25 @@ export function OrganisateurSidebarLayout({ children, espace = "organisateur" }:
               <Menu className="h-5 w-5" aria-hidden />
               Menu
             </button>
+          </div>
+          {/* barre du haut, sur toutes les pages : compte connecté, puis notifications (organisateur) */}
+          <div className="flex items-center justify-end gap-2 px-4 pt-3 lg:px-8 lg:pt-5">
+            <button
+              type="button"
+              onClick={ouvrirProfil}
+              className="flex items-center gap-2.5 rounded-full py-1 pr-3 pl-1 transition-colors hover:bg-gw-violet-pale dark:hover:bg-white/10"
+            >
+              <AvatarEquipe compte={compte} className="h-8 w-8 text-xs" />
+              <span className="hidden text-left sm:block">
+                <span className="block max-w-[12rem] truncate text-sm leading-tight font-semibold">{compte?.fullname ?? "Mon profil"}</span>
+                <span className="block text-xs leading-tight text-gw-texte-doux dark:text-white/60">
+                  {libelleRole(compte?.role ?? (espace === "admin" ? "admin" : "organisateur"))}
+                </span>
+              </span>
+            </button>
+            {espace === "organisateur" && (
+              <NotificationBell boutonClassName="text-gw-encre hover:bg-gw-violet-pale dark:text-white dark:hover:bg-white/10" />
+            )}
           </div>
           {isValidElement(children)
             ? cloneElement(children as React.ReactElement<{ darkMode?: boolean }>, { darkMode })

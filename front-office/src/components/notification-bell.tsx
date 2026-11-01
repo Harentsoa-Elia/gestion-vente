@@ -83,18 +83,18 @@ export function NotificationBell({ boutonClassName = "text-white hover:bg-gw-vio
       </Button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-gw-surface text-gw-encre rounded-lg shadow-xl border z-50">
-          <div className="px-4 py-3 border-b font-semibold text-sm">Notifications</div>
+        <div className="absolute right-0 z-50 mt-2 max-h-96 w-80 overflow-y-auto rounded-2xl border border-gw-bordure bg-gw-surface text-gw-encre shadow-[0_18px_40px_-20px_rgba(42,26,94,0.45)] dark:border-gw-bordure-sombre dark:bg-gw-carte-sombre dark:text-white">
+          <div className="border-b border-gw-bordure px-4 py-3 text-sm font-semibold dark:border-gw-bordure-sombre">Notifications</div>
           {notifications.length === 0 ? (
-            <div className="px-4 py-6 text-center text-sm text-gw-texte-doux">
+            <div className="px-4 py-6 text-center text-sm text-gw-texte-doux dark:text-white/60">
               Aucune notification pour le moment.
             </div>
           ) : (
-            <ul className="divide-y">
+            <ul className="divide-y divide-gw-bordure dark:divide-gw-bordure-sombre">
               {notifications.map((n) => (
-                <li key={n.id} className="px-4 py-3 text-sm hover:bg-gw-fond">
-                  <p className={n.lu ? "text-gw-texte" : "text-gw-encre font-medium"}>{n.message}</p>
-                  <p className="text-xs text-gw-texte-pale mt-1">
+                <li key={n.id} className="px-4 py-3 text-sm hover:bg-gw-fond dark:hover:bg-white/5">
+                  <p className={n.lu ? "text-gw-texte dark:text-white/70" : "font-medium text-gw-encre dark:text-white"}>{n.message}</p>
+                  <p className="mt-1 text-xs text-gw-texte-pale dark:text-white/50">
                     {new Date(n.date_creation).toLocaleString("fr-FR")}
                   </p>
                 </li>
