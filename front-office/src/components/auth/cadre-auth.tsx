@@ -123,7 +123,7 @@ function PanneauVisuel({ onglets }: { onglets: OngletAuth[] }) {
       </div>
 
       <div className="relative z-10 mt-auto hidden px-8 pb-10 md:block md:pr-36">
-        <p className="font-titre text-3xl leading-tight font-bold">{t("Vos soirées commencent")}<br />{t("au")}{" "}<span className="font-script text-4xl font-normal text-gw-lavande">{t("guichet")}</span>.
+        <p className="font-titre text-3xl leading-tight font-bold">{t("Vos soirées commencent")}<br />{t("au")}{" "}<span className="font-script text-4xl font-normal text-[#D9D2FF]">{t("guichet")}</span>.
         </p>
         <p className="mt-3 max-w-[16rem] text-sm text-white/75">{t("Réservez vos billets, votez pour les prochains événements et suivez-les en un seul endroit.")}</p>
       </div>

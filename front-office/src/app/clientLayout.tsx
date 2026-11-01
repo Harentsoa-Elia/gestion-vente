@@ -21,6 +21,8 @@ const inter = Inter({ subsets: ["latin"] })
 export default function ClientLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname()
   const isPublic = isPublicRoute(pathname)
+  // la page de connexion de l'équipe n'a pas d'en-tête, mais suit le mode jour / nuit du site public
+  const themePublic = isPublic || pathname === "/login"
 
   return (
     <html lang="fr">
@@ -52,7 +54,7 @@ export default function ClientLayout({ children }: Readonly<{ children: React.Re
           {(langue) => (
             <ModeNuitProvider>
               {(nuit) => (
-                <div key={langue} className={isPublic ? `gw-public${nuit ? " dark" : ""}` : undefined}>
+                <div key={langue} className={themePublic ? `gw-public${nuit ? " dark" : ""}` : undefined}>
                   {isPublic && <PublicHeader />}
 
                   <main>{children}</main>
