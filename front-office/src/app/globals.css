@@ -289,3 +289,6 @@ body {
     overflow-x: auto;
   }
 }
+
+/* Mode nuit : le panneau des formulaires de connexion et d'inscription devient sombre, pour que les textes clairs restent lisibles */
+.gw-public.dark, .gw-public.dark * { --panneau: var(--color-gw-surface) !important; }
