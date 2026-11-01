@@ -52,6 +52,7 @@ import { ChoixFond } from "@/components/organisateur/fond-billet"
 import { definirFondTarif } from "@/services/horsLigneService"
 import { estRegionEntreprise, villeEtRegion } from "@/lib/regions"
 import { VignetteImage, ZoneImage } from "@/components/organisateur/zone-image"
+import { PilotageEvenement } from "@/components/organisateur/pilotage-evenement"
 
 /*
  * Fiche d'un événement de l'organisateur (cas d'utilisation "Gérer un événement") :
@@ -63,7 +64,7 @@ import { VignetteImage, ZoneImage } from "@/components/organisateur/zone-image"
  * Tant qu'aucune image n'est ajoutée, le site public affiche une image de test (lib/media.ts).
  */
 
-type Onglet = "propositions" | "billets" | "informations"
+type Onglet = "pilotage" | "propositions" | "billets" | "informations"
 
 const TYPES: {
   type: PropositionType
@@ -164,7 +165,7 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
         if (l.status === "fulfilled") setLieux(l.value)
         if (a.status === "fulfilled") setArtistes(a.value)
         if (c.status === "fulfilled") setCategories(c.value)
-        if (ev.statut_validation === "valide") setOnglet("billets")
+        if (ev.statut_validation === "valide") setOnglet("pilotage")
       })
       .finally(() => setChargement(false))
   }, [evenementId])
@@ -224,6 +225,8 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
   }
 
   const onglets: { id: Onglet; libelle: string; nombre?: number }[] = [
+    // tableau de bord des ventes : seulement une fois l'événement en vente
+    ...(statut === "valide" ? [{ id: "pilotage" as Onglet, libelle: "Tableau de bord" }] : []),
     { id: "propositions", libelle: "Propositions au public", nombre: propositions.length },
     { id: "billets", libelle: "Billets", nombre: billets.length },
     { id: "informations", libelle: "Informations" },
@@ -353,6 +356,7 @@ export function OrganisateurEvenementDetail({ evenementId }: { evenementId: numb
         ))}
       </div>
 
+      {onglet === "pilotage" && statut === "valide" && <PilotageEvenement evenement={evenement} />}
       {onglet === "propositions" && (
         <OngletPropositions
           evenementId={evenement.id}

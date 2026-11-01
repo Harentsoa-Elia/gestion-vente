@@ -44,3 +44,14 @@ export interface Statistiques {
     par_type: { type: "depot" | "guichet" | "invitation"; libelle: string; emis: number; vendus: number; entres: number }[]
   }
 }
+
+/** Tableau de bord d'un événement (onglet "Tableau de bord" de sa fiche). Voir backend/app/schemas/statistiques.py */
+export interface Pilotage {
+  evenement_id: number
+  tarifs: { id: number; nom: string; prix: number; quota: number | null; vendus: number; recettes: number; part: number }[]
+  /** recette si tout est vendu ; null quand un tarif est sans limite */
+  recette_potentielle: number | null
+  en_attente: { participant: string; tarif: string; billets: number; montant: number; expire_le: string }[]
+  montant_en_attente: number
+  meilleurs_acheteurs: { participant: string; billets: number; montant: number }[]
+}

@@ -75,3 +75,36 @@ class Statistiques(BaseModel):
     tranches_age: List[Repartition]
     evenements: List[StatEvenement]
     hors_ligne: StatHorsLigne
+
+
+class PilotageTarif(BaseModel):
+    id: int
+    nom: str
+    prix: float
+    quota: Optional[int] = None  # vide : sans limite
+    vendus: int  # en ligne + hors ligne
+    recettes: float
+    part: float  # % des recettes de l'événement
+
+
+class PilotageAttente(BaseModel):
+    participant: str  # prénom et initiale du nom
+    tarif: str
+    billets: int
+    montant: float
+    expire_le: datetime
+
+
+class PilotageAcheteur(BaseModel):
+    participant: str
+    billets: int
+    montant: float
+
+
+class Pilotage(BaseModel):
+    evenement_id: int
+    tarifs: List[PilotageTarif]
+    recette_potentielle: Optional[float] = None  # si tout est vendu (tous les tarifs ont un quota)
+    en_attente: List[PilotageAttente]
+    montant_en_attente: float
+    meilleurs_acheteurs: List[PilotageAcheteur]

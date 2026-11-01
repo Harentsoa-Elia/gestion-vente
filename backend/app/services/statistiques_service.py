@@ -330,3 +330,81 @@ class StatistiquesService:
             "_par_evenement": par_ev,
             "_par_tarif": par_tarif,
         }
+
+
+    async def pilotage(self, evenement: Evenement) -> Dict:
+        """Tableau de bord d'un événement : remplissage et recettes par tarif, paiements à finaliser,
+        meilleurs acheteurs. Les totaux (vendus, entrées, ventes par jour) viennent de calculer()."""
+        ids = [evenement.id]
+        tarifs = list(
+            (await self.db.execute(select(CategorieBillet).where(CategorieBillet.evenement_id == evenement.id).order_by(CategorieBillet.prix.desc())))
+            .scalars()
+            .all()
+        )
+        en_ligne = {
+            cid: (int(n or 0), float(m or 0))
+            for cid, n, m in (
+                await self.db.execute(
+                    select(Reservation.categorie_billet_id, func.count(Billet.id), func.sum(Paiement.montant))
+                    .join(Billet, Billet.reservation_id == Reservation.id)
+                    .outerjoin(Paiement, Paiement.reservation_id == Reservation.id)
+                    .where(Reservation.evenement_id == evenement.id)
+                    .group_by(Reservation.categorie_billet_id)
+                )
+            ).all()
+        }
+        hl_tarifs = (await self._hors_ligne(ids))["_par_tarif"]
+        lignes = []
+        for t in tarifs:
+            n, m = en_ligne.get(t.id, (0, 0.0))
+            n_hl, m_hl = hl_tarifs.get(t.nom, (0, 0.0))
+            lignes.append({"id": t.id, "nom": t.nom, "prix": float(t.prix), "quota": t.quantite_disponible,
+                           "vendus": int(n + n_hl), "recettes": float(m + m_hl)})
+        total = sum(x["recettes"] for x in lignes)
+        for x in lignes:
+            x["part"] = round(x["recettes"] / total * 100, 1) if total else 0.0
+        # recette si tout est vendu : connue seulement quand chaque tarif a un quota
+        potentielle = sum(t.prix * t.quantite_disponible for t in tarifs) if tarifs and all(t.quantite_disponible for t in tarifs) else None
+
+        # réservations encore gardées (moins de 15 minutes), regroupées par participant et par tarif
+        limite = datetime.now(timezone.utc) - DUREE_RESERVATION
+        attente = (
+            await self.db.execute(
+                select(Participant.prenom, Participant.nom, CategorieBillet.nom, CategorieBillet.prix,
+                       func.count(Reservation.id), func.min(Reservation.date_reservation))
+                .join(Participant, Participant.id == Reservation.participant_id)
+                .join(CategorieBillet, CategorieBillet.id == Reservation.categorie_billet_id)
+                .where(Reservation.evenement_id == evenement.id, Reservation.statut == "en_attente", Reservation.date_reservation >= limite)
+                .group_by(Participant.id, Participant.prenom, Participant.nom, CategorieBillet.nom, CategorieBillet.prix)
+                .order_by(func.min(Reservation.date_reservation))
+            )
+        ).all()
+        en_attente = [
+            {"participant": f"{p} {n[:1]}.".strip(), "tarif": tarif, "billets": int(k), "montant": float(prix) * int(k),
+             "expire_le": debut + DUREE_RESERVATION}
+            for p, n, tarif, prix, k, debut in attente
+        ]
+
+        # meilleurs acheteurs : billets payés pour cet événement
+        acheteurs = (
+            await self.db.execute(
+                select(Participant.prenom, Participant.nom, func.count(Billet.id), func.sum(Paiement.montant))
+                .join(Reservation, Reservation.participant_id == Participant.id)
+                .join(Billet, Billet.reservation_id == Reservation.id)
+                .outerjoin(Paiement, Paiement.reservation_id == Reservation.id)
+                .where(Reservation.evenement_id == evenement.id)
+                .group_by(Participant.id, Participant.prenom, Participant.nom)
+                .order_by(func.count(Billet.id).desc(), func.sum(Paiement.montant).desc(), Participant.prenom, Participant.id)
+                .limit(5)
+            )
+        ).all()
+        return {
+            "evenement_id": evenement.id,
+            "tarifs": lignes,
+            "recette_potentielle": float(potentielle) if potentielle is not None else None,
+            "en_attente": en_attente,
+            "montant_en_attente": sum(x["montant"] for x in en_attente),
+            "meilleurs_acheteurs": [
+                {"participant": f"{p} {n[:1]}.".strip(), "billets": int(k), "montant": float(m or 0)} for p, n, k, m in acheteurs
+            ],
+        }
