@@ -4,7 +4,8 @@ import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { ArrowRight, CalendarPlus, CalendarRange, Loader2, RefreshCw, ScanLine, ShieldCheck, Ticket, UserPlus, Users, Wallet, type LucideIcon } from "lucide-react"
+import { ArrowRight, CalendarPlus, CalendarRange, CheckCircle2, Loader2, RefreshCw, ScanLine, ShieldCheck, Ticket, UserCog, UserPlus, Users, type LucideIcon } from "lucide-react"
+import { Anneau } from "@/components/organisateur/anneau"
 import type { ActiviteAdmin, VueEnsemble as Donnees } from "@/types"
 import { cn } from "@/utils"
 import { fetchVueEnsemble } from "@/services/administrationService"
@@ -14,12 +15,11 @@ import { StyleGraphiques } from "@/lib/couleurs-graphiques"
  * Vue d'ensemble de l'administrateur (supervision) : chiffres de toute la plateforme,
  * événements à valider, ventes des 30 derniers jours, événements les plus vendus
  * et activité récente (ventes, inscriptions, événements créés, entrées scannées).
+ * Même style que l'espace organisateur : bandeau violet nuit, pastilles d'icônes, dégradé violet -> rose.
  */
 
 const entier = new Intl.NumberFormat("fr-FR")
 const ariary = (n: number) => `${entier.format(Math.round(n))} Ar`
-const compact = (n: number) =>
-  n >= 1_000_000 ? `${(n / 1_000_000).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} M Ar` : n >= 10_000 ? `${entier.format(Math.round(n / 1000))} k Ar` : ariary(n)
 const jourCourt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }).replace(".", "")
 const jourLong = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
 
@@ -40,24 +40,32 @@ const ACTIVITE: Record<ActiviteAdmin["type"], { icone: LucideIcon; fond: string 
 }
 
 const STATUTS = [
-  { cle: "valide", libelle: "Publiés" },
-  { cle: "en_attente_validation", libelle: "À valider" },
-  { cle: "brouillon", libelle: "Brouillons" },
-  { cle: "rejete", libelle: "Rejetés" },
+  { cle: "valide", libelle: "Publiés", point: "bg-gw-violet" },
+  { cle: "en_attente_validation", libelle: "À valider", point: "bg-gw-rose-action" },
+  { cle: "brouillon", libelle: "Brouillons", point: "bg-gw-lavande dark:bg-white/40" },
+  { cle: "rejete", libelle: "Rejetés", point: "bg-gw-rose-pale dark:bg-gw-rose/40" },
 ]
 
-function Tuile({ icone: Icone, libelle, valeur, detail, lien }: { icone: LucideIcon; libelle: string; valeur: string; detail?: string; lien?: string }) {
+function Tuile({ icone: Icone, libelle, valeur, detail, lien, rose = false }: { icone: LucideIcon; libelle: string; valeur: string; detail?: string; lien?: string; rose?: boolean }) {
   const contenu = (
     <>
       <p className="flex items-center gap-2 text-xs text-gw-texte-doux sm:text-sm dark:text-white/60">
-        <Icone className="h-4 w-4" aria-hidden /> {libelle}
+        <span
+          className={cn(
+            "grid h-8 w-8 shrink-0 place-items-center rounded-xl",
+            rose ? "bg-gw-rose-pale text-gw-rose-action dark:bg-gw-rose/15 dark:text-gw-rose" : "bg-gw-violet-pale text-gw-violet dark:bg-white/10 dark:text-gw-lavande",
+          )}
+        >
+          <Icone className="h-4 w-4" aria-hidden />
+        </span>
+        {libelle}
       </p>
-      <p className="font-titre mt-2 text-2xl font-bold whitespace-nowrap sm:text-3xl xl:text-[1.65rem]">{valeur}</p>
+      <p className="font-titre mt-3 text-2xl font-bold whitespace-nowrap tabular-nums sm:text-3xl xl:text-[1.65rem]">{valeur}</p>
       {detail && <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/55">{detail}</p>}
     </>
   )
   return lien ? (
-    <Link href={lien} className="gw-carte block p-4 transition-shadow hover:ring-2 hover:ring-gw-lavande sm:p-5 dark:hover:ring-white/15">
+    <Link href={lien} className="gw-carte block p-4 transition-transform hover:-translate-y-0.5 hover:ring-2 hover:ring-gw-lavande sm:p-5 dark:hover:ring-white/15">
       {contenu}
     </Link>
   ) : (
@@ -109,72 +117,126 @@ export function VueEnsemble() {
   const totalEvenements = Object.values(d.evenements).reduce((s, n) => s + n, 0)
   const ventes30 = d.ventes_30_jours.reduce((s, v) => s + v.billets, 0)
   const maxTop = Math.max(...d.top_evenements.map((e) => e.vendus), 0)
+  const tauxEntrees = d.billets_vendus ? Math.round((d.entrees / d.billets_vendus) * 100) : 0
 
   return (
     <div className="gw-stats space-y-6 px-4 py-6 lg:px-8 lg:py-8">
       <StyleGraphiques />
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-titre text-2xl font-semibold">Vue d&apos;ensemble</h1>
-          <p className="mt-1 max-w-2xl text-sm text-gw-texte-doux dark:text-white/65">Toute l&apos;activité de guichetweb : comptes, événements, ventes et entrées.</p>
+      {/* bandeau : toute la plateforme en un coup d'oeil, et ce qui attend l'administrateur */}
+      <section className="relative overflow-hidden rounded-3xl bg-gw-nuit p-6 text-white sm:p-8 dark:ring-1 dark:ring-white/10" aria-labelledby="vue-titre">
+        <span aria-hidden className="absolute -top-28 -right-24 h-72 w-72 rounded-full bg-gw-violet/40 blur-3xl" />
+        <span aria-hidden className="absolute -bottom-36 left-1/4 h-64 w-64 rounded-full bg-gw-rose-action/25 blur-3xl" />
+        <div className="relative flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-white/60 uppercase">Administration</p>
+            <h1 id="vue-titre" className="font-titre mt-1 text-3xl font-bold">Vue d&apos;ensemble</h1>
+            <p className="mt-1 max-w-xl text-sm text-white/70">Toute l&apos;activité de guichetweb : comptes, événements, ventes et entrées.</p>
+          </div>
+          <button
+            type="button"
+            onClick={charger}
+            className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/20"
+          >
+            <RefreshCw className={cn("h-3.5 w-3.5", chargement && "animate-spin")} aria-hidden /> Actualiser
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={charger}
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-gw-violet hover:bg-gw-surface dark:text-gw-lavande dark:hover:bg-white/10"
-        >
-          <RefreshCw className={cn("h-4 w-4", chargement && "animate-spin")} aria-hidden /> Actualiser
-        </button>
-      </div>
 
-      {aValider > 0 && (
-        <Link
-          href="/admin/evenements"
-          className="flex items-center gap-4 rounded-3xl bg-gw-nuit p-5 text-white transition-colors hover:bg-gw-violet-fonce sm:p-6 dark:bg-white/10 dark:hover:bg-white/15"
-        >
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gw-rose-action">
-            <ShieldCheck className="h-6 w-6" aria-hidden />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="font-titre block text-lg font-semibold">
-              {aValider} événement{aValider > 1 ? "s attendent" : " attend"} votre validation
-            </span>
-            <span className="text-sm text-white/75">Vérifiez les informations, puis publiez-les ou demandez une correction.</span>
-          </span>
-          <ArrowRight className="h-5 w-5 shrink-0" aria-hidden />
-        </Link>
-      )}
+        <div className="relative mt-7 grid gap-6 lg:grid-cols-[1.2fr_1fr_1.2fr] lg:items-center">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.14em] text-white/60 uppercase">Montant des ventes</p>
+            <p className="font-titre mt-1 text-4xl font-bold">{ariary(d.total_ventes)}</p>
+            <p className="mt-1 text-sm text-white/65">
+              {entier.format(d.billets_vendus)} billets vendus, dont {entier.format(ventes30)} ces 30 derniers jours
+            </p>
+          </div>
+          <div className="flex items-center gap-4 lg:border-l lg:border-white/15 lg:pl-6">
+            <div className="relative shrink-0">
+              <Anneau id="admin-entrees" pourcentage={tauxEntrees} taille={96} epaisseur={11} />
+              <span className="font-titre absolute inset-0 grid place-items-center text-xl font-bold">{tauxEntrees} %</span>
+            </div>
+            <div>
+              <p className="text-xs font-semibold tracking-[0.14em] text-white/60 uppercase">Entrées scannées</p>
+              <p className="mt-1 text-sm text-white/75">
+                {entier.format(d.entrees)} sur {entier.format(d.billets_vendus)} billets
+              </p>
+            </div>
+          </div>
+          {aValider > 0 ? (
+            <Link
+              href="/admin/evenements"
+              className="group flex items-center gap-4 rounded-2xl bg-white/10 p-4 transition-colors hover:bg-white/15"
+            >
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gw-rose-action">
+                <ShieldCheck className="h-6 w-6" aria-hidden />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="font-titre block font-semibold">
+                  {aValider} événement{aValider > 1 ? "s attendent" : " attend"} votre validation
+                </span>
+                <span className="text-xs text-white/70">Vérifiez, puis publiez ou demandez une correction.</span>
+              </span>
+              <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </Link>
+          ) : (
+            <div className="flex items-center gap-4 rounded-2xl bg-white/10 p-4">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gw-violet">
+                <CheckCircle2 className="h-6 w-6" aria-hidden />
+              </span>
+              <span>
+                <span className="font-titre block font-semibold">Tout est à jour</span>
+                <span className="text-xs text-white/70">Aucun événement n&apos;attend votre validation.</span>
+              </span>
+            </div>
+          )}
+        </div>
+      </section>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-6">
+      {/* comptes et événements : le travail de l'administrateur (les ventes sont dans le bandeau) */}
+      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         <Tuile icone={Users} libelle="Participants" valeur={entier.format(d.participants)} detail={`${entier.format(d.participants_verifies)} e-mails confirmés`} lien="/admin/utilisateurs?onglet=participants" />
         <Tuile
-          icone={Users}
+          rose
+          icone={UserCog}
           libelle="Équipe"
           valeur={entier.format(d.organisateurs)}
-          detail={d.organisateurs_suspendus ? `dont ${d.organisateurs_suspendus} suspendu${d.organisateurs_suspendus > 1 ? "s" : ""}` : "organisateurs et administrateurs"}
+          detail={
+            d.organisateurs_suspendus
+              ? `${entier.format(d.organisateurs - d.organisateurs_suspendus)} actifs, ${d.organisateurs_suspendus} suspendu${d.organisateurs_suspendus > 1 ? "s" : ""}`
+              : "tous les comptes sont actifs"
+          }
           lien="/admin/utilisateurs"
         />
         <Tuile icone={CalendarRange} libelle="Événements publiés" valeur={entier.format(d.evenements["valide"] ?? 0)} detail={`${entier.format(totalEvenements)} au total`} lien="/admin/evenements" />
-        <Tuile icone={Ticket} libelle="Billets vendus" valeur={entier.format(d.billets_vendus)} detail={`${entier.format(ventes30)} ces 30 derniers jours`} />
-        <Tuile icone={Wallet} libelle="Total des ventes" valeur={compact(d.total_ventes)} detail={ariary(d.total_ventes)} />
-        <Tuile icone={ScanLine} libelle="Entrées scannées" valeur={entier.format(d.entrees)} detail={d.billets_vendus ? `${Math.round((d.entrees / d.billets_vendus) * 100)} % des billets` : undefined} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <section className="gw-carte p-5 sm:p-6 lg:col-span-2" aria-label="Ventes des 30 derniers jours">
-          <h2 className="font-titre text-lg font-semibold">Ventes des 30 derniers jours</h2>
-          <p className="mt-0.5 mb-4 text-xs text-gw-texte-doux dark:text-white/55">Billets payés par jour, tous événements confondus</p>
+        <section className="gw-carte flex flex-col p-5 sm:p-6 lg:col-span-2" aria-label="Ventes des 30 derniers jours">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h2 className="font-titre text-lg font-semibold">Ventes des 30 derniers jours</h2>
+              <p className="mt-0.5 mb-4 text-xs text-gw-texte-doux dark:text-white/55">Billets payés par jour, tous événements confondus</p>
+            </div>
+            <span className="rounded-full bg-gw-fond px-3 py-1 text-xs font-semibold text-gw-violet dark:bg-white/10 dark:text-white">
+              {entier.format(ventes30)} billets
+            </span>
+          </div>
           {ventes30 === 0 ? (
             <p className="py-16 text-center text-sm text-gw-texte-doux dark:text-white/55">Aucune vente ces 30 derniers jours.</p>
           ) : (
-            <div className="h-60" role="img" aria-label={`${ventes30} billets vendus ces 30 derniers jours`}>
+            <div className="h-60 lg:h-auto lg:min-h-60 lg:flex-1" role="img" aria-label={`${ventes30} billets vendus ces 30 derniers jours`}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={d.ventes_30_jours} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
                   <CartesianGrid vertical={false} stroke="var(--stat-grille)" />
                   <XAxis dataKey="date" tickFormatter={jourCourt} tick={{ fill: "var(--stat-axe)", fontSize: 11 }} axisLine={{ stroke: "var(--stat-grille)" }} tickLine={false} minTickGap={20} />
                   <YAxis allowDecimals={false} tick={{ fill: "var(--stat-axe)", fontSize: 11 }} axisLine={false} tickLine={false} width={36} />
                   <Tooltip cursor={{ fill: "var(--stat-piste)", opacity: 0.6 }} content={<InfoBulle />} />
-                  <Bar dataKey="billets" fill="var(--stat-1)" radius={[4, 4, 0, 0]} maxBarSize={18} />
+                  <defs>
+                    <linearGradient id="admin-barres" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stopColor="#E8479A" />
+                      <stop offset="1" stopColor="#6C5CE7" />
+                    </linearGradient>
+                  </defs>
+                  <Bar dataKey="billets" fill="url(#admin-barres)" radius={[6, 6, 0, 0]} maxBarSize={18} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -186,7 +248,10 @@ export function VueEnsemble() {
           <ul className="mt-4 grid grid-cols-2 gap-3">
             {STATUTS.map((s) => (
               <li key={s.cle} className="rounded-2xl bg-gw-fond p-3 dark:bg-white/5">
-                <p className="text-xs text-gw-texte-doux dark:text-white/55">{s.libelle}</p>
+                <p className="flex items-center gap-1.5 text-xs text-gw-texte-doux dark:text-white/55">
+                  <span className={cn("h-2 w-2 rounded-full", s.point)} aria-hidden />
+                  {s.libelle}
+                </p>
                 <p className="font-titre text-2xl font-bold">{entier.format(d.evenements[s.cle] ?? 0)}</p>
               </li>
             ))}
@@ -198,17 +263,38 @@ export function VueEnsemble() {
             <ListeVoirPlus elements={d.top_evenements}>
               {(topPage) => (
             <ul className="mt-3 space-y-3">
-              {topPage.map((e) => (
-                <li key={e.id}>
-                  <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
-                    <Link href={`/evenements/${e.id}`} className="truncate hover:text-gw-violet dark:hover:text-gw-lavande">
-                      {e.titre}
-                    </Link>
-                    <span className="shrink-0 font-semibold tabular-nums">{entier.format(e.vendus)}</span>
-                  </div>
-                  <span className="block h-2 rounded-r-[4px]" style={{ width: `${maxTop ? Math.max((e.vendus / maxTop) * 100, 3) : 0}%`, backgroundColor: "var(--stat-1)" }} />
-                </li>
-              ))}
+              {topPage.map((e) => {
+                const premier = e.vendus === maxTop
+                return (
+                  <li key={e.id} className="flex items-center gap-3">
+                    <span
+                      className={cn(
+                        "grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs font-bold",
+                        premier ? "bg-[linear-gradient(135deg,#6C5CE7,#C92A7A)] text-white" : "bg-gw-violet-pale text-gw-violet dark:bg-white/10 dark:text-white",
+                      )}
+                    >
+                      {d.top_evenements.indexOf(e) + 1}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="mb-1 flex items-baseline justify-between gap-3 text-sm">
+                        <Link href={`/evenements/${e.id}`} className="truncate hover:text-gw-violet dark:hover:text-gw-lavande">
+                          {e.titre}
+                        </Link>
+                        <span className="shrink-0 font-semibold tabular-nums">{entier.format(e.vendus)}</span>
+                      </span>
+                      <span className="block h-2 rounded-full bg-gw-fond dark:bg-white/10">
+                        <span
+                          className="block h-full rounded-full"
+                          style={{
+                            width: `${maxTop ? Math.max((e.vendus / maxTop) * 100, 3) : 0}%`,
+                            background: premier ? "linear-gradient(90deg,#6C5CE7,#E8479A)" : "var(--stat-1)",
+                          }}
+                        />
+                      </span>
+                    </span>
+                  </li>
+                )
+              })}
             </ul>
               )}
             </ListeVoirPlus>
