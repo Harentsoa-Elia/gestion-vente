@@ -87,22 +87,40 @@ function InfoBulle({ active, payload }: { active?: boolean; payload?: { payload:
   )
 }
 
+const RAFRAICHISSEMENT_MS = 30_000
+
 export function VueEnsemble() {
   const [d, setD] = useState<Donnees | null>(null)
   const [erreur, setErreur] = useState<string | null>(null)
   const [chargement, setChargement] = useState(true)
+  const [majLe, setMajLe] = useState<Date | null>(null)
 
-  const charger = () => {
-    setChargement(true)
+  // discret = rafraîchissement automatique : pas d'icône qui tourne, une erreur passagère garde les chiffres affichés
+  const charger = (discret = false) => {
+    if (!discret) setChargement(true)
     fetchVueEnsemble()
       .then((x) => {
         setD(x)
         setErreur(null)
+        setMajLe(new Date())
       })
-      .catch((e) => setErreur(e instanceof Error ? e.message : "Impossible de charger la vue d'ensemble."))
-      .finally(() => setChargement(false))
+      .catch((e) => !discret && setErreur(e instanceof Error ? e.message : "Impossible de charger la vue d'ensemble."))
+      .finally(() => !discret && setChargement(false))
   }
-  useEffect(charger, [])
+
+  // mise à jour automatique toutes les 30 s, et dès que l'administrateur revient sur l'onglet
+  useEffect(() => {
+    charger()
+    const minuterie = setInterval(() => {
+      if (document.visibilityState === "visible") charger(true)
+    }, RAFRAICHISSEMENT_MS)
+    const auRetour = () => document.visibilityState === "visible" && charger(true)
+    document.addEventListener("visibilitychange", auRetour)
+    return () => {
+      clearInterval(minuterie)
+      document.removeEventListener("visibilitychange", auRetour)
+    }
+  }, [])
 
   if (!d && chargement) {
     return (
@@ -132,13 +150,21 @@ export function VueEnsemble() {
             <h1 id="vue-titre" className="font-titre mt-1 text-3xl font-bold">Vue d&apos;ensemble</h1>
             <p className="mt-1 max-w-xl text-sm text-white/70">Toute l&apos;activité de guichetweb : comptes, événements, ventes et entrées.</p>
           </div>
-          <button
-            type="button"
-            onClick={charger}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/20"
-          >
-            <RefreshCw className={cn("h-3.5 w-3.5", chargement && "animate-spin")} aria-hidden /> Actualiser
-          </button>
+          <div className="flex flex-col items-end gap-1.5">
+            <button
+              type="button"
+              onClick={() => charger()}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/20"
+            >
+              <RefreshCw className={cn("h-3.5 w-3.5", chargement && "animate-spin")} aria-hidden /> Actualiser
+            </button>
+            {majLe && (
+              <p className="flex items-center gap-1.5 text-[11px] text-white/60" aria-live="polite">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gw-rose" aria-hidden />
+                En direct, mis à jour à {majLe.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="relative mt-7 grid gap-6 lg:grid-cols-[1.2fr_1fr_1.2fr] lg:items-center">
