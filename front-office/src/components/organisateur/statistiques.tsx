@@ -4,12 +4,13 @@ import { ListeVoirPlus } from "@/components/organisateur/voir-plus"
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import Link from "next/link"
-import { BarChart3, Flame, Loader2, ScanLine, Ticket, TicketPlus, Users, Wallet } from "lucide-react"
+import { BarChart3, CalendarCheck, Flame, Loader2, ScanLine, Ticket, TicketPlus, TrendingUp, Users, Wallet } from "lucide-react"
 import type { Statistiques as Stats } from "@/types"
 import { cn } from "@/utils"
 import { fetchStatistiques } from "@/services/statistiquesService"
 import { classeChamp } from "@/components/organisateur/ui"
 import { StyleGraphiques } from "@/lib/couleurs-graphiques"
+import { Anneau } from "@/components/organisateur/anneau"
 
 /*
  * Statistiques de l'organisateur (cahier des charges, "Dashboard organisateur") :
@@ -20,7 +21,7 @@ import { StyleGraphiques } from "@/lib/couleurs-graphiques"
  *  - ventes par tarif, remplissage par événement, événements les plus populaires ;
  *  - billets hors ligne (dépôt-vente, guichet, invitations) : inclus dans les indicateurs,
  *    détaillés dans leur propre carte (vendus, encore chez le revendeur, non scannés, à encaisser).
- * Couleurs : variables --stat-* de lib/couleurs-graphiques.ts.
+ * Couleurs : variables --stat-* de lib/couleurs-graphiques.ts ; barres et anneau en dégradé violet -> rose.
  */
 
 
@@ -59,24 +60,29 @@ function Tuile({ icone: Icone, libelle, valeur, detail }: { icone: typeof Ticket
   return (
     <div className="gw-carte p-4 sm:p-5">
       <p className="flex items-center gap-2 text-xs text-gw-texte-doux sm:text-sm dark:text-white/60">
-        <Icone className="h-4 w-4" aria-hidden /> {libelle}
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gw-violet-pale text-gw-violet dark:bg-white/10 dark:text-gw-lavande">
+          <Icone className="h-4 w-4" aria-hidden />
+        </span>
+        {libelle}
       </p>
-      <p className="font-titre mt-2 text-2xl font-bold sm:text-3xl">{valeur}</p>
+      <p className="font-titre mt-3 text-2xl font-bold whitespace-nowrap tabular-nums sm:text-3xl xl:text-[1.65rem]">{valeur}</p>
       {detail && <p className="mt-1 text-xs text-gw-texte-doux dark:text-white/55">{detail}</p>}
     </div>
   )
 }
 
 /** Barre horizontale simple (valeur au bout), pour les listes courtes. */
-function LigneBarre({ libelle, valeur, max, texte, couleur = "var(--stat-1)" }: { libelle: string; valeur: number; max: number; texte: string; couleur?: string }) {
+const DEGRADE = "linear-gradient(90deg,#6C5CE7,#E8479A)"
+
+function LigneBarre({ libelle, valeur, max, texte, couleur = DEGRADE }: { libelle: string; valeur: number; max: number; texte: string; couleur?: string }) {
   const largeur = max ? Math.max((valeur / max) * 100, valeur ? 2 : 0) : 0
   return (
     <li className="grid grid-cols-[minmax(0,9rem)_1fr_auto] items-center gap-3 text-sm">
       <span className="truncate text-gw-texte dark:text-white/80" title={libelle}>
         {libelle}
       </span>
-      <span className="h-3 rounded-r-[4px] bg-transparent">
-        <span className="block h-full rounded-r-[4px]" style={{ width: `${largeur}%`, backgroundColor: couleur }} />
+      <span className="h-2.5 rounded-full bg-gw-fond dark:bg-white/10">
+        <span className="block h-full rounded-full" style={{ width: `${largeur}%`, background: couleur }} />
       </span>
       <span className="text-right font-semibold tabular-nums">{texte}</span>
     </li>
@@ -87,7 +93,7 @@ function LigneBarre({ libelle, valeur, max, texte, couleur = "var(--stat-1)" }: 
 function Jauge({ valeur }: { valeur: number }) {
   return (
     <span className="block h-2.5 overflow-hidden rounded-full" style={{ backgroundColor: "var(--stat-piste)" }}>
-      <span className="block h-full rounded-full" style={{ width: `${Math.min(valeur, 100)}%`, backgroundColor: "var(--stat-1)" }} />
+      <span className="block h-full rounded-full" style={{ width: `${Math.min(valeur, 100)}%`, background: DEGRADE }} />
     </span>
   )
 }
@@ -157,10 +163,17 @@ export function Statistiques() {
   const valables = i.entres + i.non_scannes
   const baseEntrees = i.entres + i.non_scannes + restantes
   const segments = [
-    { libelle: "Entrés (scannés)", nombre: i.entres, couleur: "var(--stat-1)" },
+    { libelle: "Entrés (scannés)", nombre: i.entres, couleur: "linear-gradient(90deg,#6C5CE7,#E8479A)" },
     { libelle: "Pas encore entrés", nombre: i.non_scannes, couleur: "var(--stat-clair)" },
     ...(i.places_restantes != null ? [{ libelle: "Places restantes", nombre: restantes, couleur: "var(--stat-piste)" }] : []),
   ]
+  // ventes par jour : total, meilleur jour et moyenne des jours avec ventes
+  const joursVente = stats.ventes_par_jour.filter((v) => v.billets > 0)
+  const totalPeriode = stats.ventes_par_jour.reduce((t, v) => t + v[mesure], 0)
+  const meilleurJour = joursVente.reduce<(typeof joursVente)[number] | null>((m, v) => (!m || v[mesure] > m[mesure] ? v : m), null)
+  const moyenne = joursVente.length ? totalPeriode / joursVente.length : 0
+  const formater = (n: number) => (mesure === "montant" ? compact(n) : entier.format(Math.round(n)))
+  const tauxEntres = pourcent(i.entres, valables)
 
   return (
     <div className={cn("gw-stats space-y-6 px-4 py-6 lg:px-8 lg:py-8", chargement && "opacity-70 transition-opacity")}>
@@ -298,6 +311,22 @@ export function Statistiques() {
                 <p className="py-16 text-center text-sm text-gw-texte-doux dark:text-white/55">Aucune vente pour l&apos;instant.</p>
               ) : (
                 <>
+                  <dl className="mb-5 grid grid-cols-3 gap-2 sm:gap-3">
+                    {[
+                      { icone: Ticket, l: "Sur la période", v: formater(totalPeriode), d: mesure === "billets" ? "billets vendus" : "de ventes" },
+                      { icone: TrendingUp, l: "Meilleur jour", v: meilleurJour ? formater(meilleurJour[mesure]) : "-", d: meilleurJour ? jourCourt(meilleurJour.date) : "" },
+                      { icone: CalendarCheck, l: "Moyenne", v: formater(moyenne), d: "par jour de vente" },
+                    ].map((x, k) => (
+                      <div key={x.l} className="rounded-2xl bg-gw-fond p-3 dark:bg-white/5">
+                        <dt className="flex items-center gap-1.5 text-[11px] text-gw-texte-doux sm:text-xs dark:text-white/55">
+                          <x.icone className={cn("h-3.5 w-3.5", k === 1 ? "text-gw-rose-action dark:text-gw-rose" : "text-gw-violet dark:text-gw-lavande")} aria-hidden />
+                          {x.l}
+                        </dt>
+                        <dd className="font-titre mt-1 text-lg font-bold tabular-nums sm:text-xl">{x.v}</dd>
+                        <dd className="text-[11px] text-gw-texte-doux dark:text-white/50">{x.d}</dd>
+                      </div>
+                    ))}
+                  </dl>
                   <div className="h-64" role="img" aria-label={`Ventes par jour, ${mesure === "billets" ? "en billets" : "en ariary"}`}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={stats.ventes_par_jour} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
@@ -318,8 +347,14 @@ export function Statistiques() {
                           tickLine={false}
                           width={48}
                         />
-                        <Tooltip cursor={{ fill: "var(--stat-piste)", opacity: 0.6 }} content={<InfoBulle mesure={mesure} />} />
-                        <Bar dataKey={mesure} fill="var(--stat-1)" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                        <defs>
+                          <linearGradient id="stats-barres" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stopColor="#E8479A" />
+                            <stop offset="1" stopColor="#6C5CE7" />
+                          </linearGradient>
+                        </defs>
+                        <Tooltip cursor={{ fill: "var(--stat-piste)", opacity: 0.6, radius: 6 }} content={<InfoBulle mesure={mesure} />} />
+                        <Bar dataKey={mesure} fill="url(#stats-barres)" radius={[6, 6, 0, 0]} maxBarSize={24} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -356,17 +391,32 @@ export function Statistiques() {
                 <p className="py-10 text-center text-sm text-gw-texte-doux dark:text-white/55">Aucun billet vendu pour l&apos;instant.</p>
               ) : (
                 <>
+                  <div className="mb-5 flex items-center gap-4">
+                    <div className="relative shrink-0">
+                      <Anneau id="stats-entrees" pourcentage={tauxEntres} taille={104} epaisseur={12} />
+                      <span className="absolute inset-0 grid place-items-center text-center">
+                        <span>
+                          <span className="font-titre block text-xl font-bold leading-none">{tauxEntres} %</span>
+                          <span className="text-[10px] text-gw-texte-doux dark:text-white/55">des vendus</span>
+                        </span>
+                      </span>
+                    </div>
+                    <p className="text-sm text-gw-texte-doux dark:text-white/65">
+                      <span className="font-titre block text-2xl font-bold text-gw-encre tabular-nums dark:text-white">{entier.format(i.entres)}</span>
+                      billets scannés sur {entier.format(valables)} vendus
+                    </p>
+                  </div>
                   <div className="flex h-4 w-full gap-[2px] overflow-hidden rounded-full" role="img" aria-label={segments.map((s) => `${s.libelle} : ${s.nombre}`).join(", ")}>
                     {segments
                       .filter((s) => s.nombre > 0)
                       .map((s) => (
-                        <span key={s.libelle} title={`${s.libelle} : ${entier.format(s.nombre)}`} style={{ flexGrow: s.nombre, backgroundColor: s.couleur }} />
+                        <span key={s.libelle} title={`${s.libelle} : ${entier.format(s.nombre)}`} style={{ flexGrow: s.nombre, background: s.couleur }} />
                       ))}
                   </div>
-                  <ul className="mt-5 space-y-3 text-sm">
+                  <ul className="mt-4 space-y-2 text-sm">
                     {segments.map((s) => (
-                      <li key={s.libelle} className="flex items-center gap-3">
-                        <span aria-hidden className="h-3 w-3 shrink-0 rounded-[3px]" style={{ backgroundColor: s.couleur }} />
+                      <li key={s.libelle} className="flex items-center gap-3 rounded-xl bg-gw-fond px-3 py-2.5 dark:bg-white/5">
+                        <span aria-hidden className="h-3 w-3 shrink-0 rounded-full" style={{ background: s.couleur }} />
                         <span className="flex-1 text-gw-texte dark:text-white/80">{s.libelle}</span>
                         <span className="font-semibold tabular-nums">{entier.format(s.nombre)}</span>
                         <span className="w-10 text-right text-xs text-gw-texte-doux tabular-nums dark:text-white/55">{pourcent(s.nombre, baseEntrees)} %</span>
