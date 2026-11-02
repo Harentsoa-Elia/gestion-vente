@@ -8,7 +8,7 @@ import { cn } from "@/utils"
 
 /*
  * Fond d'image des billets : choisi par tarif (organisateur) ou par type d'événement (administrateur).
- * Le PDF garde un voile blanc derrière le texte et un carré blanc derrière le QR code :
+ * Le PDF garde un voile blanc léger (55 %) derrière le texte et un carré blanc derrière le QR code :
  * n'importe quelle image convient, le billet reste lisible et scannable.
  */
 
@@ -95,11 +95,12 @@ export function ChoixFond({
   )
 }
 
-/** Aperçu d'un billet imprimé (format planche), avec ou sans fond : même disposition que le PDF. */
+/** Aperçu d'un billet imprimé (style "billet de concert"), avec ou sans fond : même disposition que le PDF. */
 export function ApercuBillet({
   fond,
   evenement,
-  date,
+  dateIso,
+  lieu,
   tarif,
   prix,
   porteur,
@@ -107,38 +108,58 @@ export function ApercuBillet({
 }: {
   fond: string | null | undefined
   evenement: string
-  date: string
+  dateIso: string
+  lieu?: string | null
   tarif: string
   prix: string
   porteur: string
   className?: string
 }) {
   const image = urlMedia(fond)
+  const d = new Date(dateIso)
+  const mois = d.toLocaleDateString("fr-FR", { month: "long" }).slice(0, 3).toUpperCase()
+  const heure = `${d.getFullYear()} - ${String(d.getHours()).padStart(2, "0")}h${String(d.getMinutes()).padStart(2, "0")}`
   return (
     <div
-      className={cn("relative aspect-[63/44] w-full overflow-hidden rounded-md border border-dashed border-gw-lavande bg-gw-surface text-gw-encre shadow-sm", className)}
+      className={cn("@container relative aspect-[63/44] w-full overflow-hidden rounded-md bg-[#2A1A5E] text-white shadow-sm", className)}
       style={image ? { backgroundImage: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
     >
-      <span className="absolute inset-y-0 left-0 w-[3.5%]">
-        <span className="block h-[65%] bg-gw-violet" />
-        <span className="block h-[35%] bg-gw-rose-action" />
+      {/* voile nuit sur l'image, ou halo violet sans image */}
+      {image ? (
+        <span aria-hidden className="absolute inset-0 bg-[#2A1A5E]/55" />
+      ) : (
+        <span aria-hidden className="absolute -top-[36%] left-[41%] aspect-square w-[48%] rounded-full bg-gw-violet/35" />
+      )}
+      <span aria-hidden className="absolute inset-x-0 top-0 flex h-[2.7%]">
+        <span className="w-[65%] bg-gw-violet" />
+        <span className="w-[35%] bg-gw-rose-action" />
       </span>
-      <div
-        className={cn(
-          "absolute top-[5%] bottom-[5%] left-[5%] right-[46%] flex flex-col rounded-[3px] px-[3%] py-[2.5%]",
-          image && "bg-gw-surface/85",
-        )}
-      >
-        <span className="text-[9px] font-bold text-gw-rose-action">guichetweb</span>
-        <span className="mt-0.5 line-clamp-2 text-[11px] leading-tight font-bold">{evenement}</span>
-        <span className="mt-1 truncate text-[8px] text-gw-texte-doux">{date}</span>
-        <span className="mt-auto truncate text-[10px] font-bold">{tarif}</span>
-        <span className="truncate text-[10px] font-bold text-gw-violet">{prix}</span>
-        <span className="truncate text-[8px] text-gw-texte-doux">{porteur}</span>
+
+      <div className="absolute top-[9.5%] bottom-[9.5%] left-[6.3%] right-[44%] flex flex-col">
+        <div className="flex items-start gap-[3cqw]">
+          <span className="flex aspect-[9/10] w-[14.3cqw] shrink-0 flex-col items-center justify-center rounded-[1.6cqw] bg-gw-rose-action">
+            <span className="text-[6.6cqw] leading-none font-bold">{d.getDate()}</span>
+            <span className="mt-[0.6cqw] text-[2.9cqw] leading-none font-bold">{mois}</span>
+          </span>
+          <span className="min-w-0 leading-tight">
+            <span className="block text-[3.3cqw] font-bold">
+              guichet<span className="text-[#D9D2FF]">web</span>
+            </span>
+            <span className="block truncate text-[3.1cqw] text-[#D9D2FF]">{heure}</span>
+            {lieu && <span className="block truncate text-[3.1cqw] text-[#D9D2FF]">{lieu}</span>}
+          </span>
+        </div>
+        <span className="mt-[3cqw] line-clamp-2 text-[4.6cqw] leading-tight font-bold">{evenement}</span>
+        <span className="mt-auto truncate text-[2.8cqw] font-bold tracking-[0.12em] text-[#D9D2FF] uppercase">{tarif}</span>
+        <span className="truncate text-[5.6cqw] leading-tight font-bold">{prix}</span>
+        <span className="truncate text-[2.9cqw] text-[#D9D2FF]">{porteur}</span>
       </div>
-      <div className="absolute top-[8%] right-[3.5%] flex w-[40%] flex-col items-center rounded-[3px] bg-gw-surface p-[2%]">
-        <QrCode className="aspect-square h-auto w-full text-gw-encre" strokeWidth={1.2} aria-hidden />
-        <span className="mt-0.5 font-mono text-[7px] font-bold">BHL-...</span>
+
+      {/* panneau QR code, blanc opaque */}
+      <div className="absolute top-[9.5%] bottom-[9.5%] right-[4.8%] flex w-[32.5%] flex-col items-center rounded-[2cqw] bg-white px-[2cqw] pt-[2.6cqw] text-[#2A1A5E]">
+        <QrCode className="aspect-square h-auto w-[86%]" strokeWidth={1.2} aria-hidden />
+        <span className="mt-[0.8cqw] text-[2.9cqw] font-bold">BHL-...</span>
+        <span className="mt-auto pb-[2cqw] text-[2.5cqw] text-gw-texte-doux">Une seule entrée</span>
       </div>
     </div>
   )

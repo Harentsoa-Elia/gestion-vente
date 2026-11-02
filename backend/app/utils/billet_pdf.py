@@ -44,6 +44,12 @@ class InfosBillet:
     fond: Optional[str] = None
 
 
+# opacité du voile blanc posé sur l'image derrière le texte : assez léger pour que le fond se voie,
+# assez couvrant pour que le texte reste lisible (le QR code, lui, reste toujours sur blanc opaque)
+VOILE_BILLET = 0.6
+VOILE_PLANCHE = 0.55
+
+
 @lru_cache(maxsize=32)
 def _fond_recadre(url: str, ratio: float) -> Optional[bytes]:
     """Image de fond recadrée au format du billet (comme "cover" en CSS), en JPEG ; None si illisible."""
@@ -120,7 +126,7 @@ def generer_pdf_billets(billets: List[InfosBillet]) -> bytes:
         avec_fond = _dessiner_fond(pdf, b.fond, 0, 0, l, h)
         pdf.set_fill_color(255, 255, 255)
         # sur une image, la carte devient un voile blanc : le fond reste visible, le texte lisible
-        with pdf.local_context(fill_opacity=0.84 if avec_fond else 1):
+        with pdf.local_context(fill_opacity=VOILE_BILLET if avec_fond else 1):
             pdf.rect(10, 10, l - 20, h - 20, style="F", round_corners=True, corner_radius=6)
         if avec_fond:
             # zone du QR code toujours blanche et opaque : il doit rester lisible par la caméra
@@ -253,14 +259,94 @@ def generer_planche_billets(billets: List[InfosBillet], pied: str = "") -> bytes
         x = marge_x + (k % PLANCHE_COLONNES) * (BILLET_L + ECART_X)
         y = marge_y + (k // PLANCHE_COLONNES) * (BILLET_H + ECART_Y)
 
-        # fond du billet : image recadrée, voile blanc sur le texte, QR code sur blanc opaque
-        qr = 25.0
-        qx, qy = x + BILLET_L - qr - 2.5, y + 4.5
+        # style "billet de concert" : fond nuit (ou image sous un voile nuit), pastille de date rose,
+        # textes blancs, QR code sur un panneau blanc opaque à droite (lisible par la caméra)
         if _dessiner_fond(pdf, b.fond, x, y, BILLET_L, BILLET_H):
-            pdf.set_fill_color(255, 255, 255)
-            with pdf.local_context(fill_opacity=0.82):
-                pdf.rect(x + 3.2, y + 2.2, qx - x - 4.4, BILLET_H - 4.4, style="F", round_corners=True, corner_radius=1.5)
-            pdf.rect(qx - 1.2, qy - 1.2, qr + 2.4, qr + 7.2, style="F", round_corners=True, corner_radius=1.5)
+            pdf.set_fill_color(*NUIT)
+            with pdf.local_context(fill_opacity=VOILE_PLANCHE):
+                pdf.rect(x, y, BILLET_L, BILLET_H, style="F")
+        else:
+            pdf.set_fill_color(*NUIT)
+            pdf.rect(x, y, BILLET_L, BILLET_H, style="F")
+            # halo violet discret en haut à droite
+            pdf.set_fill_color(*VIOLET)
+            with pdf.rect_clip(x, y, BILLET_L, BILLET_H), pdf.local_context(fill_opacity=0.35):
+                pdf.ellipse(x + 26, y - 16, 30, 30, style="F")
+        # liseré violet / rose en haut
+        pdf.set_fill_color(*VIOLET)
+        pdf.rect(x, y, BILLET_L * 0.65, 1.2, style="F")
+        pdf.set_fill_color(*ROSE)
+        pdf.rect(x + BILLET_L * 0.65, y, BILLET_L * 0.35, 1.2, style="F")
+
+        # panneau QR code
+        px, pw = x + BILLET_L - 23.5, 20.5
+        py, ph = y + 4.2, BILLET_H - 8.4
+        pdf.set_fill_color(255, 255, 255)
+        pdf.rect(px, py, pw, ph, style="F", round_corners=True, corner_radius=2)
+        qr = 17.0
+        pdf.image(BytesIO(qr_png(b.qr, taille_module=6)), x=px + (pw - qr) / 2, y=py + 1.8, w=qr, h=qr)
+        pdf.set_font("Helvetica", "B", 5.2)
+        pdf.set_text_color(*NUIT)
+        pdf.set_xy(px, py + qr + 2.2)
+        pdf.cell(pw, 2.8, _latin1(b.numero), align="C")
+        pdf.set_font("Helvetica", "B" if b.utilise else "", 4.6)
+        pdf.set_text_color(*(ROSE if b.utilise else DOUX))
+        pdf.set_xy(px, py + ph - 4.2)
+        pdf.cell(pw, 2.6, _latin1("déjà utilisé" if b.utilise else "Une seule entrée"), align="C")
+
+        # pastille de date : jour en grand, mois en dessous (heure de Madagascar)
+        quand = b.date_debut.astimezone(FUSEAU) if b.date_debut.tzinfo is not None else b.date_debut
+        tx, tl = x + 4, px - x - 7
+        pdf.set_fill_color(*ROSE)
+        pdf.rect(tx, y + 4.2, 9, 10, style="F", round_corners=True, corner_radius=1.8)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font("Helvetica", "B", 12)
+        pdf.set_xy(tx, y + 5)
+        pdf.cell(9, 5, str(quand.day), align="C")
+        pdf.set_font("Helvetica", "B", 5.2)
+        pdf.set_xy(tx, y + 10.2)
+        pdf.cell(9, 2.6, _latin1(MOIS[quand.month - 1][:3].upper()), align="C")
+        # à côté : marque, heure et lieu
+        ix, il = tx + 11, tl - 11
+        pdf.set_font("Helvetica", "B", 6)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_xy(ix, y + 4.4)
+        pdf.cell(il, 3, "guichet")
+        pdf.set_text_color(*LAVANDE)
+        pdf.set_xy(ix + pdf.get_string_width("guichet"), y + 4.4)
+        pdf.cell(10, 3, "web")
+        pdf.set_font("Helvetica", "", 5.6)
+        pdf.set_text_color(*LAVANDE)
+        heure = f"{quand.year}  -  {quand.hour:02d}h{quand.minute:02d}"
+        for n, texte in enumerate((heure, b.lieu or "Lieu à venir")):
+            pdf.set_xy(ix, y + 8 + n * 3)
+            pdf.cell(il, 3, _tronquer(pdf, texte, il))
+
+        # titre de l'événement (deux lignes au plus)
+        pdf.set_font("Helvetica", "B", 8.2)
+        pdf.set_text_color(255, 255, 255)
+        titre = pdf.multi_cell(tl, 3.6, _latin1(b.evenement), dry_run=True, output="LINES")
+        if len(titre) > 2:
+            titre = [titre[0], _tronquer(pdf, " ".join(titre[1:]), tl)]
+        for n, ligne in enumerate(titre):
+            pdf.set_xy(tx, y + 16.6 + n * 3.6)
+            pdf.cell(tl, 3.6, ligne)
+
+        # tarif, prix et porteur en bas
+        pdf.set_font("Helvetica", "B", 5)
+        pdf.set_text_color(*LAVANDE)
+        pdf.set_char_spacing(0.6)
+        pdf.set_xy(tx, y + BILLET_H - 13.4)
+        pdf.cell(tl, 2.6, _tronquer(pdf, b.categorie.upper(), tl - 4))
+        pdf.set_char_spacing(0)
+        pdf.set_font("Helvetica", "B", 10)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_xy(tx, y + BILLET_H - 10.6)
+        pdf.cell(tl, 4.4, _tronquer(pdf, prix_ariary(b.prix) if b.prix > 0 else "Offert", tl))
+        pdf.set_font("Helvetica", "", 5.2)
+        pdf.set_text_color(*LAVANDE)
+        pdf.set_xy(tx, y + BILLET_H - 5.6)
+        pdf.cell(tl, 2.8, _tronquer(pdf, b.participant, tl))
 
         # contour de découpe
         pdf.set_draw_color(*LAVANDE)
@@ -268,54 +354,5 @@ def generer_planche_billets(billets: List[InfosBillet], pied: str = "") -> bytes
         pdf.set_dash_pattern(dash=1.2, gap=1)
         pdf.rect(x, y, BILLET_L, BILLET_H)
         pdf.set_dash_pattern()
-        # bandeau gauche violet / rose
-        pdf.set_fill_color(*VIOLET)
-        pdf.rect(x, y, 2.2, BILLET_H * 0.65, style="F")
-        pdf.set_fill_color(*ROSE)
-        pdf.rect(x, y + BILLET_H * 0.65, 2.2, BILLET_H * 0.35, style="F")
-
-        # QR code à droite
-        pdf.image(BytesIO(qr_png(b.qr, taille_module=6)), x=qx, y=qy, w=qr, h=qr)
-        pdf.set_font("Helvetica", "B", 6.3)
-        pdf.set_text_color(*NUIT)
-        pdf.set_xy(qx - 2, qy + qr + 0.5)
-        pdf.cell(qr + 4, 3, _latin1(b.numero), align="C")
-        if b.utilise:
-            pdf.set_text_color(*ROSE)
-            pdf.set_xy(qx - 2, qy + qr + 3.6)
-            pdf.cell(qr + 4, 3, _latin1("déjà utilisé"), align="C")
-
-        # textes à gauche
-        tx, tl = x + 4.5, BILLET_L - qr - 9.5
-        pdf.set_font("Helvetica", "B", 6.5)
-        pdf.set_text_color(*ROSE)
-        pdf.set_xy(tx, y + 3.5)
-        pdf.cell(tl, 3, "guichetweb")
-        pdf.set_font("Helvetica", "B", 8.2)
-        pdf.set_text_color(*NUIT)
-        titre = pdf.multi_cell(tl, 3.6, _latin1(b.evenement), dry_run=True, output="LINES")
-        if len(titre) > 2:  # deux lignes au plus
-            titre = [titre[0], _tronquer(pdf, " ".join(titre[1:]), tl)]
-        for n, ligne in enumerate(titre):
-            pdf.set_xy(tx, y + 7.5 + n * 3.6)
-            pdf.cell(tl, 3.6, ligne)
-        yy = y + 8.5 + len(titre) * 3.6
-        lignes = [
-            (6.2, "", DOUX, date_courte(b.date_debut)),
-            (6.2, "", DOUX, b.lieu or "Lieu communiqué par l'organisateur"),
-            (7.4, "B", NUIT, f"{b.categorie}"),
-            (7.4, "B", VIOLET, prix_ariary(b.prix) if b.prix > 0 else "Invitation"),
-            (5.8, "", DOUX, b.participant),
-        ]
-        for taille, style, couleur, texte in lignes:
-            pdf.set_font("Helvetica", style, taille)
-            pdf.set_text_color(*couleur)
-            pdf.set_xy(tx, yy)
-            pdf.cell(tl, 3.2, _tronquer(pdf, texte, tl))
-            yy += 3.6 if taille > 7 else 3.3
-        pdf.set_font("Helvetica", "", 5)
-        pdf.set_text_color(*DOUX)
-        pdf.set_xy(tx, y + BILLET_H - 4.2)
-        pdf.cell(BILLET_L - 7, 3, _latin1("Valable pour une seule entrée."))
 
     return bytes(pdf.output())

@@ -310,9 +310,9 @@ export function Impression() {
                   className="mt-3"
                   fond={lot.fond_url}
                   evenement={lot.evenement_titre}
-                  date={new Date(lot.evenement_date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                  dateIso={lot.evenement_date}
                   tarif={lot.categorie_nom}
-                  prix={lot.type === "invitation" ? "Invitation" : ariary(lot.prix_unitaire)}
+                  prix={lot.type === "invitation" ? "Offert" : ariary(lot.prix_unitaire)}
                   porteur={porteur}
                 />
                 <p className="mt-3 text-xs text-gw-texte-doux dark:text-white/60">
