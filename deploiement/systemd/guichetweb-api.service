@@ -1,0 +1,19 @@
+# Service systemd de l'API FastAPI.
+# Copier dans /etc/systemd/system/ puis :  sudo systemctl daemon-reload && sudo systemctl enable --now guichetweb-api
+[Unit]
+Description=guichetweb - API FastAPI (Uvicorn)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=guichetweb
+Group=guichetweb
+WorkingDirectory=/opt/guichetweb/backend
+# L'API n'écoute que sur la machine elle-même (127.0.0.1) : seul Nginx y accède.
+# Un seul processus : la liste des jetons révoqués à la déconnexion est gardée en mémoire.
+ExecStart=/opt/guichetweb/backend/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8888 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

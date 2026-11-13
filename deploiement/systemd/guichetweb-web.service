@@ -1,0 +1,19 @@
+# Service systemd du site Next.js (version "standalone" produite par npm run build).
+# Copier dans /etc/systemd/system/ puis :  sudo systemctl daemon-reload && sudo systemctl enable --now guichetweb-web
+[Unit]
+Description=guichetweb - site Next.js
+After=network.target guichetweb-api.service
+
+[Service]
+User=guichetweb
+Group=guichetweb
+WorkingDirectory=/opt/guichetweb/front-office/.next/standalone
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=4000
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
