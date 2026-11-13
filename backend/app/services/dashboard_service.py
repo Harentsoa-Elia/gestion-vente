@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import func
 from typing import List, Dict, Optional
+from datetime import datetime, timezone
 
 from app.models.evenement import Evenement
 from app.models.proposition import Proposition
@@ -52,18 +53,27 @@ class DashboardService:
         return max(0, sum(poids(t, s, c) for t, s, c in interactions_result.all()))
 
     async def get_evenements_populaires(self, organisateur_id: int, limit: int = 5) -> List[Dict]:
+        # seuls les événements validés sont publiés : un événement en attente ou rejeté ne peut pas être classé
         result = await self.db.execute(
-            select(Evenement).filter(Evenement.organisateur_id == organisateur_id)
+            select(Evenement).filter(
+                Evenement.organisateur_id == organisateur_id,
+                Evenement.statut_validation == "valide",
+            )
         )
         evenements = result.scalars().all()
+        maintenant = datetime.now(timezone.utc)
 
         resultats = []
         for evenement in evenements:
             score = await self.get_score_total_evenement(evenement.id)
+            if score <= 0:
+                continue  # aucune réaction du public : rien à classer
+            fin = evenement.date_fin or evenement.date_debut
             resultats.append({
                 "id": evenement.id,
                 "titre": evenement.titre,
                 "score_popularite": score,
+                "passe": fin < maintenant,
             })
 
         resultats.sort(key=lambda x: x["score_popularite"], reverse=True)

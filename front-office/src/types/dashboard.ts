@@ -3,6 +3,7 @@ export interface EvenementPopulaire {
   id: number
   titre: string
   score_popularite: number
+  passe?: boolean
 }
 
 export interface VenteParJour {

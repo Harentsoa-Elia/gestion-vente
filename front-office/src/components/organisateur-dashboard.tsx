@@ -315,6 +315,11 @@ export function OrganisateurDashboard({ darkMode = false }: OrganisateurDashboar
                         <span className="line-clamp-2 text-sm leading-snug font-semibold">{e.titre}</span>
                         <span className="mt-0.5 block text-xs text-gw-texte-doux dark:text-white/60">
                           {entier.format(e.score_popularite)} pts de popularité
+                          {e.passe && (
+                            <span className="ml-2 rounded-full bg-gw-texte-doux/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase dark:bg-white/10">
+                              Passé
+                            </span>
+                          )}
                         </span>
                       </span>
                       <ChevronRight className="h-4 w-4 text-gw-texte-doux transition-transform group-hover:translate-x-0.5 dark:text-white/50" aria-hidden />

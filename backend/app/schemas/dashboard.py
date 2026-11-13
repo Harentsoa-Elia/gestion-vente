@@ -7,6 +7,7 @@ class EvenementPopulaireResponse(BaseModel):
     id: int
     titre: str
     score_popularite: int
+    passe: bool = False
 
 
 class VenteParJourItem(BaseModel):
